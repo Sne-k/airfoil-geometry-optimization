@@ -1,0 +1,9 @@
+# Script outputs (regenerate with the MATLAB scripts)
+MATLAB/output/
+
+# MATLAB temporary files
+*.asv
+*.autosave
+*.mex*
+slprj/
+codegen/
