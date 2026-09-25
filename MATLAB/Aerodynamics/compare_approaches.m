@@ -82,7 +82,7 @@ title('Lift-to-drag ratio, XFOIL Re = 10^6');
 exportgraphics(f2, fullfile(outDir, 'ld_polars.png'), 'Resolution', 150);
 
 function row = nacaCase(name, v, x)
-[xu, yu, xl, yl] = naca4(v(1), v(2), v(3), x);
+[xu, yu, xl, yl] = naca4(v(1), v(2), v(3), x, true);
 row = {name, xu, yu, xl, yl};
 end
 

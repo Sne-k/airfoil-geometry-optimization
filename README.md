@@ -7,7 +7,7 @@ for **XFLR5**.
 
 The project report used a geometric objective (camber/thickness) and analysed the result in XFLR5
 afterwards. This repository also runs **XFOIL inside the optimisation loop**, so the optimiser
-maximises lift-to-drag directly. The resulting airfoil has a **79 % higher peak lift-to-drag ratio than
+maximises lift-to-drag directly. The resulting airfoil has a **74 % higher peak lift-to-drag ratio than
 NACA 2412 at the same 12 % thickness**. The same approach is packaged as `optimize_airfoil`, which
 takes any airfoil.
 
@@ -19,10 +19,10 @@ All airfoils analysed with XFOIL under the same conditions: Re = 10⁶, M = 0, N
 
 | Airfoil | t/c | Peak CL/CD (α) | Peak CL^1.5/CD | CL,max (α) | CM at α = 0° |
 |---|---:|---:|---:|---:|---:|
-| NACA 2412 (baseline) | 12.0 % | 102.0 (4.5°) | 95.4 | 1.46 (15.5°) | −0.043 |
-| Report airfoil: camber/thickness objective, ≈ NACA 5508 | 8.0 % | 176.1 (2.0°) | 169.3 | 1.55 (13.5°) | −0.150 |
-| **PARSEC, XFOIL in the loop, t ≥ 12 %** | 12.3 % | **182.5 (4.0°)**, +79 % | **187.0**, +96 % | 1.55 (16.5°) | −0.124 |
-| CST, `optimize_airfoil` (limits CM) | 12.0 % | 140.5 (5.5°), +38 % | 147.9, +55 % | 1.49 (17.5°) | −0.065 |
+| NACA 2412 (baseline) | 12.0 % | 104.6 (4.5°) | 95.7 | 1.43 (16.0°) | −0.048 |
+| Report airfoil: camber/thickness objective, ≈ NACA 5508 | 8.0 % | 178.9 (2.5°) | 170.6 | 1.52 (13.5°) | −0.156 |
+| **PARSEC, XFOIL in the loop, t ≥ 12 %** | 12.3 % | **182.5 (4.5°)**, +74 % | **190.5**, +99 % | 1.55 (16.5°) | −0.124 |
+| CST, `optimize_airfoil` (limits CM) | 12.0 % | 141.0 (5.5°), +35 % | 148.1, +55 % | 1.49 (17.5°) | −0.065 |
 
 ![Baseline and optimised shapes](results/xfoil/designs.png)
 
@@ -31,14 +31,14 @@ All airfoils analysed with XFOIL under the same conditions: Re = 10⁶, M = 0, N
 - **Most efficient: the PARSEC design.** It has the highest peak L/D and endurance factor and the
   same thickness as NACA 2412, and stalls later with more lift. The optimiser moved the maximum
   thickness from 30 % to 44 % chord and raised the camber from 2 % to 4.6 %, with its peak at 52 %
-  chord. The price is a nose-down pitching moment three times that of NACA 2412 and a narrow
+  chord. The price is a nose-down pitching moment about 2.6 times that of NACA 2412 and a narrow
   high-efficiency range: at CL = 0.5 it is worse than the baseline (table below).
 - **The report airfoil comes close on peak L/D, but only because it is thinner.** At 8 % thickness it has
   a third less structural depth, the largest pitching moment and the earliest stall. The camber/thickness
   objective pushes every run to the thinnest, most cambered corner of the bounds, so this result comes
   from the chosen bounds, not from aerodynamics.
 - **Most balanced: the CST design.** It is more efficient than NACA 2412 over most of the lift range
-  (CL ≈ 0.45 to 1.3) and the best of the four at CL = 0.5 and 1.2. Its pitching moment grew by only
+  (CL ≈ 0.5 to 1.35) and the best of the four at CL = 0.5 and 1.2. Its pitching moment grew by only
   0.02 because `optimize_airfoil` constrains it.
 
 Efficiency at equal lift, which is what a wing flying at a given weight and speed sees
@@ -46,10 +46,10 @@ Efficiency at equal lift, which is what a wing flying at a given weight and spee
 
 | CL/CD at | CL = 0.5 | CL = 0.8 | CL = 1.0 | CL = 1.2 |
 |---|---:|---:|---:|---:|
-| NACA 2412 | 83.0 | 101.2 | 91.9 | 78.9 |
-| Report airfoil | 84.2 | 157.1 | 164.2 | 90.0 |
-| PARSEC, t ≥ 12 % | 63.1 | 123.8 | **172.4** | 80.3 |
-| CST, `optimize_airfoil` | **88.5** | 126.7 | 139.9 | **124.6** |
+| NACA 2412 | 83.0 | 104.5 | 90.4 | 78.5 |
+| Report airfoil | 84.6 | **168.7** | 165.1 | 89.8 |
+| PARSEC, t ≥ 12 % | 63.1 | 124.5 | **168.9** | 80.5 |
+| CST, `optimize_airfoil` | **85.2** | 126.7 | 139.8 | **125.3** |
 
 Every approach tried during the project, ranked the same way:
 [approach comparison](results/xfoil/approach_comparison.png),
@@ -69,6 +69,16 @@ almost any airfoil. A GA and then fmincon change the shape to maximise the XFOIL
 may not get thinner than the original, and its pitching moment may not grow by more than a set
 amount. The result is written as an XFLR5-compatible `.dat` file together with both polars and a
 before/after table. Options are listed in [MATLAB/Optimization](MATLAB/Optimization/README.md).
+
+Results with the default options (XFOIL, Re = 10⁶; details in [results/README.md](results/README.md)):
+
+| Airfoil | Peak CL/CD | Peak CL^1.5/CD | CM at 0° |
+|---|---|---|---|
+| NACA 0012 | 76.5 → 123.7 (+62 %) | 76.0 → 117.6 (+55 %) | 0.000 → −0.027 |
+| NACA 2412 | 104.6 → 140.8 (+35 %) | 95.7 → 148.1 (+55 %) | −0.048 → −0.065 |
+| NACA 4412 | 129.6 → 168.5 (+30 %) | 133.6 → 172.0 (+29 %) | −0.096 → −0.131 |
+
+All three keep their thickness. A run takes 30–50 minutes on 8 cores.
 
 ## The report method
 
@@ -98,7 +108,7 @@ XFLR5 results from the report:
 | Peak CL/CD (read from the polar plot) | ≈ 100 at α ≈ 4–5° | ≈ 160 at α ≈ 2° | ≈ **+55–60 %** |
 | CL,max | 1.549 at 16° | 1.531 at 13.3° | −1.1 %, stall 2.7° earlier |
 
-The +142.6 % applies only at α = 0°. The fair comparison is peak to peak, which XFOIL puts at +73 %.
+The +142.6 % applies only at α = 0°. The fair comparison is peak to peak, which XFOIL puts at +71 %.
 
 Limitations of the report method:
 
@@ -124,6 +134,7 @@ MATLAB/
   make_report_figures.m
 results/
   xfoil/          XFOIL comparison: optimised airfoils (.dat), polars (.csv), figures
+  optimize_airfoil/  NACA 0012 and NACA 4412 optimised with optimize_airfoil
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method
@@ -156,7 +167,7 @@ run Morphing/morph_to_design.m                % morph to the PARSEC design with 
 ```
 
 Outputs are written to `MATLAB/output/` (not tracked). Each XFOIL optimisation takes about
-10–20 minutes on 8 cores. To analyse an
+10–50 minutes on 8 cores. To analyse an
 airfoil in XFLR5, open its `.dat` file (File → Open). XFLR5 accepts at most 300 points per foil; the
 exported files have 199–299.
 
