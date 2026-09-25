@@ -7,3 +7,6 @@ MATLAB/output/
 *.mex*
 slprj/
 codegen/
+
+# XFOIL executable (download separately, see MATLAB/Aerodynamics/README.md)
+xfoil.exe
