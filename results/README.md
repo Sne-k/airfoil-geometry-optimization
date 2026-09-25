@@ -4,30 +4,31 @@
 
 The final airfoil of every approach tried during the project was analysed with the same XFOIL
 settings: Re = 10⁶, M = 0, Ncrit = 9, re-panelled, α = −2° to 18° in 0.5° steps
-(`MATLAB/Aerodynamics/compare_approaches.m`). Peak values are taken from a 3-point moving median, so a
-single spurious XFOIL point cannot set them.
+(`MATLAB/Aerodynamics/compare_approaches.m`). NACA sections use the closed-trailing-edge form of the
+thickness formula. A peak value counts only if a neighbouring angle confirms it, so a single spurious
+XFOIL point cannot set it.
 
 ![Approach comparison](xfoil/approach_comparison.png)
 
 | Approach | t/c | Peak CL/CD (α) | Peak CL^1.5/CD | CL,max (α) | CM at 0° |
 |---|---:|---:|---:|---:|---:|
-| **XFOIL GA + fmincon, PARSEC, t ≥ 0.12** (`optimize_xfoil_parsec.m`) | 0.123 | **182.5** (4.0°) | **187.0** | 1.553 (16.5°) | −0.124 |
-| Report method: GA + fmincon, camber/thickness (`gian.m`) | 0.080 | 176.1 (2.0°) | 169.3 | 1.547 (13.5°) | −0.150 |
-| XFOIL GA + fmincon, NACA [m p t], t ≥ 0.12 (`optimize_xfoil_naca.m`) | 0.127 | 143.0 (3.5°) | 145.4 | 1.649 (17.0°) | −0.131 |
-| `optimize_airfoil('NACA 2412')`, CST + XFOIL | 0.121 | 140.5 (5.5°) | 147.9 | 1.493 (17.5°) | −0.065 |
-| XFOIL GA + fmincon, PARSEC, t ≥ 0.08 \* | 0.081 | 136.1 (2.0°) | 132.4 | 1.741 (15.5°) | −0.184 |
-| NSGA-II multi-objective (`idkwimdt.m`) \* | 0.080 | 126.9 (1.0°) | 107.3 | 0.736 (1.0°) | −0.152 |
-| XFOIL GA + fmincon, NACA [m p t], t ≥ 0.08 \* | 0.080 | 111.1 (0.5°) | 88.1 | 0.651 (0.5°) | −0.144 |
-| Bezier camber line, 12 % thick (`letshope.m`, fixed) | 0.120 | 110.5 (4.5°) | 105.7 | 1.483 (16.0°) | −0.056 |
-| PARSEC fit of NACA 2412 | 0.120 | 104.9 (5.0°) | 99.9 | 1.404 (15.0°) | −0.046 |
-| **NACA 2412 (baseline)** | 0.120 | **102.0** (4.5°) | **95.4** | 1.457 (15.5°) | −0.043 |
-| PARSEC GA, minimum area (`GAairfoil.m`, reference method) | 0.101 | 95.3 (3.5°) | 99.1 | 1.705 (15.5°) | −0.115 |
-| GA + PSO + fmincon with the sign error (`suniyo.m` / `deki.m`) | 0.130 | 75.6 (9.0°) | 79.0 | 1.341 (16.5°) | 0.000 |
-| Thin Bezier "supersonic" target (`trialgp.m`) | 0.050 | 51.8 (1.0°) | 33.9 | 0.610 (5.5°) | −0.009 |
+| **XFOIL GA + fmincon, PARSEC, t ≥ 0.12** (`optimize_xfoil_parsec.m`) | 0.123 | **182.5** (4.5°) | **190.5** | 1.553 (16.5°) | −0.124 |
+| Report method: GA + fmincon, camber/thickness (`gian.m`) | 0.080 | 178.9 (2.5°) | 170.6 | 1.524 (13.5°) | −0.156 |
+| NSGA-II multi-objective (`idkwimdt.m`) | 0.080 | 175.7 (3.0°) | 174.4 | 1.541 (14.0°) | −0.159 |
+| XFOIL GA + fmincon, NACA [m p t], t ≥ 0.12 (`optimize_xfoil_naca.m`) | 0.127 | 153.2 (3.0°) | 150.5 | 1.603 (17.5°) | −0.150 |
+| XFOIL GA + fmincon, PARSEC, t ≥ 0.08 \* | 0.081 | 143.9 (2.5°) | 143.1 | 1.741 (15.5°) | −0.184 |
+| `optimize_airfoil('NACA 2412')`, CST + XFOIL | 0.121 | 141.0 (5.5°) | 148.1 | 1.493 (17.5°) | −0.065 |
+| XFOIL GA + fmincon, NACA [m p t], t ≥ 0.08 \* | 0.080 | 124.8 (0.5°) | 102.9 | 0.680 (0.5°) | −0.149 |
+| Bezier camber line, 12 % thick (`letshope.m`, fixed) | 0.120 | 112.2 (4.5°) | 106.1 | 1.483 (16.0°) | −0.056 |
+| PARSEC fit of NACA 2412 | 0.120 | 104.9 (6.0°) | 102.1 | 1.404 (15.0°) | −0.046 |
+| **NACA 2412 (baseline)** | 0.120 | **104.6** (4.5°) | **95.7** | 1.429 (16.0°) | −0.048 |
+| PARSEC GA, minimum area (`GAairfoil.m`, reference method) | 0.101 | 97.1 (3.5°) | 99.6 | 1.705 (15.5°) | −0.115 |
+| GA + PSO + fmincon with the sign error (`suniyo.m` / `deki.m`) | 0.130 | 77.3 (9.0°) | 79.2 | 1.313 (16.5°) | 0.000 |
+| Thin Bezier "supersonic" target (`trialgp.m`) | 0.050 | 55.4 (1.0°) | 35.5 | 0.610 (5.5°) | −0.009 |
 
-\* Not reliable. At 8 % thickness XFOIL's convergence is fragile: the PARSEC t ≥ 0.08 design scored
-394.6 inside the optimiser but 136.1 when its saved file was re-analysed, and the other two polars end
-at α ≈ 1°. These designs are left out of the conclusions.
+\* Not reliable. The PARSEC t ≥ 0.08 design scored 394.6 inside its optimiser, which used an earlier
+XFOIL wrapper, and scores 143.9 here. XFOIL does not converge above α = 0.5° for the NACA t ≥ 0.08
+design, so its polar is incomplete.
 
 What the comparison shows:
 
@@ -35,12 +36,37 @@ What the comparison shows:
   minimum area) either run to the bounds or do not target efficiency at all. The area-minimising PARSEC
   GA ends up below the baseline.
 - **Shape freedom matters.** With the thickness held at 12 %, the best NACA 4-digit section (m = 0.050,
-  p = 0.52, t = 0.127) reaches 143. PARSEC can also move the thickness peak and shape the rear of the
-  section, which adds another 28 % (182.5).
+  p = 0.52, t = 0.127) reaches 153. PARSEC can also move the thickness peak and shape the rear of the
+  section, which adds another 19 % (182.5).
+- **The 8 %-thick designs owe their efficiency to being thin.** The report airfoil and the NSGA-II
+  design reach 176–179, but with a third less thickness, the largest pitching moments and the earliest
+  stall.
 - **The sign error explains the "no improvement" runs.** `suniyo.m` and `deki.m` minimised camber
   instead of maximising it and produced symmetric airfoils, 26 % worse than NACA 2412.
-- **XFOIL's resolution.** The PARSEC fit of NACA 2412 differs from it by at most 0.003 c and scores 3 %
-  higher, so differences of a few percent between airfoils are within XFOIL's scatter.
+- **XFOIL is consistent.** The PARSEC fit of NACA 2412 scores within 0.3 % of NACA 2412 itself (104.9
+  against 104.6), and the peak values of the main designs change by less than 1 % between 140 and 240
+  panel nodes (next section).
+
+### Robustness of the peak values
+
+Two problems made earlier numbers depend on how XFOIL panelled the airfoil. Both are fixed:
+
+- The standard NACA thickness formula leaves a trailing edge 0.25 % of chord thick, which the
+  geometry routine closed with a small, almost vertical step. The step cost NACA 2412 about 2.5 % of
+  its peak L/D (102.0 instead of 104.6), and XFOIL broke down on it at 240 panel nodes. NACA sections
+  are now generated with the closed-trailing-edge coefficient (−0.1036) for all aerodynamic work.
+- The earlier peak filter, a 3-point moving median, compared points across angles that had not
+  converged, and in one case cut the PARSEC design's peak of 182.5 down to 157.
+
+Peak CL/CD after both fixes ([panel_check.csv](xfoil/panel_check.csv)):
+
+| Panel nodes | 140 | 160 | 180 | 200 | 220 | 240 |
+|---|---:|---:|---:|---:|---:|---:|
+| NACA 2412 | 104.4 | 104.6 | 104.7 | 104.9 | 105.1 | 104.9 |
+| Report airfoil | 178.9 | 178.9 | 178.6 | 178.6 | 178.7 | 178.7 |
+| PARSEC, t ≥ 12 % | 183.1 | 182.5 | 182.7 | 182.8 | 182.4 | 182.5 |
+| CST, `optimize_airfoil` | 141.0 | 141.0 | 141.0 | 140.8 | 140.7 | 140.4 |
+| NACA [m p t], t ≥ 12 % | 152.9 | 153.0 | 152.9 | 153.0 | 152.8 | 153.0 |
 
 ### Recommended design
 
@@ -50,17 +76,18 @@ What the comparison shows:
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0.01622 | 0.45933 | 0.10751 | −0.52059 | 0.42516 | −0.01575 | 0.31189 | 0 | 0 | −2.710° | 13.003° |
 
-Compared with NACA 2412: peak L/D +79 %, peak CL^1.5/CD +96 %, CL,max +6.5 % with stall 1° later, same
-thickness (12.3 %, at 44 % chord instead of 30 %). Two things to consider before using it:
+Compared with NACA 2412: peak L/D +74 %, peak CL^1.5/CD +99 %, CL,max +8.6 % with stall 0.5° later,
+same thickness (12.3 %, at 44 % chord instead of 30 %). Two things to consider before using it:
 
-- The pitching moment at α = 0° is −0.124, three times that of NACA 2412, so the tail must trim a
-  larger nose-down moment.
-- The efficiency peak is narrow. At CL = 0.5 the airfoil is less efficient than NACA 2412 (63 against 83).
+- The pitching moment at α = 0° is −0.124, about 2.6 times that of NACA 2412 (−0.048), so the tail must
+  trim a larger nose-down moment.
+- The efficiency peak is narrow, about 1° of α. At CL = 0.5 the airfoil is less efficient than NACA
+  2412 (63 against 83).
 
 If these matter more than peak efficiency, the CST design from `optimize_airfoil`
-([`NACA2412_cst_optimized.dat`](xfoil/NACA2412_cst_optimized.dat)) is the better choice: +38 % peak
+([`NACA2412_cst_optimized.dat`](xfoil/NACA2412_cst_optimized.dat)) is the better choice: +35 % peak
 L/D and +55 % CL^1.5/CD with a pitching moment of only −0.065, and more efficient than NACA 2412 from
-CL ≈ 0.45 to 1.3.
+CL ≈ 0.5 to 1.35.
 
 ![Shapes](xfoil/designs.png)
 
@@ -68,17 +95,17 @@ CL ≈ 0.45 to 1.3.
 
 | CL/CD at | CL = 0.3 | CL = 0.5 | CL = 0.8 | CL = 1.0 | CL = 1.2 |
 |---|---:|---:|---:|---:|---:|
-| NACA 2412 | 55.0 | 83.0 | 101.2 | 91.9 | 78.9 |
-| Report airfoil | – | 84.2 | 157.1 | 164.2 | 90.0 |
-| PARSEC, t ≥ 12 % | – | 63.1 | 123.8 | 172.4 | 80.3 |
-| CST, `optimize_airfoil` | 45.9 | 88.5 | 126.7 | 139.9 | 124.6 |
+| NACA 2412 | 55.6 | 83.0 | 104.5 | 90.4 | 78.5 |
+| Report airfoil | – | 84.6 | 168.7 | 165.1 | 89.8 |
+| PARSEC, t ≥ 12 % | – | 63.1 | 124.5 | 168.9 | 80.5 |
+| CST, `optimize_airfoil` | 46.0 | 85.2 | 126.7 | 139.8 | 125.3 |
 
 (– : the airfoil does not reach that low a CL within α ≥ −2°.)
 
 ### Morphing to the recommended design
 
 `MATLAB/Morphing/morph_to_design.m` blends NACA 2412 into the PARSEC design in 20 steps. The peak L/D
-rises at every step analysed, from 101 to 183.
+rises at every step analysed, from 105 to 183.
 
 | | |
 |---|---|
@@ -93,12 +120,32 @@ rises at every step analysed, from 101 to 183.
 | `NACA2412_naca_t12_optimized.dat` | Best NACA 4-digit section with t ≥ 12 % (m = 0.050, p = 0.524, t = 0.127) |
 | `polar_*.csv` | α, CL, CD, CM of NACA 2412, the report airfoil and the three designs above |
 | `ld_at_cl.csv` | L/D at fixed lift coefficients |
+| `panel_check.csv` | Peak L/D of the main designs for 140–240 panel nodes |
 | `approach_comparison.csv`, `approach_comparison.png`, `ld_polars.png` | All approaches ranked; L/D against α |
 | `designs.png`, `polars.png` | Shapes; lift, L/D against CL and pitching moment |
 | `NACA2412_cst_summary.csv`, `NACA2412_cst_comparison.png` | Before/after output of `optimize_airfoil` |
 | `morph_to_design.gif`, `morph_efficiency.png`, `morph_efficiency.csv` | Morph to the PARSEC design with the peak L/D of every second step |
 
 All `.dat` files are in Selig format with fewer than 300 points and open in XFLR5.
+
+## `optimize_airfoil` on other airfoils (`optimize_airfoil/`)
+
+Same XFOIL settings and default options: never thinner than the original, and |CM| at 0° may grow by
+at most 0.05.
+
+| Airfoil | Peak CL/CD | Peak CL^1.5/CD | CM at 0° | t/c | Run time (8 cores) |
+|---|---|---|---|---|---:|
+| NACA 0012 | 76.5 → 123.7 (+62 %) | 76.0 → 117.6 (+55 %) | 0.000 → −0.027 | 0.120 → 0.120 | 48 min |
+| NACA 2412 | 104.6 → 140.8 (+35 %) | 95.7 → 148.1 (+55 %) | −0.048 → −0.065 | 0.120 → 0.121 | – |
+| NACA 4412 | 129.6 → 168.5 (+30 %) | 133.6 → 172.0 (+29 %) | −0.096 → −0.131 | 0.120 → 0.121 | 32 min |
+
+- Each folder holds the optimised `.dat` file, both polars, `summary.csv` and `comparison.png`.
+- The gains hold under the optimiser's own score, the lower result of two panellings (NACA 0012:
+  76.5 → 123.4, NACA 4412: 129.5 → 168.1).
+- The NACA 2412 result comes from an earlier version that scored each candidate with one panelling.
+- During the NACA 0012 run the pitching-moment limit was not active, because of a bug that has since
+  been fixed; the result is within the limit anyway.
+- Baselines are the closed-trailing-edge sections.
 
 ## Airfoils analysed in XFLR5 for the report
 
@@ -140,15 +187,15 @@ Notes on reading these numbers:
 
 - **The α = 0° values are not the peak values.** The report's CL/CD polars show the baseline peaking at
   about 100 near α ≈ 4–5° and the optimised airfoil at about 160 near α ≈ 2°, roughly +55–60 % peak to
-  peak (XFOIL: 102.0 → 176.1, +73 %). The +142.6 % applies only at α = 0°, where the extra camber
+  peak (XFOIL: 104.6 → 178.9, +71 %). The +142.6 % applies only at α = 0°, where the extra camber
   raises the lift on its own.
 - Above α ≈ 6° the baseline has the higher CL/CD, and the optimised airfoil stalls about 2.7° earlier
   with a slightly lower CL,max.
 - The XFLR5 settings (Reynolds number, Mach number, Ncrit, panelling) were not recorded. The drag
-  values suggest Re ≈ 10⁶. XFOIL at Re = 10⁶ gives the same drag and peak L/D for NACA 2412 but about
-  0.04 less lift at 0°.
-- The report did not evaluate the pitching moment. XFOIL gives CM = −0.150 at α = 0° for the optimised
-  airfoil against −0.043 for NACA 2412.
+  values suggest Re ≈ 10⁶. XFOIL at Re = 10⁶ gives similar drag and peak L/D for NACA 2412, but
+  about 0.02 less lift at 0° and a lower CL,max (1.43).
+- The report did not evaluate the pitching moment. XFOIL gives CM = −0.156 at α = 0° for the optimised
+  airfoil against −0.048 for NACA 2412.
 
 | Baseline CL/CD vs α (report Fig. 4.4) | Optimised (blue) vs baseline (black) (report Fig. 4.8) |
 |---|---|

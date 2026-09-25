@@ -5,7 +5,9 @@ function result = optimize_airfoil(airfoil, varargin)
 %   runs a hybrid genetic algorithm -> fmincon search with XFOIL in the loop
 %   to maximise its efficiency. By default the result keeps at least the
 %   original maximum thickness (the structure is not weakened) and a
-%   pitching moment within 0.05 of the original. The optimised .dat file,
+%   pitching moment within 0.05 of the original. Every candidate is
+%   analysed with two XFOIL panellings and scored by the lower result, so
+%   the search cannot exploit numerical artefacts. The optimised .dat file,
 %   the polars, a before/after table and figures are written to OutputDir.
 %
 %   Options (name, value):
@@ -67,8 +69,9 @@ mBase = efficiencyMetrics(polBase);
 %% CST representation
 n1 = o.Order + 1;
 [Au, Al, dte] = cstFit(xu0, yu0, xl0, yl0, o.Order);
-fitErr = max(abs([cstBasis(xu0, o.Order)*Au.' + xu0*dte/2 - yu0; ...
-                  cstBasis(xl0, o.Order)*Al.' - xl0*dte/2 - yl0]));
+iu = xu0 >= 0;  il = xl0 >= 0;          % cambered NACA noses reach slightly ahead of x = 0
+fitErr = max(abs([cstBasis(xu0(iu), o.Order)*Au.' + xu0(iu)*dte/2 - yu0(iu); ...
+                  cstBasis(xl0(il), o.Order)*Al.' - xl0(il)*dte/2 - yl0(il)]));
 x = (1 - cos(linspace(0, pi, 150)')) / 2;
 [yuF, ylF] = cstSurfaces(Au, Al, dte, x);
 tFit = max(yuF - ylF);
@@ -78,7 +81,12 @@ S.alphaRange = [-2 12 0.5];
 S.tMin = o.MinThickness * tFit - 1e-4;
 S.tMax = max(0.25, 1.5 * tFit);
 S.cmMax = Inf;
-if ~isnan(mBase.CM0), S.cmMax = abs(mBase.CM0) + o.CmIncrease; end
+if ~isnan(mBase.CM0)
+    S.cmMax = abs(mBase.CM0) + o.CmIncrease;
+else
+    warning('optimize_airfoil:noCM0', ...
+        'XFOIL gave no pitching moment around alpha = 0; the pitching-moment limit is not applied.');
+end
 S.objective = o.Objective;
 S.designCL = o.DesignCL;
 
@@ -106,6 +114,7 @@ if min(fNLP, fGA) >= fStart
     warning('optimize_airfoil:noGain', 'No improvement found; returning the fitted original.');
     d = zeros(1, nv);
 end
+fOpt = objective(d);
 
 %% Optimised airfoil
 AuOpt = Au + d(1:n1);
@@ -119,12 +128,15 @@ writetable(struct2table(polBase), fullfile(o.OutputDir, 'polar_original.csv'));
 writetable(struct2table(polOpt), fullfile(o.OutputDir, 'polar_optimized.csv'));
 
 rows = {'max CL/CD'; 'alpha at max CL/CD (deg)'; 'max CL^1.5/CD'; 'CL max'; ...
-        'alpha at CL max (deg)'; 'CD min'; 'CM at alpha = 0'; 't/c max'};
+        'alpha at CL max (deg)'; 'CD min'; 'CM at alpha = 0'; 't/c max'; ...
+        sprintf('objective %s, lower of 160/200 panels', o.Objective)};
 vb = [mBase.LDmax; mBase.alphaLD; mBase.E15max; mBase.CLmax; mBase.alphaStall; ...
-      mBase.CDmin; mBase.CM0; maxThickness(xu0, yu0, xl0, yl0)];
+      mBase.CDmin; mBase.CM0; maxThickness(xu0, yu0, xl0, yl0); -fStart];
 vo = [mOpt.LDmax; mOpt.alphaLD; mOpt.E15max; mOpt.CLmax; mOpt.alphaStall; ...
-      mOpt.CDmin; mOpt.CM0; max(yu - yl)];
-summary = table(rows, vb, vo, 100*(vo - vb)./abs(vb), ...
+      mOpt.CDmin; mOpt.CM0; max(yu - yl); -fOpt];
+change = 100*(vo - vb)./abs(vb);
+change(abs(vb) < 1e-3) = NaN;                            % no percentage of a value near 0
+summary = table(rows, vb, vo, change, ...
     'VariableNames', {'Quantity', 'Original', 'Optimized', 'Change_percent'});
 writetable(summary, fullfile(o.OutputDir, 'summary.csv'));
 fprintf('\n%s at Re = %.3g (XFOIL, Ncrit 9):\n', name, o.Re);

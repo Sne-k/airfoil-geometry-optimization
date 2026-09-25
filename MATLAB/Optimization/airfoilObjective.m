@@ -5,6 +5,11 @@ function f = airfoilObjective(d, S)
 %   with crossing surfaces, a maximum thickness outside [S.tMin S.tMax], a
 %   pitching moment |CM(alpha=0)| above S.cmMax, or no XFOIL convergence
 %   get the penalty value 0.
+%
+%   The efficiency is computed with XFOIL's default 160 panel nodes and
+%   again with 200, and the lower value counts. Optimisers are good at
+%   finding numerical artefacts; an XFOIL result that appears with only one
+%   panelling does not survive this check.
 
 n1 = numel(S.Au);
 [yu, yl] = cstSurfaces(S.Au + d(1:n1), S.Al + d(n1+1:end), S.dte, S.x);
@@ -13,15 +18,19 @@ if any(~isfinite(t)) || any(t(2:end-1) <= 0) || max(t) < S.tMin || max(t) > S.tM
     f = 0;
     return;
 end
-pol = xfoilPolar(S.x, yu, S.x, yl, S.Re, S.alphaRange, S.exe);
-if numel(pol.alpha) < 12
-    f = 0;
-    return;
+v = Inf;
+for panels = {[], 200}
+    pol = xfoilPolar(S.x, yu, S.x, yl, S.Re, S.alphaRange, S.exe, panels{1});
+    if numel(pol.alpha) < 12 || pol.alpha(1) > 0 || pol.alpha(end) < 0 || ...
+            abs(interp1(pol.alpha, pol.CM, 0)) > S.cmMax
+        f = 0;
+        return;
+    end
+    v = min(v, efficiencyValue(pol, S.objective, S.designCL));
 end
-k0 = find(abs(pol.alpha) < 1e-9, 1);
-if ~isempty(k0) && abs(pol.CM(k0)) > S.cmMax
+if ~isfinite(v) || v <= 0
     f = 0;
-    return;
+else
+    f = -v;
 end
-f = -efficiencyValue(pol, S.objective, S.designCL);
 end
