@@ -12,7 +12,9 @@ r = optimize_airfoil('myfoil.dat', 'Re', 5e5, 'Objective', 'endurance');
 2. Fits it with a **CST** (class-shape transformation) parameterisation: 7 coefficients per surface.
    CST can represent almost any airfoil, so this step does not depend on the airfoil family.
 3. Runs the hybrid search from the report: **genetic algorithm** (global, parallel, seeded with the
-   original shape), then **fmincon** (SQP, local). Every candidate is scored by XFOIL.
+   original shape), then **fmincon** (SQP, local). Every candidate is analysed by XFOIL with two
+   panellings (160 and 200 nodes) and scored by the lower result, so the search cannot exploit a
+   numerical artefact that only one panelling produces.
 4. Returns the better of the GA and fmincon results. If neither beats the original, it returns the
    original.
 
@@ -33,7 +35,7 @@ Outputs, in `MATLAB/output/optimize_airfoil/<name>/`:
 - `comparison.png`
 - `result.mat`
 
-A run takes roughly 10–20 min on 8 cores.
+A run takes 30–50 min on 8 cores, because every candidate is analysed twice.
 
 ## Report method and its XFOIL versions
 
@@ -50,10 +52,10 @@ The report's camber/thickness objective always pushes `m` to its upper bound and
 bound. `optimize_naca_ga_nlp.m` repeats the search over five random seeds to show this. With t ≥ 0.08
 the XFOIL search in the NACA 4-digit family ends at the same corner (m = 0.050, t = 0.080), so the
 proxy happened to point at the right NACA shape. Only XFOIL shows what that shape costs: an earlier
-stall and a pitching moment 3.5 times that of NACA 2412.
+stall and a pitching moment more than three times that of NACA 2412.
 
-With the thickness held at t ≥ 0.12, `optimize_xfoil_naca.m` reaches a peak L/D of 143 and
-`optimize_xfoil_parsec.m` reaches 182.5 (NACA 2412: 102). The PARSEC design is the recommended
+With the thickness held at t ≥ 0.12, `optimize_xfoil_naca.m` reaches a peak L/D of 153 and
+`optimize_xfoil_parsec.m` reaches 182.5 (NACA 2412: 104.6). The PARSEC design is the recommended
 airfoil; see [results/README.md](../../results/README.md) for the comparison and its trade-offs.
 
 Supporting functions:
