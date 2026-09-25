@@ -4,7 +4,7 @@ function ld = nacaMaxLD(v, x, Re, exe)
 %   x and returns max(CL/CD) over alpha = -2..12 deg (0.5 deg steps), or 0 if XFOIL does
 %   not converge.
 
-[xu, yu, xl, yl] = naca4(v(1), v(2), v(3), x);
+[xu, yu, xl, yl] = naca4(v(1), v(2), v(3), x, true);
 pol = xfoilPolar(xu, yu, xl, yl, Re, [-2 12 0.5], exe);
 if numel(pol.alpha) < 12
     ld = 0;

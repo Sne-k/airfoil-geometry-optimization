@@ -19,7 +19,7 @@ so the target does not have to be a NACA section. The default target is the XFOI
 airfoil ([`results/xfoil`](../../results/xfoil)). Every step is written as a `.dat` file and a GIF frame,
 and XFOIL computes the peak L/D of every second step. Outputs go to `output/morph_to_design`.
 
-For the PARSEC target the peak L/D rises steadily from 101 to 183 along the way
+For the PARSEC target the peak L/D rises steadily from 105 to 183 along the way
 ([morph_efficiency.png](../../results/xfoil/morph_efficiency.png)), so every intermediate shape is
 more efficient than the one before it.
 

@@ -40,7 +40,7 @@ for c = 1:size(cases, 1)
     [vNLP, fNLP] = fmincon(objective, vGA, [], [], [], [], lb, ub, [], nlpOpts);
     if fNLP <= objective(vGA), v = vNLP; else, v = vGA; end   % XFOIL is noisy: keep the better point
 
-    [xu, yu, xl, yl] = naca4(v(1), v(2), v(3), x);
+    [xu, yu, xl, yl] = naca4(v(1), v(2), v(3), x, true);
     pol = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe);
     m = efficiencyMetrics(pol);
     fprintf('%s: m = %.4f  p = %.4f  t = %.4f  (L/D)max = %.1f at %.1f deg  CLmax = %.3f\n', ...

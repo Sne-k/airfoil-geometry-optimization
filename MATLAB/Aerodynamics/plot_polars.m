@@ -45,13 +45,12 @@ for k = 1:numel(polars)
     plot(ax(2), P.CL, P.CL ./ P.CD, styles{k}, 'LineWidth', 1.5);
     plot(ax(3), P.alpha, P.CM, styles{k}, 'LineWidth', 1.5);
 
-    % L/D at fixed lift coefficients, attached branch only
-    [~, iMax] = max(P.CL);
-    a = P(1:iMax, :);
-    [cl, i] = unique(a.CL);
-    ok = clTargets >= cl(1) & clTargets <= cl(end);
-    ldAtCL(k, ok) = clTargets(ok) ./ interp1(cl, a.CD(i), clTargets(ok));
+    % L/D at fixed lift coefficients (first crossing on the attached branch)
+    for j = 1:numel(clTargets)
+        ldAtCL(k, j) = efficiencyValue(P, 'LDatCL', clTargets(j));
+    end
 end
+ldAtCL(ldAtCL == 0) = NaN;                   % lift coefficient not reached
 xlabel(ax(1), '\alpha (deg)'); ylabel(ax(1), 'C_L'); title(ax(1), 'Lift');
 xlabel(ax(2), 'C_L'); ylabel(ax(2), 'C_L / C_D'); title(ax(2), 'Efficiency at equal lift');
 xlim(ax(2), [0 1.7]);

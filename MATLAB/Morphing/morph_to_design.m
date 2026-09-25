@@ -23,7 +23,7 @@ if isempty(exe), exe = fullfile(root, 'Aerodynamics', 'xfoil.exe'); end
 
 %% Start and end shapes on the same stations
 x = (1 - cos(linspace(0, pi, 150)')) / 2;
-[xu, yu, xl, yl] = naca4(0.02, 0.40, 0.12, x);
+[xu, yu, xl, yl] = naca4(0.02, 0.40, 0.12, x, true);
 yuB = onGrid(xu, yu, x);  ylB = onGrid(xl, yl, x);
 [xu, yu, xl, yl] = readAirfoil(targetFile);
 yuT = onGrid(xu, yu, x);  ylT = onGrid(xl, yl, x);

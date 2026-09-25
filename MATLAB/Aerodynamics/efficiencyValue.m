@@ -2,26 +2,30 @@ function e = efficiencyValue(pol, objective, designCL)
 %EFFICIENCYVALUE  Efficiency figure of an XFOIL polar used as objective.
 %   'LDmax'      maximum CL/CD
 %   'endurance'  maximum CL^1.5/CD
-%   'LDatCL'     CL/CD at the lift coefficient designCL (0 if not reached)
+%   'LDatCL'     CL/CD at the lift coefficient designCL
+%   Returns 0 when the value cannot be determined.
 
-% LDmax and endurance use a 3-point moving median, so an isolated spurious
-% XFOIL point cannot set the maximum
+% The maxima must be confirmed by a neighbouring angle (supportedMax), so an
+% isolated spurious XFOIL point cannot set them
+e = 0;
 switch objective
     case 'LDmax'
-        e = max(movmedian(pol.CL ./ pol.CD, 3));
+        e = supportedMax(pol.alpha, pol.CL ./ pol.CD);
     case 'endurance'
-        e = max(movmedian(max(pol.CL, 0).^1.5 ./ pol.CD, 3));
+        e = supportedMax(pol.alpha, max(pol.CL, 0).^1.5 ./ pol.CD);
     case 'LDatCL'
+        % first crossing of designCL, in angle order, below the maximum lift
         [~, iMax] = max(pol.CL);
-        cl = pol.CL(1:iMax);                   % attached-flow branch
-        ld = cl ./ pol.CD(1:iMax);
-        [cl, iu] = unique(cl);
-        if numel(cl) < 2 || designCL < cl(1) || designCL > cl(end)
-            e = 0;
-        else
-            e = interp1(cl, ld(iu), designCL);
+        for k = 1:iMax - 1
+            c = pol.CL(k:k+1);
+            if c(1) <= designCL && designCL <= c(2) && c(2) > c(1)
+                ld = c ./ pol.CD(k:k+1);
+                e = ld(1) + (designCL - c(1)) / (c(2) - c(1)) * (ld(2) - ld(1));
+                break;
+            end
         end
     otherwise
         error('efficiencyValue:objective', 'Unknown objective "%s".', objective);
 end
+if isempty(e) || isnan(e), e = 0; end
 end

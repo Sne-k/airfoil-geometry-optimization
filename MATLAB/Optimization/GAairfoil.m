@@ -6,6 +6,9 @@ function [AAoriginal,AAfittest,fittest,fitness]=GAairfoil(genNo,p0,range)
 %area, individuals larger than the original are clamped to the original
 %area, and shapes with maximum thickness above 0.12 or below 0.01 are
 %rejected. The result is therefore a thinner airfoil.
+%Note: as in the reference implementation, the thickness limits are only
+%checked for the first generation; the children of later generations are
+%not checked. The published result (t/c = 0.101) is within the limits.
 %genNo      number of generations to mate
 %p0         Original airfoil to optimize
 %range      Randomizer range to vary the PARSEC parameters

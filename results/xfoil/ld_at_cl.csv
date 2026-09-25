@@ -1,5 +1,5 @@
 Airfoil,LD_at_CL_0.3,LD_at_CL_0.5,LD_at_CL_0.8,LD_at_CL_1.0,LD_at_CL_1.2
-"NACA 2412 (baseline)",55,83,101.2,91.9,78.9
-"Report airfoil (camber/thickness)",NaN,84.2,157.1,164.2,90
-"PARSEC, XFOIL-optimised, t >= 12%",NaN,63.1,123.8,172.4,80.3
-"CST, optimize_airfoil",45.9,88.5,126.7,139.9,124.6
+"NACA 2412 (baseline)",55.6,83,104.5,90.4,78.5
+"Report airfoil (camber/thickness)",NaN,84.6,168.7,165.1,89.8
+"PARSEC, XFOIL-optimised, t >= 12%",NaN,63.1,124.5,168.9,80.5
+"CST, optimize_airfoil",46,85.2,126.7,139.8,125.3
