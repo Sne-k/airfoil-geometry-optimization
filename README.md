@@ -83,6 +83,22 @@ Results with the default options (XFOIL, Re = 10⁶; details in [results/README.
 All keep their thickness. Without the pitching-moment limit (`'CmIncrease', Inf`), NACA 2412 reaches
 166.8 (+59 %), 91 % of the PARSEC design. A run takes 30–50 minutes on 8 cores.
 
+### Further results
+
+- **More seeds and options.** Clark Y improves by +49 %. A particle swarm → pattern search option
+  gives the same result as GA → fmincon. The tool also optimises for cruise, loiter, a weighted
+  combination, or with maximum lift kept.
+- **Benchmark.** Given the same task as Xoptfoil2, `optimize_airfoil` scores 9 % higher but runs 25
+  times longer.
+- **Caveat.** Our designs have slightly wavy surfaces, which Xoptfoil2's curvature limits would reject.
+  Part of their advantage may be an XFOIL artefact. Curvature constraints and a CFD check are the
+  next steps.
+- **Morphing.** Morphing between a cruise and a loiter shape beats any fixed airfoil at the two ends of
+  the lift range. Nose and trailing-edge morphing with a fixed wing box raises the loiter
+  efficiency of NACA 2412 by 84 %.
+
+Details are in [results/README.md](results/README.md).
+
 ## The report method
 
 ```
@@ -133,11 +149,15 @@ MATLAB/
   Optimization/   optimize_airfoil.m (any airfoil, CST + XFOIL), optimize_xfoil_parsec.m,
                   optimize_xfoil_naca.m, optimize_naca_ga_nlp.m (report method), run_parsec_ga.m
   Morphing/       morph_airfoil.m (report morph), morph_to_design.m (morph to any .dat, with L/D per step)
+  CFD/            C-grid generator, Fluent mesh export and journals (work in progress)
+  airfoils/       seed airfoils as .dat files (Clark Y)
   run_project.m   runs everything in order
   make_report_figures.m
 results/
   xfoil/          XFOIL comparison: optimised airfoils (.dat), polars (.csv), figures
-  optimize_airfoil/  NACA 0012, 4412, 23012 and NACA 2412 without the CM limit (optimize_airfoil)
+  optimize_airfoil/  optimize_airfoil results: other airfoils, options and flight phases
+  xoptfoil2/      benchmark against Xoptfoil2
+  morphing/       morphing envelope and nose/trailing-edge morphing
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method
