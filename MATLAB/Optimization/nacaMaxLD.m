@@ -5,7 +5,7 @@ function ld = nacaMaxLD(v, x, Re, exe)
 %   not converge.
 
 [xu, yu, xl, yl] = naca4(v(1), v(2), v(3), x, true);
-pol = xfoilPolar(xu, yu, xl, yl, Re, [-2 12 0.5], exe);
+pol = xfoilPolar(xu, yu, xl, yl, Re, [-2 12 0.5], exe, [], false);
 if numel(pol.alpha) < 12
     ld = 0;
     return;

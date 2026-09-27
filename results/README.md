@@ -15,10 +15,10 @@ XFOIL point cannot set it.
 | **XFOIL GA + fmincon, PARSEC, t ≥ 0.12** (`optimize_xfoil_parsec.m`) | 0.123 | **182.5** (4.5°) | **190.5** | 1.553 (16.5°) | −0.124 |
 | Report method: GA + fmincon, camber/thickness (`gian.m`) | 0.080 | 178.9 (2.5°) | 170.6 | 1.524 (13.5°) | −0.156 |
 | NSGA-II multi-objective (`idkwimdt.m`) | 0.080 | 175.7 (3.0°) | 174.4 | 1.541 (14.0°) | −0.159 |
+| XFOIL GA + fmincon, NACA [m p t], t ≥ 0.08 (`optimize_xfoil_naca.m`) | 0.080 | 171.4 (2.5°) | 165.0 | 1.516 (14.0°) | −0.149 |
 | XFOIL GA + fmincon, NACA [m p t], t ≥ 0.12 (`optimize_xfoil_naca.m`) | 0.127 | 153.2 (3.0°) | 150.5 | 1.603 (17.5°) | −0.150 |
+| `optimize_airfoil('NACA 2412')`, CST + XFOIL | 0.120 | 145.1 (5.5°) | 149.9 | 1.409 (16.0°) | −0.065 |
 | XFOIL GA + fmincon, PARSEC, t ≥ 0.08 \* | 0.081 | 143.9 (2.5°) | 143.1 | 1.741 (15.5°) | −0.184 |
-| `optimize_airfoil('NACA 2412')`, CST + XFOIL | 0.121 | 141.0 (5.5°) | 148.1 | 1.493 (17.5°) | −0.065 |
-| XFOIL GA + fmincon, NACA [m p t], t ≥ 0.08 \* | 0.080 | 124.8 (0.5°) | 102.9 | 0.680 (0.5°) | −0.149 |
 | Bezier camber line, 12 % thick (`letshope.m`, fixed) | 0.120 | 112.2 (4.5°) | 106.1 | 1.483 (16.0°) | −0.056 |
 | PARSEC fit of NACA 2412 | 0.120 | 104.9 (6.0°) | 102.1 | 1.404 (15.0°) | −0.046 |
 | **NACA 2412 (baseline)** | 0.120 | **104.6** (4.5°) | **95.7** | 1.429 (16.0°) | −0.048 |
@@ -27,8 +27,9 @@ XFOIL point cannot set it.
 | Thin Bezier "supersonic" target (`trialgp.m`) | 0.050 | 55.4 (1.0°) | 35.5 | 0.610 (5.5°) | −0.009 |
 
 \* Not reliable. The PARSEC t ≥ 0.08 design scored 394.6 inside its optimiser, which used an earlier
-XFOIL wrapper, and scores 143.9 here. XFOIL does not converge above α = 0.5° for the NACA t ≥ 0.08
-design, so its polar is incomplete.
+XFOIL wrapper, and scores 143.9 here. The NACA t ≥ 0.08 design used to stop converging above α = 0.5°;
+with XFOIL restarts it now gives a full polar (171.4), in line with the almost identical report
+airfoil (178.9).
 
 What the comparison shows:
 
@@ -39,7 +40,7 @@ What the comparison shows:
   p = 0.52, t = 0.127) reaches 153. PARSEC can also move the thickness peak and shape the rear of the
   section, which adds another 19 % (182.5).
 - **The 8 %-thick designs owe their efficiency to being thin.** The report airfoil and the NSGA-II
-  design reach 176–179, but with a third less thickness, the largest pitching moments and the earliest
+  and NACA t ≥ 0.08 designs reach 171–179, but with a third less thickness, the largest pitching moments and the earliest
   stall.
 - **The sign error explains the "no improvement" runs.** `suniyo.m` and `deki.m` minimised camber
   instead of maximising it and produced symmetric airfoils, 26 % worse than NACA 2412.
@@ -65,7 +66,7 @@ Peak CL/CD after both fixes ([panel_check.csv](xfoil/panel_check.csv)):
 | NACA 2412 | 104.4 | 104.6 | 104.7 | 104.9 | 105.1 | 104.9 |
 | Report airfoil | 178.9 | 178.9 | 178.6 | 178.6 | 178.7 | 178.7 |
 | PARSEC, t ≥ 12 % | 183.1 | 182.5 | 182.7 | 182.8 | 182.4 | 182.5 |
-| CST, `optimize_airfoil` | 141.0 | 141.0 | 141.0 | 140.8 | 140.7 | 140.4 |
+| CST, `optimize_airfoil` | 145.3 | 145.1 | 144.6 | 144.7 | 144.6 | 144.5 |
 | NACA [m p t], t ≥ 12 % | 152.9 | 153.0 | 152.9 | 153.0 | 152.8 | 153.0 |
 
 ### Recommended design
@@ -85,9 +86,9 @@ same thickness (12.3 %, at 44 % chord instead of 30 %). Two things to consider b
   2412 (63 against 83).
 
 If these matter more than peak efficiency, the CST design from `optimize_airfoil`
-([`NACA2412_cst_optimized.dat`](xfoil/NACA2412_cst_optimized.dat)) is the better choice: +35 % peak
-L/D and +55 % CL^1.5/CD with a pitching moment of only −0.065, and more efficient than NACA 2412 from
-CL ≈ 0.5 to 1.35.
+([`NACA2412_cst_optimized.dat`](xfoil/NACA2412_cst_optimized.dat)) is the better choice: +39 % peak
+L/D and +57 % CL^1.5/CD with a pitching moment of only −0.065, and more efficient than NACA 2412 from
+CL ≈ 0.45 to 1.3.
 
 ![Shapes](xfoil/designs.png)
 
@@ -98,7 +99,7 @@ CL ≈ 0.5 to 1.35.
 | NACA 2412 | 55.6 | 83.0 | 104.5 | 90.4 | 78.5 |
 | Report airfoil | – | 84.6 | 168.7 | 165.1 | 89.8 |
 | PARSEC, t ≥ 12 % | – | 63.1 | 124.5 | 168.9 | 80.5 |
-| CST, `optimize_airfoil` | 46.0 | 85.2 | 126.7 | 139.8 | 125.3 |
+| CST, `optimize_airfoil` | 46.3 | 90.4 | 130.6 | 144.8 | 89.1 |
 
 (– : the airfoil does not reach that low a CL within α ≥ −2°.)
 
@@ -136,13 +137,20 @@ at most 0.05.
 | Airfoil | Peak CL/CD | Peak CL^1.5/CD | CM at 0° | t/c | Run time (8 cores) |
 |---|---|---|---|---|---:|
 | NACA 0012 | 76.5 → 123.7 (+62 %) | 76.0 → 117.6 (+55 %) | 0.000 → −0.027 | 0.120 → 0.120 | 48 min |
-| NACA 2412 | 104.6 → 140.8 (+35 %) | 95.7 → 148.1 (+55 %) | −0.048 → −0.065 | 0.120 → 0.121 | – |
+| NACA 2412 | 104.6 → 145.0 (+39 %) | 95.7 → 149.8 (+57 %) | −0.048 → −0.065 | 0.120 → 0.120 | 35 min |
 | NACA 4412 | 129.6 → 168.5 (+30 %) | 133.6 → 172.0 (+29 %) | −0.096 → −0.131 | 0.120 → 0.121 | 32 min |
+| NACA 23012 | 98.9 → 133.9 (+35 %) | 104.3 → 135.1 (+29 %) | −0.003 → −0.034 | 0.120 → 0.121 | 34 min |
+| NACA 2412, no CM limit \*\* | 104.6 → 166.8 (+59 %) | 95.7 → 172.7 (+80 %) | −0.048 → −0.112 | 0.120 → 0.120 | 36 min |
+
+\*\* `optimize_airfoil('NACA 2412', 'CmIncrease', Inf, 'MaxChange', 0.15)`: no limit on the pitching
+moment and wider bounds on the shape. This reaches 91 % of the PARSEC design (182.5) with a smaller
+nose-down moment (−0.112 against −0.124) and 14 % more CL,max, so the general CST optimiser gets close
+to the specialised PARSEC search when it is allowed the same trade-off.
 
 - Each folder holds the optimised `.dat` file, both polars, `summary.csv` and `comparison.png`.
 - The gains hold under the optimiser's own score, the lower result of two panellings (NACA 0012:
-  76.5 → 123.4, NACA 4412: 129.5 → 168.1).
-- The NACA 2412 result comes from an earlier version that scored each candidate with one panelling.
+  76.5 → 123.4, NACA 2412: 104.6 → 144.8, NACA 4412: 129.5 → 168.1, NACA 23012: 98.0 → 133.7).
+- CL,max is not constrained, and it changes by −4.7 % (23012) to +2.5 % (0012) in the default runs.
 - During the NACA 0012 run the pitching-moment limit was not active, because of a bug that has since
   been fixed; the result is within the limit anyway.
 - Baselines are the closed-trailing-edge sections.

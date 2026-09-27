@@ -22,7 +22,7 @@ All airfoils analysed with XFOIL under the same conditions: Re = 10⁶, M = 0, N
 | NACA 2412 (baseline) | 12.0 % | 104.6 (4.5°) | 95.7 | 1.43 (16.0°) | −0.048 |
 | Report airfoil: camber/thickness objective, ≈ NACA 5508 | 8.0 % | 178.9 (2.5°) | 170.6 | 1.52 (13.5°) | −0.156 |
 | **PARSEC, XFOIL in the loop, t ≥ 12 %** | 12.3 % | **182.5 (4.5°)**, +74 % | **190.5**, +99 % | 1.55 (16.5°) | −0.124 |
-| CST, `optimize_airfoil` (limits CM) | 12.0 % | 141.0 (5.5°), +35 % | 148.1, +55 % | 1.49 (17.5°) | −0.065 |
+| CST, `optimize_airfoil` (limits CM) | 12.0 % | 145.0 (5.5°), +39 % | 149.8, +57 % | 1.41 (16.0°) | −0.065 |
 
 ![Baseline and optimised shapes](results/xfoil/designs.png)
 
@@ -38,8 +38,8 @@ All airfoils analysed with XFOIL under the same conditions: Re = 10⁶, M = 0, N
   objective pushes every run to the thinnest, most cambered corner of the bounds, so this result comes
   from the chosen bounds, not from aerodynamics.
 - **Most balanced: the CST design.** It is more efficient than NACA 2412 over most of the lift range
-  (CL ≈ 0.5 to 1.35) and the best of the four at CL = 0.5 and 1.2. Its pitching moment grew by only
-  0.02 because `optimize_airfoil` constrains it.
+  (CL ≈ 0.45 to 1.3) and the best of the four at CL = 0.5. Its pitching moment grew by only 0.02
+  because `optimize_airfoil` constrains it; without that limit it reaches 166.8 (see below).
 
 Efficiency at equal lift, which is what a wing flying at a given weight and speed sees
 ([ld_at_cl.csv](results/xfoil/ld_at_cl.csv)):
@@ -47,9 +47,9 @@ Efficiency at equal lift, which is what a wing flying at a given weight and spee
 | CL/CD at | CL = 0.5 | CL = 0.8 | CL = 1.0 | CL = 1.2 |
 |---|---:|---:|---:|---:|
 | NACA 2412 | 83.0 | 104.5 | 90.4 | 78.5 |
-| Report airfoil | 84.6 | **168.7** | 165.1 | 89.8 |
+| Report airfoil | 84.6 | **168.7** | 165.1 | **89.8** |
 | PARSEC, t ≥ 12 % | 63.1 | 124.5 | **168.9** | 80.5 |
-| CST, `optimize_airfoil` | **85.2** | 126.7 | 139.8 | **125.3** |
+| CST, `optimize_airfoil` | **90.4** | 130.6 | 144.8 | 89.1 |
 
 Every approach tried during the project, ranked the same way:
 [approach comparison](results/xfoil/approach_comparison.png),
@@ -60,6 +60,7 @@ Every approach tried during the project, ranked the same way:
 ```matlab
 cd MATLAB/Optimization
 r = optimize_airfoil('NACA 2412');                     % NACA 4-digit code
+r = optimize_airfoil('NACA 23012');                    % NACA 5-digit code
 r = optimize_airfoil('myfoil.dat');                    % any Selig or Lednicer .dat file
 r = optimize_airfoil('myfoil.dat', 'Re', 5e5, 'Objective', 'endurance');
 ```
@@ -75,10 +76,12 @@ Results with the default options (XFOIL, Re = 10⁶; details in [results/README.
 | Airfoil | Peak CL/CD | Peak CL^1.5/CD | CM at 0° |
 |---|---|---|---|
 | NACA 0012 | 76.5 → 123.7 (+62 %) | 76.0 → 117.6 (+55 %) | 0.000 → −0.027 |
-| NACA 2412 | 104.6 → 140.8 (+35 %) | 95.7 → 148.1 (+55 %) | −0.048 → −0.065 |
+| NACA 2412 | 104.6 → 145.0 (+39 %) | 95.7 → 149.8 (+57 %) | −0.048 → −0.065 |
 | NACA 4412 | 129.6 → 168.5 (+30 %) | 133.6 → 172.0 (+29 %) | −0.096 → −0.131 |
+| NACA 23012 | 98.9 → 133.9 (+35 %) | 104.3 → 135.1 (+29 %) | −0.003 → −0.034 |
 
-All three keep their thickness. A run takes 30–50 minutes on 8 cores.
+All keep their thickness. Without the pitching-moment limit (`'CmIncrease', Inf`), NACA 2412 reaches
+166.8 (+59 %), 91 % of the PARSEC design. A run takes 30–50 minutes on 8 cores.
 
 ## The report method
 
@@ -123,7 +126,7 @@ Limitations of the report method:
 
 ```
 MATLAB/
-  NACA2412/       naca4.m (geometry), writeAirfoilDat.m (XFLR5 export), naca2412_baseline.m
+  NACA2412/       naca4.m, naca5.m (geometry), writeAirfoilDat.m (XFLR5 export), naca2412_baseline.m
   PARSEC/         PARSEC parameterisation (parsec.m, parsecSurfaces.m ...), fit_parsec_naca2412.m
   Aerodynamics/   XFOIL wrapper (xfoilPolar.m), efficiency metrics, readAirfoil.m,
                   compare_approaches.m, plot_polars.m
@@ -134,7 +137,7 @@ MATLAB/
   make_report_figures.m
 results/
   xfoil/          XFOIL comparison: optimised airfoils (.dat), polars (.csv), figures
-  optimize_airfoil/  NACA 0012 and NACA 4412 optimised with optimize_airfoil
+  optimize_airfoil/  NACA 0012, 4412, 23012 and NACA 2412 without the CM limit (optimize_airfoil)
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method
@@ -194,7 +197,7 @@ most 300.
 
 - The PARSEC and GA routines (`MATLAB/PARSEC`, `GAairfoil.m`, `randp.m`) come from the reference study
   A. El Houd and Y. Hallou, *Optimization study of NACA airfoil using nonlinear programming & genetic
-  algorithms*, Bachelor's thesis, 2022. They were corrected for this repository; see the header of
+  algorithms*, project report, ENSAM Meknès, Morocco, 2019. They were corrected for this repository; see the header of
   `parsec.m`.
 - The morphing-airfoil idea draws on M. Bashir, S. Longtin-Martel, R. M. Botez and T. Wong,
   *Aerodynamic Design Optimization of a Morphing Leading Edge and Trailing Edge Airfoil–Application on
