@@ -3,13 +3,16 @@ function f = airfoilObjective(d, S)
 %   f = AIRFOILOBJECTIVE(d, S) applies the CST coefficient changes d to the
 %   fitted airfoil in S and returns minus its efficiency (XFOIL). Shapes
 %   with crossing surfaces, a maximum thickness outside [S.tMin S.tMax], a
-%   pitching moment |CM(alpha=0)| above S.cmMax, or no XFOIL convergence
-%   get the penalty value 0.
+%   pitching moment |CM(alpha=0)| above S.cmMax, a maximum lift below
+%   S.clMaxMin, or no XFOIL convergence get the penalty value 0.
 %
 %   The efficiency is computed with XFOIL's default 160 panel nodes and
 %   again with 200, and the lower value counts. Optimisers are good at
 %   finding numerical artefacts; an XFOIL result that appears with only one
-%   panelling does not survive this check.
+%   panelling does not survive this check. The second analysis is skipped
+%   when the first already scores below S.checkAbove (normally the original
+%   airfoil's value): such a shape cannot be the result, so its exact score
+%   does not matter, and skipping it saves much of the search time.
 
 n1 = numel(S.Au);
 [yu, yl] = cstSurfaces(S.Au + d(1:n1), S.Al + d(n1+1:end), S.dte, S.x);
@@ -22,11 +25,12 @@ v = Inf;
 for panels = {[], 200}
     pol = xfoilPolar(S.x, yu, S.x, yl, S.Re, S.alphaRange, S.exe, panels{1}, false);
     if numel(pol.alpha) < 12 || pol.alpha(1) > 0 || pol.alpha(end) < 0 || ...
-            abs(interp1(pol.alpha, pol.CM, 0)) > S.cmMax
+            abs(interp1(pol.alpha, pol.CM, 0)) > S.cmMax || max(pol.CL) < S.clMaxMin
         f = 0;
         return;
     end
-    v = min(v, efficiencyValue(pol, S.objective, S.designCL));
+    v = min(v, efficiencyValue(pol, S.objective, S.designCL, S.weights));
+    if v < S.checkAbove, break; end
 end
 if ~isfinite(v) || v <= 0
     f = 0;
