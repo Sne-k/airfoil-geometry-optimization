@@ -155,6 +155,95 @@ to the specialised PARSEC search when it is allowed the same trade-off.
   been fixed; the result is within the limit anyway.
 - Baselines are the closed-trailing-edge sections.
 
+## More `optimize_airfoil` runs: other seeds, options and flight phases
+
+All runs use Re = 10⁶ and the default limits: never thinner than the seed, and |CM| at 0° may grow
+by at most 0.05. Each folder in `optimize_airfoil/` holds the optimised `.dat` file, both polars,
+`summary.csv` and `comparison.png`.
+
+| Run | Setting | Result |
+|---|---|---|
+| Clark Y (`MATLAB/airfoils/clarky.dat`) | default | peak CL/CD 114.8 → 171.1 (+49 %), CL^1.5/CD 122.6 → 188.2 (+54 %) |
+| NACA 2412, particle swarm → pattern search | `'Algorithm', 'pso'` | peak CL/CD 104.6 → 146.9 (+40 %); GA → fmincon gives 145.0 |
+| NACA 2412, cruise | `'Objective', 'LDatCL', 'DesignCL', 0.4` | CL/CD at CL = 0.4: 71.3 → 85.6 (+20 %) |
+| NACA 2412, loiter | `'Objective', 'endurance'` | CL^1.5/CD 95.0 → 152.3 (+60 %) |
+| NACA 2412, cruise and loiter | `'DesignCL', [0.4 1.0], 'Weights', [0.2 0.8]` | weighted CL/CD 85.3 → 129.3 (+52 %) |
+| NACA 2412, keep maximum lift | `'KeepCLmax', true` | peak CL/CD 104.6 → 143.3 (+37 %), CL,max 1.43 → 1.51 |
+
+- The two search methods end within 1.5 % of each other. That is within the run-to-run scatter of a
+  single run, so they are not ranked here.
+- Keeping CL,max costs about 1 % of peak efficiency against the default run (145.0). In return, CL,max
+  rises by 5.5 % instead of falling by 1.7 %.
+
+## Benchmark against Xoptfoil2 (`xoptfoil2/`)
+
+[Xoptfoil2](https://github.com/jxjo/Xoptfoil2) 2.0.0 is an established airfoil optimiser: Bezier shape
+functions, particle swarm, XFOIL built in. It was given the same task as the weighted run above
+(`naca2412_weighted.xo2`): maximum CL/CD at CL = 0.4 (weight 0.2) and CL = 1.0 (weight 0.8), with
+t/c ≥ 12 %. Its leading-edge curvature check had to be switched off, because the NACA 2412 seed
+already fails it. Both results were re-analysed with the settings used here (lower value of 160 and
+200 panel nodes; [benchmark.csv](xoptfoil2/benchmark.csv)):
+
+| | CL/CD at CL = 0.4 | at CL = 1.0 | Weighted | Peak CL/CD | t/c | CM at 0° | Run time |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NACA 2412 | 71.5 | 90.2 | 86.4 | 104.6 | 0.120 | −0.048 | |
+| `optimize_airfoil` (CST, GA → fmincon) | 72.9 | 143.2 | **129.2** | 143.3 | 0.121 | −0.060 | 38 min |
+| Xoptfoil2 (Bezier, particle swarm) | 69.6 | 130.8 | 118.5 | 130.9 | 0.131 | −0.052 | 1.5 min |
+
+`optimize_airfoil` scores 9 % higher but takes 25 times longer. It also has no curvature constraints,
+which Xoptfoil2 enforces; the next section shows what that means.
+
+## Curvature check (`curvature_check.csv`)
+
+`MATLAB/Aerodynamics/check_curvature.m` fits every airfoil with a smooth high-order CST shape. It then
+counts curvature reversals between 10 % and 97 % chord on each surface, and records the largest
+curvature over the last 5 % of chord. Xoptfoil2 limits both, because optimisers learn to exploit
+XFOIL's sensitivity to small shape details (for example a tiny "spoiler" at the trailing edge).
+
+- The seeds are clean: NACA 2412 has no reversals and a trailing-edge curvature of 1.39 (upper
+  surface).
+- Most `optimize_airfoil` designs have 1–2 reversals per surface, i.e. slightly wavy surfaces.
+- The recommended PARSEC design has 1 reversal on the upper surface, 4 on the lower one, and a
+  trailing-edge curvature of 3.05.
+- Xoptfoil2's design has 0 and 1 reversals and a trailing-edge curvature of 0.34.
+
+Part of the advantage of our designs may therefore come from shape details that XFOIL rewards more
+than a real flow would. Two follow-ups are planned: curvature constraints in `optimize_airfoil`, and
+checking the designs with CFD (`MATLAB/CFD`, in progress).
+
+## Morphing (`morphing/`)
+
+**Morphing envelope** (`morph_envelope.m`): the cruise and loiter designs above are blended in 10 steps.
+At each lift coefficient, a morphing wing can use the best intermediate shape. Every shape was
+analysed with 160 and 200 panel nodes, and the lower CL/CD is used.
+
+| CL/CD at | CL = 0.4 | CL = 0.8 | CL = 1.0 | CL = 1.2 |
+|---|---:|---:|---:|---:|
+| NACA 2412 | 71.5 | 104.3 | 90.3 | 78.6 |
+| cruise design (fixed) | **85.6** | 113.0 | 80.6 | 67.6 |
+| loiter design (fixed) | 60.2 | 118.3 | 134.4 | **138.4** |
+| weighted compromise (fixed) | 72.9 | **128.7** | **143.1** | 76.3 |
+| morphing between cruise and loiter | **85.6** | 120.2 | 134.4 | **138.4** |
+
+- Morphing beats every fixed airfoil at low lift (cruise) and at high lift.
+- Between CL ≈ 0.75 and 1.05, the fixed compromise design is better than any shape on the path
+  between the two end designs. Which end shapes are chosen matters as much as the ability to morph.
+
+**Nose and trailing-edge morphing with a fixed wing box** (`optimize_le_te_morphing.m`): only 0–15 %
+and 65–100 % of the chord of NACA 2412 are deflected, and the box in between is kept.
+
+| Flight phase | Nose deflection | Trailing-edge deflection | NACA 2412 | Morphed |
+|---|---:|---:|---:|---:|
+| Cruise (CL/CD at CL = 0.4) | 0 | 0.02 c down | 71.5 | 74.8 (+4.6 %) |
+| Loiter (max CL^1.5/CD) | 0 | 0.06 c down | 95.6 | 175.7 (+84 %) |
+| High lift (CL,max) | 0.05 c down | 0.06 c down | 1.43 | 2.06 (+44 %) |
+
+- The loiter and high-lift optima sit at the largest deflections in the grid, so larger deflections
+  could do even better.
+- XFOIL tends to over-predict CL,max.
+- A first version of this study showed a loiter gain of +403 %. That came from a spurious, almost
+  fully laminar XFOIL solution at one panelling; the two-panelling check removed it.
+
 ## Airfoils analysed in XFLR5 for the report
 
 `morph_sequence/` holds the 21 files (steps 00–20) produced by the project run and analysed for the

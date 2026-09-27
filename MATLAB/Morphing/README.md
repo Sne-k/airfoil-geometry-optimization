@@ -23,7 +23,25 @@ For the PARSEC target the peak L/D rises steadily from 105 to 183 along the way
 ([morph_efficiency.png](../../results/xfoil/morph_efficiency.png)), so every intermediate shape is
 more efficient than the one before it.
 
-Both scripts interpolate shapes only. They show the geometries a morphing wing would pass through, but
+## `morph_envelope.m`: what a morphing airfoil gains
+
+Blends two optimised airfoils, by default the cruise design (best CL/CD at CL = 0.4) and the loiter
+design (best CL^1.5/CD) from `optimize_airfoil`, and analyses every intermediate shape. At each lift
+coefficient, a wing that can take any of these shapes flies with the best of them. This *morphing
+envelope* is compared with the two fixed designs and with one fixed compromise design (weighted 20 %
+cruise, 80 % loiter). Outputs go to `output/morph_envelope`; the results are in
+[`results/morphing`](../../results/morphing).
+
+## `optimize_le_te_morphing.m`: nose and trailing-edge morphing with a fixed wing box
+
+Morphs only a droop nose (0–15 % chord) and the trailing edge (65–100 % chord) of NACA 2412 and leaves
+the wing box in between unchanged, as in the droop-nose / morphing-trailing-edge study of Bashir et
+al. (2021). Both surfaces are shifted by the same smooth deflection, so the thickness is kept. A grid
+of nose and trailing-edge deflections is analysed with XFOIL, and the best setting is found for
+cruise (CL/CD at CL = 0.4), loiter (maximum CL^1.5/CD) and high lift (CL,max). Outputs go to
+`output/le_te_morphing`; the results are in [`results/morphing`](../../results/morphing).
+
+All four scripts model shapes only. They show the geometries a morphing wing would pass through, but
 they do not model the mechanism, flexible skin, structure or actuation. The aerodynamics of each step
 is also quasi-steady: every intermediate shape is analysed as if it were fixed. Wind-tunnel and CFD
 tests of a morphing supercritical airfoil (Wang et al., *Shock and Vibration*, 2021,

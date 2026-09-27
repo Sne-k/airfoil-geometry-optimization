@@ -1,0 +1,30 @@
+&info
+  description(1) = 'Benchmark for optimize_airfoil: same task as its weighted NACA 2412 run'
+  description(2) = 'Re 1e6, Ncrit 9. Max glide at CL 0.4 (weight 0.2) and CL 1.0 (weight 0.8). t >= 12 %'
+/
+
+&optimization_options
+  airfoil_file = 'NACA2412.dat'
+  shape_functions = 'bezier'
+  cpu_threads = -1
+  show_details = .false.
+/
+
+&operating_conditions
+  re_default = 1000000
+  noppoint = 2
+  op_point(1) = 0.4
+  optimization_type(1) = 'max-glide'
+  weighting(1) = 0.2
+  op_point(2) = 1.0
+  optimization_type(2) = 'max-glide'
+  weighting(2) = 0.8
+/
+
+&constraints
+  min_thickness = 0.12
+/
+
+&curvature
+  check_le_curvature = .false.
+/
