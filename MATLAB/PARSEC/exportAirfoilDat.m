@@ -3,7 +3,7 @@ function exportAirfoilDat(p, filename, name)
     % (Selig format: trailing edge -> upper surface -> leading edge -> lower
     % surface -> trailing edge), ready for XFLR5 / XFOIL.
     %
-    % Source: reference implementation used in El Houd & Hallou (2022),
+    % Source: reference implementation used in El Houd & Hallou (2019),
     % ref. [5] of the project report. Changed for this repository: 100
     % cosine-spaced points per surface (199 in total) instead of 201,
     % because XFLR5 rejects foils with more than 300 points.

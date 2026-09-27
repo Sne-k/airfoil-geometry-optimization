@@ -14,7 +14,7 @@ if any(~isfinite(t)) || any(t(2:end-1) <= 0) || ...
     ld = 0;
     return;
 end
-pol = xfoilPolar(x, yu, x, yl, Re, [-2 12 0.5], exe);
+pol = xfoilPolar(x, yu, x, yl, Re, [-2 12 0.5], exe, [], false);
 if numel(pol.alpha) < 12
     ld = 0;
     return;

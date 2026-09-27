@@ -16,11 +16,11 @@ driven from MATLAB.
 
 | File | Purpose |
 |---|---|
-| `xfoilPolar.m` | Runs a viscous α sweep on any airfoil and returns α, CL, CD, CM |
+| `xfoilPolar.m` | Runs a viscous α sweep on any airfoil and returns α, CL, CD, CM and the transition locations |
 | `efficiencyMetrics.m` | Peak L/D and where it occurs, peak CL^1.5/CD, CLmax, stall angle, CDmin, CM at α = 0 |
 | `efficiencyValue.m` | The objective used in optimisation: `'LDmax'`, `'endurance'` or `'LDatCL'` |
 | `supportedMax.m` | Peak of a polar quantity that a neighbouring angle confirms (spike filter) |
-| `readAirfoil.m` | Reads an airfoil from a NACA 4-digit code or a Selig/Lednicer `.dat` file |
+| `readAirfoil.m` | Reads an airfoil from a NACA 4- or 5-digit code or a Selig/Lednicer `.dat` file |
 | `compare_approaches.m` | Analyses the final airfoil of every approach tried in the project with the same settings |
 | `plot_polars.m` | Redraws the shapes and polars in `results/xfoil` and tabulates L/D at fixed CL |
 
@@ -53,6 +53,18 @@ Optimisers exploit numerical errors, so the wrapper and the metrics filter them 
   last angle; a second XFOIL run goes from 0° down to the first angle. Before this change, thin cambered
   sections spent the time limit on non-converging negative angles and the polar stopped at α ≈ 1°
   (for example the report airfoil's own `.dat` file). It now converges over the whole range.
+- **Restarts.** Once a solution diverges, XFOIL starts every following angle from it and usually fails
+  on all of them. If a sweep stops converging early, it is restarted from the last converged angle with
+  a fresh boundary layer and half the step (up to three times). The restart is kept only if it
+  reproduces the last converged point first. Restarts are on for analyses and off inside the
+  optimisers (`xfoilPolar(..., exe, panels, false)`). There, most failing shapes are poor candidates,
+  an incomplete polar is penalised anyway, and restarting every failure made the search four times
+  slower.
+- **Drag-rise filter.** Outside the drag bucket, drag grows as the angle moves away from it. A point
+  whose drag falls below 80 % of the highest drag between it and the drag minimum is removed. This
+  catches XFOIL's spurious low-drag branches: after a restart, the 8 %-thick NACA design showed
+  CD = 0.006 at 9° where the neighbouring angles had 0.016 (peak L/D 236 instead of 171). On twelve
+  other airfoils the filter removes nothing.
 - **Two panellings in the optimiser.** `optimize_airfoil` analyses every candidate with XFOIL's default
   160 panel nodes and with 200 (`xfoilPolar(..., exe, 200)`) and scores the lower result, so the search
   cannot exploit a solution that only one panelling produces.
@@ -67,6 +79,7 @@ Known limitations:
   the angle step. With the closed NACA trailing edge and the gap-aware spike filter, the peak values
   of the main designs change by less than 1 % between 140 and 240 panel nodes (see
   [results/README.md](../../results/README.md#robustness-of-the-peak-values)).
-- Some thin, strongly cambered sections still stop converging part-way through the sweep (for example
-  the 8 %-thick NACA design of `optimize_xfoil_naca.m` above α = 0.5°). The optimisers penalise such
-  incomplete polars.
+- For some thin, strongly cambered sections the solution above the efficiency peak depends on how
+  XFOIL reaches it. For the 8 %-thick NACA design of `optimize_xfoil_naca.m`, the lift above about 8° is
+  lower than for the almost identical report airfoil. The peak L/D is not affected, but treat CL,max of
+  such sections with caution. Polars that stay incomplete are penalised by the optimisers.

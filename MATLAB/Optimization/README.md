@@ -4,6 +4,7 @@
 
 ```matlab
 r = optimize_airfoil('NACA 2412');                          % NACA 4-digit code
+r = optimize_airfoil('NACA 23012');                         % NACA 5-digit code
 r = optimize_airfoil('myfoil.dat');                         % any Selig or Lednicer .dat file
 r = optimize_airfoil('myfoil.dat', 'Re', 5e5, 'Objective', 'endurance');
 ```

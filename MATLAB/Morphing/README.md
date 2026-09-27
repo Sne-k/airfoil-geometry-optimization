@@ -24,4 +24,8 @@ For the PARSEC target the peak L/D rises steadily from 105 to 183 along the way
 more efficient than the one before it.
 
 Both scripts interpolate shapes only. They show the geometries a morphing wing would pass through, but
-they do not model the mechanism, flexible skin, structure or actuation.
+they do not model the mechanism, flexible skin, structure or actuation. The aerodynamics of each step
+is also quasi-steady: every intermediate shape is analysed as if it were fixed. Wind-tunnel and CFD
+tests of a morphing supercritical airfoil (Wang et al., *Shock and Vibration*, 2021,
+doi:10.1155/2021/5588056) show hysteresis in lift and drag that grows with the speed and amplitude of
+the shape change, especially for camber changes, so fast morphing will behave differently.

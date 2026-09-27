@@ -3,6 +3,7 @@
 | File | Purpose |
 |---|---|
 | `naca4.m` | Coordinates of any NACA 4-digit section from `m`, `p`, `t` (thickness applied normal to the camber line); `naca4(m, p, t, x, true)` gives the closed-trailing-edge form for XFOIL |
+| `naca5.m` | Coordinates of any NACA 5-digit section, e.g. `naca5('23012', x, true)` (standard and reflexed mean lines) |
 | `writeAirfoilDat.m` | Writes a Selig-format `.dat` file for XFLR5/XFOIL (trailing edge → upper surface → leading edge → lower surface → trailing edge) |
 | `naca2412_baseline.m` | Generates, plots and exports the NACA 2412 baseline (`output/naca2412`) |
 
