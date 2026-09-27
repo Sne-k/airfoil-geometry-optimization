@@ -2,7 +2,7 @@
 
 | Folder / file | Contents |
 |---|---|
-| [NACA2412](NACA2412) | NACA 4-digit geometry (`naca4.m`), XFLR5 `.dat` export (`writeAirfoilDat.m`), baseline script |
+| [NACA2412](NACA2412) | NACA 4- and 5-digit geometry (`naca4.m`, `naca5.m`), XFLR5 `.dat` export (`writeAirfoilDat.m`), baseline script |
 | [PARSEC](PARSEC) | PARSEC parameterisation and a least-squares PARSEC fit of NACA 2412 |
 | [Aerodynamics](Aerodynamics) | XFOIL wrapper, efficiency metrics, airfoil reader, comparison of all approaches |
 | [Optimization](Optimization) | `optimize_airfoil` (any airfoil), XFOIL-in-the-loop optimisations, the report method and the PARSEC genetic algorithm |

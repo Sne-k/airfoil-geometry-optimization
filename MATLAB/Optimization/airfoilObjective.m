@@ -20,7 +20,7 @@ if any(~isfinite(t)) || any(t(2:end-1) <= 0) || max(t) < S.tMin || max(t) > S.tM
 end
 v = Inf;
 for panels = {[], 200}
-    pol = xfoilPolar(S.x, yu, S.x, yl, S.Re, S.alphaRange, S.exe, panels{1});
+    pol = xfoilPolar(S.x, yu, S.x, yl, S.Re, S.alphaRange, S.exe, panels{1}, false);
     if numel(pol.alpha) < 12 || pol.alpha(1) > 0 || pol.alpha(end) < 0 || ...
             abs(interp1(pol.alpha, pol.CM, 0)) > S.cmMax
         f = 0;
