@@ -2,7 +2,7 @@ function [p]=randp(p,range)
 %%%%%%%%%%%%%%%%%%%%%%%%
 %this is a special randomizer for a given range for the GA to create random
 %individuals
-%Source: reference implementation used in El Houd & Hallou (2022), ref. [5]
+%Source: reference implementation used in El Houd & Hallou (2019), ref. [5]
 %%%%%%%%%%%%%%%%%%%%%%%%
 if length(range)==length(p)
     p1=2*range(1)*rand+p(1)-range(1);

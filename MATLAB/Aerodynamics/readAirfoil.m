@@ -2,7 +2,8 @@ function [xu, yu, xl, yl, name] = readAirfoil(src)
 %READAIRFOIL  Airfoil coordinates from a NACA 4-digit code or a .dat file.
 %   [xu, yu, xl, yl, name] = READAIRFOIL('NACA 2412') or READAIRFOIL('2412')
 %   builds the section with naca4 (150 cosine-spaced stations, closed
-%   trailing edge).
+%   trailing edge), and READAIRFOIL('NACA 23012') a 5-digit section with
+%   naca5.
 %   READAIRFOIL('file.dat') reads a Selig file (trailing edge -> upper
 %   surface -> leading edge -> lower surface -> trailing edge) or a Lednicer
 %   file (point counts, then the upper and the lower surface from the
@@ -23,8 +24,15 @@ if ~isempty(code)
     name = ['NACA ' code{2}];
     return;
 end
-if ~isempty(regexp(upper(src), '^(NACA)?\s*\d{5,6}$', 'once'))
-    error('readAirfoil:code', ['Only NACA 4-digit codes can be generated. ' ...
+code = regexp(upper(src), '^(NACA)?\s*(\d{5})$', 'tokens', 'once');
+if ~isempty(code)
+    x = (1 - cos(linspace(0, pi, 150)')) / 2;
+    [xu, yu, xl, yl] = naca5(code{2}, x, true);
+    name = ['NACA ' code{2}];
+    return;
+end
+if ~isempty(regexp(upper(src), '^(NACA)?\s*\d{6}$', 'once'))
+    error('readAirfoil:code', ['Only NACA 4- and 5-digit codes can be generated. ' ...
         'For %s, pass its coordinates as a .dat file.'], src);
 end
 

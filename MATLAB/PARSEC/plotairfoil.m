@@ -2,7 +2,7 @@ function []=plotairfoil(p,c)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %this function plots the airfoil shape for a given (p) PARSEC parameters
 %(P.S.) c is the graph color
-%Source: reference implementation used in El Houd & Hallou (2022), ref. [5]
+%Source: reference implementation used in El Houd & Hallou (2019), ref. [5]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dbeta=pi/200;
 beta=0;

@@ -13,7 +13,7 @@ trailing-edge height, thickness, direction and wedge angle.
 | `exportAirfoilDat.m` | Exports a PARSEC airfoil as `.dat` (100 cosine-spaced points per surface) |
 | `fit_parsec_naca2412.m` | Least-squares PARSEC fit of NACA 2412 (maximum error 0.3 % chord) |
 
-The routines come from the reference study of El Houd & Hallou (2022). Four errors were corrected here
+The routines come from the reference study of El Houd & Hallou (2019). Four errors were corrected here
 (details in the header of `parsec.m`):
 
 - The crest-curvature coefficient was 53/4; the correct value is 63/4.

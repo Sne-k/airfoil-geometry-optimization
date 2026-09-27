@@ -1,20 +1,29 @@
-function pol = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels)
+function pol = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, restarts)
 %XFOILPOLAR  Viscous XFOIL polar of an airfoil.
 %   pol = XFOILPOLAR(xu, yu, xl, yl, Re, alphaRange) writes the airfoil
 %   (both surfaces ordered from the leading edge to the trailing edge) to a
 %   temporary .dat file, lets XFOIL re-panel it (PANE) and runs a viscous
 %   angle-of-attack sweep alphaRange = [first last step] (degrees) at the
 %   Reynolds number Re, Mach 0 and Ncrit 9. pol has the fields alpha, CL,
-%   CD and CM for the converged points (empty if XFOIL failed).
+%   CD, CM and the transition locations xtrTop and xtrBot (x/c) for the
+%   converged points (empty if XFOIL failed).
 %
 %   The sweep is split in two XFOIL runs: from the angle closest to 0 up to
 %   the last angle, and from there down to the first angle. Angles near 0
 %   converge most easily, and a failure at one end (stall, or lower-surface
 %   separation of thin cambered sections at negative angles) cannot spoil
-%   the other end or use up its time limit.
+%   the other end or use up its time limit. If XFOIL stops converging
+%   before the end of a part, it is restarted from the last converged angle
+%   with half the step, and the restart is kept only if it reproduces that
+%   angle (up to three times per part). Points with a drag below the
+%   laminar flat-plate value, or on a spurious low-drag branch outside the
+%   drag bucket, are removed.
 %
 %   pol = XFOILPOLAR(..., exe, panels) re-panels with the given number of
-%   panel nodes instead of XFOIL's default (160).
+%   panel nodes instead of XFOIL's default (160). pol = XFOILPOLAR(..., exe,
+%   panels, false) turns the restarts off. The optimisers do this: it is
+%   much faster for shapes that do not converge, and a polar that stops
+%   early is penalised there anyway.
 %
 %   XFOIL is not part of this repository. Download it from
 %   https://web.mit.edu/drela/Public/web/xfoil/ and put xfoil.exe in this
@@ -28,6 +37,7 @@ if nargin < 7 || isempty(exe)
     end
 end
 if nargin < 8, panels = []; end
+if nargin < 9 || isempty(restarts), restarts = true; end
 if ~isfile(exe)
     error('xfoilPolar:noXfoil', 'XFOIL executable not found: %s', exe);
 end
@@ -44,21 +54,73 @@ fclose(fid);
 
 a = alphaRange(1):alphaRange(3):alphaRange(2);
 [~, i0] = min(abs(a));
-d = [runSweep(work, exe, Re, a(i0:end), panels, 'up'); ...
-     runSweep(work, exe, Re, a(i0-1:-1:1), panels, 'down')];
+d = [sweepWithRestarts(work, exe, Re, a(i0:end), panels, 'up', restarts); ...
+     sweepWithRestarts(work, exe, Re, a(i0-1:-1:1), panels, 'down', restarts)];
 
-pol = struct('alpha', [], 'CL', [], 'CD', [], 'CM', []);
+pol = struct('alpha', [], 'CL', [], 'CD', [], 'CM', [], 'xtrTop', [], 'xtrBot', []);
 if isempty(d), return; end
 d = sortrows(d, 1);
+[~, iu] = unique(d(:, 1));                   % one point per angle
+d = d(iu, :);
 % Drop non-physical points: profile drag cannot be lower than the skin
 % friction of a fully laminar flat plate on both sides, CD = 2.656/sqrt(Re).
 % XFOIL occasionally "converges" to such solutions over several angles.
 d = d(d(:, 3) >= 0.9 * 2.656 / sqrt(Re), :);
 if isempty(d), return; end
+d = dragRiseFilter(d);
 pol.alpha = d(:, 1);
 pol.CL = d(:, 2);
 pol.CD = d(:, 3);
 pol.CM = d(:, 5);
+pol.xtrTop = d(:, 6);
+pol.xtrBot = d(:, 7);
+end
+
+function d = dragRiseFilter(d)
+% Outside the drag bucket, drag grows as the angle of attack moves away from
+% it. XFOIL sometimes converges to a spurious low-drag branch there (seen
+% after restarts on thin sections: CD 0.006 where the neighbouring angles
+% have 0.016). Drop points whose drag is below 80 % of the highest drag
+% between them and the drag minimum.
+[~, iMin] = min(d(:, 3));
+keep = true(size(d, 1), 1);
+for dir = [1 -1]
+    cdMax = 0;
+    for k = iMin + dir : dir : (dir > 0)*size(d, 1) + (dir < 0)
+        if d(k, 3) < 0.8 * cdMax
+            keep(k) = false;
+        else
+            cdMax = max(cdMax, d(k, 3));
+        end
+    end
+end
+d = d(keep, :);
+end
+
+function d = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts)
+% Sweeps over angles. Once a solution diverges, XFOIL starts every
+% following angle from it and usually fails on all of them. If the sweep
+% stops converging before the last angle, it is restarted from the last
+% converged angle with a fresh boundary layer and half the step (up to
+% three times). The restart must first reproduce the last converged point
+% (CL/CD within 2 %); otherwise its results are discarded, because a fresh
+% start can land on a different, spurious solution.
+d = runSweep(work, exe, Re, angles, panels, [tag '1']);
+if ~restarts || isempty(d) || numel(angles) < 2, return; end
+step = angles(2) - angles(1);
+for attempt = 2:4
+    j = find(abs(angles - d(end, 1)) < 1e-6, 1);   % last converged angle
+    if isempty(j) || j == numel(angles), break; end
+    r = runSweep(work, exe, Re, angles(j):step/2:angles(end), panels, sprintf('%s%d', tag, attempt));
+    ld0 = d(end, 2) / d(end, 3);
+    if isempty(r) || abs(r(1, 1) - d(end, 1)) > 1e-6 || abs(r(1, 2)/r(1, 3) - ld0) > 0.02*abs(ld0)
+        break;
+    end
+    r = r(2:end, :);                                          % drop the repeated angle
+    r = r(any(abs(r(:, 1) - angles(:).') < 1e-6, 2), :);     % original angles only
+    if isempty(r), break; end
+    d = [d; r]; %#ok<AGROW>
+end
 end
 
 function d = runSweep(work, exe, Re, angles, panels, tag)

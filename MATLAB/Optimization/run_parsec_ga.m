@@ -1,4 +1,4 @@
-%% PARSEC + genetic algorithm (reference approach, El Houd & Hallou 2022)
+%% PARSEC + genetic algorithm (reference approach, El Houd & Hallou 2019)
 % Runs the genetic algorithm of GAairfoil.m on the 11 PARSEC parameters,
 % starting from the PARSEC fit of NACA 2412. The fitness is the airfoil's
 % cross-sectional area (see GAairfoil.m), so the result is a thinner airfoil,

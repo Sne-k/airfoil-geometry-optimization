@@ -17,7 +17,7 @@ function a=parsec(p)
 % p10=alpha te    trailing-edge direction angle (deg)
 % p11=beta te     trailing-edge wedge angle (deg)
 %
-% Source: reference implementation used in El Houd & Hallou (2022),
+% Source: reference implementation used in El Houd & Hallou (2019),
 % "Optimization study of NACA airfoil using nonlinear programming & genetic
 % algorithms" (ref. [5] of the project report).
 % Corrections made for this repository:

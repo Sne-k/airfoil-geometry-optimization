@@ -13,7 +13,7 @@ function [AAoriginal,AAfittest,fittest,fitness]=GAairfoil(genNo,p0,range)
 %p0         Original airfoil to optimize
 %range      Randomizer range to vary the PARSEC parameters
 %
-%Source: reference implementation used in El Houd & Hallou (2022),
+%Source: reference implementation used in El Houd & Hallou (2019),
 %"Optimization study of NACA airfoil using nonlinear programming & genetic
 %algorithms" (ref. [5] of the project report).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
