@@ -22,6 +22,7 @@ driven from MATLAB.
 | `supportedMax.m` | Peak of a polar quantity that a neighbouring angle confirms (spike filter) |
 | `readAirfoil.m` | Reads an airfoil from a NACA 4- or 5-digit code or a Selig/Lednicer `.dat` file |
 | `compare_approaches.m` | Analyses the final airfoil of every approach tried in the project with the same settings |
+| `curvatureReport.m`, `check_curvature.m` | Curvature reversals and trailing-edge curvature of an airfoil (checks in the spirit of Xoptfoil2); `check_curvature` checks every design in `results/` |
 | `plot_polars.m` | Redraws the shapes and polars in `results/xfoil` and tabulates L/D at fixed CL |
 
 ## Analysis settings
