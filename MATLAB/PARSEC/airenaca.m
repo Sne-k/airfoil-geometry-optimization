@@ -1,7 +1,10 @@
 function [A, maxThickness] = airenaca(p)
     % Cross-sectional area and maximum thickness of a PARSEC airfoil
     % (201 cosine-spaced stations). Used as the GA fitness in GAairfoil.m.
-    % Source: reference implementation used in El Houd & Hallou (2019), ref. [5]
+    % Source: airenaca.m of the El Houd & Hallou (2019) reference
+    % implementation, https://github.com/anasselhoud/Airfoil-Shape_optimization
+    % Copyright (c) 2020 Anass El Houd, MIT licence; see THIRD_PARTY_NOTICES.md.
+    % The code is unchanged; only comments were added.
     dbeta = pi / 200;
     Z_u0 = [];
     Z_d0 = [];

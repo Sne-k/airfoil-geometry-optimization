@@ -1,4 +1,6 @@
 %% PARSEC + genetic algorithm (reference approach, El Houd & Hallou 2019)
+% Based on runit.m of https://github.com/anasselhoud/Airfoil-Shape_optimization
+% (Copyright (c) 2020 Anass El Houd, MIT licence; see THIRD_PARTY_NOTICES.md).
 % Runs the genetic algorithm of GAairfoil.m on the 11 PARSEC parameters,
 % starting from the PARSEC fit of NACA 2412. The fitness is the airfoil's
 % cross-sectional area (see GAairfoil.m), so the result is a thinner airfoil,

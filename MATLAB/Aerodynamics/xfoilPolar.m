@@ -1,4 +1,4 @@
-function pol = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, restarts)
+function [pol, info] = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, restarts, flow)
 %XFOILPOLAR  Viscous XFOIL polar of an airfoil.
 %   pol = XFOILPOLAR(xu, yu, xl, yl, Re, alphaRange) writes the airfoil
 %   (both surfaces ordered from the leading edge to the trailing edge) to a
@@ -25,6 +25,13 @@ function pol = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, restarts)
 %   much faster for shapes that do not converge, and a polar that stops
 %   early is penalised there anyway.
 %
+%   pol = XFOILPOLAR(..., restarts, flow) changes the flow settings; flow is
+%   a struct with any of the fields Mach (default 0; XFOIL applies the
+%   Karman-Tsien correction), Ncrit (default 9, the e^n transition
+%   criterion) and Xtr ([top bottom] forced transition x/c, default [1 1] =
+%   free transition). [pol, info] = XFOILPOLAR(...) also returns the header
+%   of XFOIL's polar file (info.header), which lists the settings XFOIL used.
+%
 %   XFOIL is not part of this repository. Download it from
 %   https://web.mit.edu/drela/Public/web/xfoil/ and put xfoil.exe in this
 %   folder, set the environment variable XFOIL_EXE, or pass the path of the
@@ -38,8 +45,24 @@ if nargin < 7 || isempty(exe)
 end
 if nargin < 8, panels = []; end
 if nargin < 9 || isempty(restarts), restarts = true; end
+if nargin < 10 || isempty(flow), flow = struct(); end
 if ~isfile(exe)
     error('xfoilPolar:noXfoil', 'XFOIL executable not found: %s', exe);
+end
+% Flow settings; nothing is added to the commands for the defaults
+flowCmd = '';
+if isfield(flow, 'Mach') && flow.Mach ~= 0
+    flowCmd = sprintf('MACH %g\n', flow.Mach);
+end
+vpar = '';
+if isfield(flow, 'Ncrit') && flow.Ncrit ~= 9
+    vpar = [vpar sprintf('N %g\n', flow.Ncrit)];
+end
+if isfield(flow, 'Xtr') && any(flow.Xtr ~= 1)
+    vpar = [vpar sprintf('XTR %g %g\n', flow.Xtr(1), flow.Xtr(2))];
+end
+if ~isempty(vpar)
+    flowCmd = [flowCmd sprintf('VPAR\n') vpar newline];
 end
 
 work = tempname;
@@ -54,8 +77,8 @@ fclose(fid);
 
 a = alphaRange(1):alphaRange(3):alphaRange(2);
 [~, i0] = min(abs(a));
-d = [sweepWithRestarts(work, exe, Re, a(i0:end), panels, 'up', restarts); ...
-     sweepWithRestarts(work, exe, Re, a(i0-1:-1:1), panels, 'down', restarts)];
+[dUp, info.header] = sweepWithRestarts(work, exe, Re, a(i0:end), panels, 'up', restarts, flowCmd);
+d = [dUp; sweepWithRestarts(work, exe, Re, a(i0-1:-1:1), panels, 'down', restarts, flowCmd)];
 
 pol = struct('alpha', [], 'CL', [], 'CD', [], 'CM', [], 'xtrTop', [], 'xtrBot', []);
 if isempty(d), return; end
@@ -97,7 +120,7 @@ end
 d = d(keep, :);
 end
 
-function d = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts)
+function [d, header] = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts, flowCmd)
 % Sweeps over angles. Once a solution diverges, XFOIL starts every
 % following angle from it and usually fails on all of them. If the sweep
 % stops converging before the last angle, it is restarted from the last
@@ -105,13 +128,13 @@ function d = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts)
 % three times). The restart must first reproduce the last converged point
 % (CL/CD within 2 %); otherwise its results are discarded, because a fresh
 % start can land on a different, spurious solution.
-d = runSweep(work, exe, Re, angles, panels, [tag '1']);
+[d, header] = runSweep(work, exe, Re, angles, panels, [tag '1'], flowCmd);
 if ~restarts || isempty(d) || numel(angles) < 2, return; end
 step = angles(2) - angles(1);
 for attempt = 2:4
     j = find(abs(angles - d(end, 1)) < 1e-6, 1);   % last converged angle
     if isempty(j) || j == numel(angles), break; end
-    r = runSweep(work, exe, Re, angles(j):step/2:angles(end), panels, sprintf('%s%d', tag, attempt));
+    r = runSweep(work, exe, Re, angles(j):step/2:angles(end), panels, sprintf('%s%d', tag, attempt), flowCmd);
     ld0 = d(end, 2) / d(end, 3);
     if isempty(r) || abs(r(1, 1) - d(end, 1)) > 1e-6 || abs(r(1, 2)/r(1, 3) - ld0) > 0.02*abs(ld0)
         break;
@@ -123,9 +146,11 @@ for attempt = 2:4
 end
 end
 
-function d = runSweep(work, exe, Re, angles, panels, tag)
+function [d, header] = runSweep(work, exe, Re, angles, panels, tag, flowCmd)
 % One XFOIL run over the given angles; returns the rows of its polar file
+% and the header lines above them
 d = zeros(0, 7);
+header = '';
 if isempty(angles), return; end
 step = 1;
 if numel(angles) > 1, step = angles(2) - angles(1); end
@@ -135,7 +160,7 @@ else
     pane = sprintf('PPAR\nN %d\n\n\n', panels);
 end
 fid = fopen(fullfile(work, ['cmd_' tag '.txt']), 'w');
-fprintf(fid, ['PLOP\nG F\n\nLOAD af.dat\n' pane 'OPER\nVISC %g\nITER 150\n' ...
+fprintf(fid, ['PLOP\nG F\n\nLOAD af.dat\n' pane 'OPER\nVISC %g\n' flowCmd 'ITER 150\n' ...
     'PACC\npol_%s.txt\n\nASEQ %g %g %g\nPACC\n\nQUIT\n'], Re, tag, angles(1), angles(end), step);
 fclose(fid);
 
@@ -154,6 +179,7 @@ if ~isfile(polFile), return; end
 lines = splitlines(fileread(polFile));
 first = find(startsWith(strtrim(lines), '---'), 1);
 if isempty(first), return; end
+header = strjoin(lines(1:first-1), newline);
 v = sscanf(strjoin(lines(first+1:end), ' '), '%f');
 d = reshape(v(1:7*floor(numel(v)/7)), 7, []).';
 end
