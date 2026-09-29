@@ -302,6 +302,9 @@ info.objectiveFinal = -fOpt;
 info.designMeetsCurvatureLimits = all(vCurv == 0);
 info.evaluations = height(H);
 info.xfoilAnalysedDesigns = sum(H.xfoil_analyses > 0);
+% Median duration of an analysed design: shows whether the machine ran at
+% its normal speed (about 10 s on the development laptop with 6 workers)
+info.medianEvaluationSeconds = median(H.eval_seconds(H.xfoil_analyses > 0));
 info.globalExitFlag = flagG;
 info.globalOutput = cleanOutput(outG);
 info.localExitFlag = flagL;
@@ -401,9 +404,9 @@ for i = 1:numel(files)
 end
 T = vertcat(T{:});
 T = sortrows(T, 1);
-nv = width(T) - 4;
-H = table(T{:, 1} - T{1, 1}, T{:, 2}, T{:, 3}, T{:, 4}, T{:, 5:end}, 'VariableNames', ...
-    {'time_s', 'stage', 'objective', 'xfoil_analyses', 'd'});
+nv = width(T) - 5;
+H = table(T{:, 1} - T{1, 1}, T{:, 2}, T{:, 3}, T{:, 4}, T{:, 5}, T{:, 6:end}, 'VariableNames', ...
+    {'time_s', 'stage', 'objective', 'xfoil_analyses', 'eval_seconds', 'd'});
 H.d = reshape(H.d, [], nv);
 end
 
