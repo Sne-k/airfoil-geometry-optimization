@@ -90,9 +90,14 @@ All keep their thickness. Without the pitching-moment limit (`'CmIncrease', Inf`
   combination, or with maximum lift kept.
 - **Benchmark.** Given the same task as Xoptfoil2, `optimize_airfoil` scores 9 % higher but runs 25
   times longer.
-- **Caveat.** Our designs have slightly wavy surfaces, which Xoptfoil2's curvature limits would reject.
-  Part of their advantage may be an XFOIL artefact. Curvature constraints and a CFD check are the
-  next steps.
+- **Caveat.** The designs above have slightly wavy surfaces, which Xoptfoil2's curvature limits would
+  reject, so part of their advantage may be an XFOIL artefact. `optimize_airfoil` now applies such
+  curvature limits by default ([details](MATLAB/Optimization/README.md#curvature-limits)); the runs above
+  are being repeated with the limits and three random seeds each. A CFD check is the next step.
+- **Validation.** Against NACA 0012 wind-tunnel data (Ladson 1988), XFOIL's drag agrees within 3 % when
+  transition is fixed at 5 % chord, but is 11–14 % too low with free transition, and its maximum lift is
+  too high. Absolute L/D values from XFOIL are therefore optimistic; see
+  [results/validation](results/validation/README.md).
 - **Morphing.** Morphing between a cruise and a loiter shape beats any fixed airfoil at the two ends of
   the lift range. Nose and trailing-edge morphing with a fixed wing box raises the loiter
   efficiency of NACA 2412 by 84 %.
@@ -149,6 +154,7 @@ MATLAB/
   Optimization/   optimize_airfoil.m (any airfoil, CST + XFOIL), optimize_xfoil_parsec.m,
                   optimize_xfoil_naca.m, optimize_naca_ga_nlp.m (report method), run_parsec_ga.m
   Morphing/       morph_airfoil.m (report morph), morph_to_design.m (morph to any .dat, with L/D per step)
+  Validation/     validate_xfoil.m: XFOIL against NACA 0012 wind-tunnel data
   CFD/            C-grid generator, Fluent mesh export and journals (work in progress)
   airfoils/       seed airfoils as .dat files (Clark Y)
   run_project.m   runs everything in order
@@ -158,15 +164,18 @@ results/
   optimize_airfoil/  optimize_airfoil results: other airfoils, options and flight phases
   xoptfoil2/      benchmark against Xoptfoil2
   morphing/       morphing envelope and nose/trailing-edge morphing
+  validation/     XFOIL against wind-tunnel data (experimental data, polars, comparison)
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method
+LICENSE           MIT licence
+THIRD_PARTY_NOTICES.md   code and data from other sources and their terms
 ```
 
 ## Running the code
 
-Requirements: MATLAB R2020b or newer, Optimization Toolbox, Global Optimization Toolbox, and for the
-aerodynamic steps XFOIL 6.99 ([setup](MATLAB/Aerodynamics/README.md): download `xfoil.exe` from MIT and
+Requirements: MATLAB R2021a or newer (tested with R2024b), Optimization Toolbox, Global Optimization
+Toolbox, and for the aerodynamic steps XFOIL 6.99 ([setup](MATLAB/Aerodynamics/README.md): download `xfoil.exe` from MIT and
 put it in `MATLAB/Aerodynamics`). Parallel Computing Toolbox is optional and speeds up the XFOIL
 optimisations.
 
@@ -187,6 +196,7 @@ run Optimization/optimize_xfoil_parsec.m      % XFOIL in the loop, PARSEC (the r
 run Optimization/optimize_xfoil_naca.m        % XFOIL in the loop, NACA [m p t]
 run Aerodynamics/compare_approaches.m         % every approach analysed with the same settings
 run Morphing/morph_to_design.m                % morph to the PARSEC design with L/D per step
+validate_xfoil                                % in MATLAB/Validation: XFOIL against wind-tunnel data
 ```
 
 Outputs are written to `MATLAB/output/` (not tracked). Each XFOIL optimisation takes about
@@ -215,10 +225,13 @@ most 300.
 
 ## Credits
 
-- The PARSEC and GA routines (`MATLAB/PARSEC`, `GAairfoil.m`, `randp.m`) come from the reference study
-  A. El Houd and Y. Hallou, *Optimization study of NACA airfoil using nonlinear programming & genetic
-  algorithms*, project report, ENSAM Meknès, Morocco, 2019. They were corrected for this repository; see the header of
-  `parsec.m`.
+- The PARSEC and GA routines (`parsec.m`, `yCoord2.m`, `airenaca.m`, `plotairfoil.m` and
+  `exportAirfoilDat.m` in `MATLAB/PARSEC`; `GAairfoil.m`, `randp.m` and `run_parsec_ga.m` in
+  `MATLAB/Optimization`) come from the reference implementation of A. El Houd and Y. Hallou,
+  *Optimization study of NACA airfoil using nonlinear programming & genetic algorithms*, project report,
+  ENSAM Meknès, Morocco, 2019 (<https://github.com/anasselhoud/Airfoil-Shape_optimization>, MIT licence).
+  `parsec.m` was corrected for this repository (see its header); the changes to the other files are
+  listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 - The morphing-airfoil idea draws on M. Bashir, S. Longtin-Martel, R. M. Botez and T. Wong,
   *Aerodynamic Design Optimization of a Morphing Leading Edge and Trailing Edge Airfoil–Application on
   the UAS-S45*, Applied Sciences 11(4):1664, 2021.
@@ -226,3 +239,11 @@ most 300.
   Aircraft 45(1), 2008.
 - XFOIL: M. Drela, MIT (<https://web.mit.edu/drela/Public/web/xfoil/>). XFOIL is not distributed with
   this repository.
+- Curvature limits: J. Guenzel, Xoptfoil2 (<https://github.com/jxjo/Xoptfoil2>).
+- Wind-tunnel data: C. L. Ladson, NASA TM-4074, 1988, and the NASA Langley Turbulence Modeling
+  Resource; see [results/validation/experimental](results/validation/experimental/README.md).
+
+## Licence
+
+The code is released under the [MIT licence](LICENSE). Code and data from other sources keep their
+own terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

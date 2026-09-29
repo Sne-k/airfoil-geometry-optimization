@@ -2,7 +2,10 @@ function [p]=randp(p,range)
 %%%%%%%%%%%%%%%%%%%%%%%%
 %this is a special randomizer for a given range for the GA to create random
 %individuals
-%Source: reference implementation used in El Houd & Hallou (2019), ref. [5]
+%Source: randp.m of the El Houd & Hallou (2019) reference implementation,
+%https://github.com/anasselhoud/Airfoil-Shape_optimization
+%Copyright (c) 2020 Anass El Houd, MIT licence; see THIRD_PARTY_NOTICES.md.
+%The code is unchanged apart from the closing end.
 %%%%%%%%%%%%%%%%%%%%%%%%
 if length(range)==length(p)
     p1=2*range(1)*rand+p(1)-range(1);
