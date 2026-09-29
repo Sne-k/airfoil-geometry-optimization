@@ -3,9 +3,12 @@ function exportAirfoilDat(p, filename, name)
     % (Selig format: trailing edge -> upper surface -> leading edge -> lower
     % surface -> trailing edge), ready for XFLR5 / XFOIL.
     %
-    % Source: reference implementation used in El Houd & Hallou (2019),
-    % ref. [5] of the project report. Changed for this repository: 100
-    % cosine-spaced points per surface (199 in total) instead of 201,
+    % Based on plotairfoil.m of the El Houd & Hallou (2019) reference
+    % implementation (ref. [5] of the project report), which computes the
+    % same coordinates for plotting: https://github.com/anasselhoud/Airfoil-Shape_optimization
+    % Copyright (c) 2020 Anass El Houd, MIT licence; see THIRD_PARTY_NOTICES.md.
+    % Changed for this project: the coordinates are written to a file, with
+    % 100 cosine-spaced points per surface (199 in total) instead of 201,
     % because XFLR5 rejects foils with more than 300 points.
 
     if nargin < 3

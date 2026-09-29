@@ -16,7 +16,7 @@ driven from MATLAB.
 
 | File | Purpose |
 |---|---|
-| `xfoilPolar.m` | Runs a viscous α sweep on any airfoil and returns α, CL, CD, CM and the transition locations |
+| `xfoilPolar.m` | Runs a viscous α sweep on any airfoil and returns α, CL, CD, CM and the transition locations; optional Mach number, Ncrit and forced transition |
 | `efficiencyMetrics.m` | Peak L/D and where it occurs, peak CL^1.5/CD, CLmax, stall angle, CDmin, CM at α = 0 |
 | `efficiencyValue.m` | The objective used in optimisation: `'LDmax'`, `'endurance'` or `'LDatCL'` |
 | `supportedMax.m` | Peak of a polar quantity that a neighbouring angle confirms (spike filter) |
@@ -31,6 +31,13 @@ driven from MATLAB.
 - XFOIL re-panels every airfoil (`PANE`)
 - α from −2° to 18° in 0.5° steps; the optimisation objectives use −2° to 12°
 - each sweep runs in two parts: from 0° up, then from 0° down (see below)
+
+`xfoilPolar(..., restarts, flow)` changes the flow settings for other purposes: `flow.Mach` (XFOIL
+applies the Karman-Tsien correction), `flow.Ncrit` and `flow.Xtr = [top bottom]` (forced transition,
+x/c). Nothing is added to XFOIL's commands for the default values, so all earlier results are
+unchanged. `[pol, info] = xfoilPolar(...)` also returns the header of XFOIL's polar file, which lists
+the settings XFOIL actually used; the validation checks it for every case. How well these settings
+reproduce wind-tunnel data is shown in [results/validation](../../results/validation).
 
 For NACA 2412 these settings give similar drag and peak L/D to the report's XFLR5 analysis
 (CD = 0.0056 against 0.0057 at 0°; peak L/D 105 at 4.5° against about 100 at 4–5°), but less lift:
