@@ -13,9 +13,11 @@ function [AAoriginal,AAfittest,fittest,fitness]=GAairfoil(genNo,p0,range)
 %p0         Original airfoil to optimize
 %range      Randomizer range to vary the PARSEC parameters
 %
-%Source: reference implementation used in El Houd & Hallou (2019),
-%"Optimization study of NACA airfoil using nonlinear programming & genetic
-%algorithms" (ref. [5] of the project report).
+%Source: GAairfoil.m of the reference implementation of El Houd & Hallou
+%(2019), "Optimization study of NACA airfoil using nonlinear programming &
+%genetic algorithms" (ref. [5] of the project report), https://github.com/anasselhoud/Airfoil-Shape_optimization
+%Copyright (c) 2020 Anass El Houd, MIT licence; see THIRD_PARTY_NOTICES.md.
+%The code is unchanged; only these comments were added.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%genetic parameters
 [AAoriginal,~]=airenaca(p0);

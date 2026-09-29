@@ -2,7 +2,10 @@ function []=plotairfoil(p,c)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %this function plots the airfoil shape for a given (p) PARSEC parameters
 %(P.S.) c is the graph color
-%Source: reference implementation used in El Houd & Hallou (2019), ref. [5]
+%Source: plotairfoil.m of the El Houd & Hallou (2019) reference
+%implementation, https://github.com/anasselhoud/Airfoil-Shape_optimization
+%Copyright (c) 2020 Anass El Houd, MIT licence; see THIRD_PARTY_NOTICES.md.
+%The code is unchanged; only comments were added.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dbeta=pi/200;
 beta=0;

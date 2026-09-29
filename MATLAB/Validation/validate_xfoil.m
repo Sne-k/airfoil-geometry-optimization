@@ -138,7 +138,7 @@ plot(p.alpha, p.CL, 'r-', 'LineWidth', 1.2); hold on;
 for z = 1:numel(trip), plot(trip(z).data(:, 1), trip(z).data(:, 2), marks{z}); end
 grid on; xlabel('\alpha (deg)'); ylabel('C_L');
 title('Transition fixed at 0.05c, Re = 6\times10^6, M = 0.15');
-legend([{'XFOIL'}, strcat('Ladson (1988), ', {trip.name})], 'Location', 'southeast');
+legend([{'XFOIL'}, strcat({'Ladson (1988), '}, {trip.name})], 'Location', 'southeast');
 subplot(1, 2, 2);
 plot(p.CD, p.CL, 'r-', 'LineWidth', 1.2); hold on;
 for z = 1:numel(trip), plot(trip(z).data(:, 3), trip(z).data(:, 2), marks{z}); end
@@ -156,6 +156,7 @@ cX = polyfit(p.alpha(lin), p.CL(lin), 1);
 row([7 10 12]) = {cX(1), clmaxX, p.alpha(iX)};
 ldX = supportedMax(p.alpha, p.CL ./ p.CD);
 row{18} = ldX;
+pre = [];
 if ~isempty(aL)
     [clmaxE, iE] = max(cl);
     pre = aL <= aL(iE);                                   % before the measured stall
@@ -170,6 +171,9 @@ if ~isempty(aL)
 end
 if ~isempty(cd)
     ok = ~isnan(cd);
+    if isequal(clD, cl)
+        ok = ok & pre;             % lift and drag from the same runs: drop the points after stall
+    end
     clD = clD(ok);  cd = cd(ok);
     % XFOIL drag as a function of lift on the branch below its CL max
     br = 1:iX;
