@@ -85,11 +85,12 @@ Outputs, in `MATLAB/output/optimize_airfoil/<name>/`:
 - `comparison.png`, `curvature.png` (curvature of both surfaces) and `convergence.png` (best objective
   against the number of designs analysed with XFOIL)
 - `history.csv`: every evaluation of the search in time order (stage, objective value, number of XFOIL
-  analyses, CST changes). Each MATLAB process appends to its own file in `history/`, so parallel
-  workers never write to the same file.
+  analyses, duration of the evaluation, CST changes). Each MATLAB process appends to its own file in
+  `history/`, so parallel workers never write to the same file.
 - `run_info.json`: date, run time, MATLAB version, number of parallel workers, XFOIL executable, git
   commit of the code (marked if files under `MATLAB/` had been changed), all options, the limits, the
-  objective after each stage, whether the design meets the curvature limits, and the solver outputs
+  objective after each stage, whether the design meets the curvature limits, the median duration of an
+  analysed design (a check that the machine ran at its normal speed), and the solver outputs
 - `result.mat`
 
 A run takes about 20–35 min on 8 cores.

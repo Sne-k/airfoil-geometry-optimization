@@ -164,11 +164,15 @@ fprintf(fid, ['PLOP\nG F\n\nLOAD af.dat\n' pane 'OPER\nVISC %g\n' flowCmd 'ITER 
     'PACC\npol_%s.txt\n\nASEQ %g %g %g\nPACC\n\nQUIT\n'], Re, tag, angles(1), angles(end), step);
 fclose(fid);
 
-% Stop XFOIL if it hangs: 10 s plus 0.5 s per angle (timeout.exe ships with
-% Git for Windows)
+% Stop XFOIL if it hangs: 60 s plus 2 s per angle (timeout.exe ships with
+% Git for Windows). A converging sweep needs a few seconds, so the limit
+% only stops a hanging XFOIL. It is generous on purpose: with a tight limit
+% (formerly 10 s plus 0.5 s per angle) a machine slowed down by the
+% operating system (e.g. a laptop in standby with the screen off) cut
+% sweeps short, and the results depended on the speed of the machine.
 guard = 'C:\Program Files\Git\usr\bin\timeout.exe';
 if isfile(guard)
-    cmd = sprintf('"%s" %d "%s"', guard, ceil(10 + 0.5*numel(angles)), exe);
+    cmd = sprintf('"%s" %d "%s"', guard, ceil(60 + 2*numel(angles)), exe);
 else
     cmd = sprintf('"%s"', exe);
 end

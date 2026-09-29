@@ -78,8 +78,11 @@ Optimisers exploit numerical errors, so the wrapper and the metrics filter them 
   cannot exploit a solution that only one panelling produces.
 - **Consistent sweeps.** The optimisation and the final check use the same angles and step, so they
   give the same numbers.
-- **Time limit.** Each XFOIL run is stopped after 10 s plus 0.5 s per angle if it hangs (uses
-  `timeout.exe` from Git for Windows when it is installed).
+- **Time limit.** Each XFOIL run is stopped after 60 s plus 2 s per angle if it hangs (uses
+  `timeout.exe` from Git for Windows when it is installed). A converging sweep needs a few seconds, so
+  the limit only catches a hanging XFOIL. It used to be 10 s plus 0.5 s per angle; on a laptop that
+  Windows slowed down with the screen off (Modern Standby), that cut sweeps short and made the
+  results depend on the speed of the machine.
 
 Known limitations:
 
