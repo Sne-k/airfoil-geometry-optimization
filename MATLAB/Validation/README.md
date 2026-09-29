@@ -17,9 +17,10 @@ summary = validate_xfoil;          % about 10 min; needs XFOIL (see ../Aerodynam
 The data files and their sources are listed in
 [results/validation/experimental/README.md](../../results/validation/experimental/README.md).
 
-**Geometry.** Ladson's model had the design ordinates of the NACA 0012; the standard ordinates end in a
-trailing edge 0.25 % of the chord thick. That geometry is analysed, and so is the closed-trailing-edge
-variant that all optimisations in this project use. Sensitivity checks: 200 panel nodes, and Ncrit = 12
+**Geometry.** Ladson's report says that the model was within 0.0002c of its design ordinates but does
+not give its trailing-edge thickness. The standard NACA 0012 ordinates end in a trailing edge 0.25 % of
+the chord thick; that geometry is analysed, and so is the closed-trailing-edge variant that all
+optimisations in this project use. Sensitivity checks: 200 panel nodes, and Ncrit = 12
 (XFOIL's documentation lists 10–12 for a clean wind tunnel).
 
 **Comparison.**

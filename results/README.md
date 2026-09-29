@@ -1,5 +1,10 @@
 # Results
 
+All numbers in this file come from XFOIL. How close XFOIL comes to wind-tunnel data is shown in
+[validation/](validation/README.md): with free transition its drag is 11–14 % below the measurements
+for NACA 0012, so absolute L/D values are optimistic; the comparisons between airfoils use the same
+analysis throughout.
+
 ## XFOIL comparison of all approaches (`xfoil/`)
 
 The final airfoil of every approach tried during the project was analysed with the same XFOIL
@@ -208,8 +213,9 @@ XFOIL's sensitivity to small shape details (for example a tiny "spoiler" at the 
 - Xoptfoil2's design has 0 and 1 reversals and a trailing-edge curvature of 0.34.
 
 Part of the advantage of our designs may therefore come from shape details that XFOIL rewards more
-than a real flow would. Two follow-ups are planned: curvature constraints in `optimize_airfoil`, and
-checking the designs with CFD (`MATLAB/CFD`, in progress).
+than a real flow would. `optimize_airfoil` now applies curvature limits of this kind by default (see
+[MATLAB/Optimization](../MATLAB/Optimization/README.md#curvature-limits)), and the runs are being
+repeated with them; checking the designs with CFD (`MATLAB/CFD`) is in progress.
 
 ## Morphing (`morphing/`)
 
