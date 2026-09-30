@@ -25,12 +25,15 @@ function f = airfoilObjective(d, S)
 %   does not matter, and skipping it saves much of the search time.
 %
 %   If S.historyDir is set, every evaluation is appended to a file in that
-%   folder (one file per process, so parallel workers do not collide):
-%   time, stage, objective value, number of XFOIL analyses and d.
+%   folder (one file per process, so parallel workers do not collide): time
+%   (seconds since 1970, UTC), stage, objective value, number of XFOIL
+%   analyses, duration of the evaluation (s) and d. The durations show
+%   whether the machine ran at its normal speed.
 
+clock0 = tic;
 [f, nXfoil] = evaluate(d, S);
 if isfield(S, 'historyDir') && ~isempty(S.historyDir)
-    logEvaluation(S.historyDir, S.stage, d, f, nXfoil);
+    logEvaluation(S.historyDir, S.stage, d, f, nXfoil, toc(clock0));
 end
 end
 
@@ -60,10 +63,11 @@ else
 end
 end
 
-function logEvaluation(folder, stage, d, f, nXfoil)
+function logEvaluation(folder, stage, d, f, nXfoil, seconds)
 file = fullfile(folder, sprintf('eval_%d.csv', feature('getpid')));
 fid = fopen(file, 'a');
 if fid < 0, return; end
-fprintf(fid, '%.3f,%s,%.10g,%d%s\n', posixtime(datetime('now')), stage, f, nXfoil, sprintf(',%.8g', d));
+fprintf(fid, '%.3f,%s,%.10g,%d,%.2f%s\n', posixtime(datetime('now', 'TimeZone', 'local')), ...
+    stage, f, nXfoil, seconds, sprintf(',%.8g', d));
 fclose(fid);
 end
