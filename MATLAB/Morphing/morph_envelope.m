@@ -1,27 +1,35 @@
-%% What morphing gains: efficiency envelope between two optimised airfoils
-% Blends a source and a target airfoil (e.g. a cruise and a loiter design)
-% in nSteps steps and analyses every step with XFOIL. At each lift
-% coefficient, a wing that can take any of these shapes flies with the best
-% of them; this "morphing envelope" is compared with the fixed airfoils,
-% including an optional single compromise design.
+function morph_envelope(sourceFile, targetFile, compromiseFile, outDir)
+%MORPH_ENVELOPE  What morphing gains: efficiency envelope between two airfoils.
+%   Blends a source and a target airfoil (e.g. a cruise and a loiter design)
+%   in nSteps steps and analyses every step with XFOIL. At each lift
+%   coefficient, a wing that can take any of these shapes flies with the
+%   best of them; this "morphing envelope" is compared with the fixed
+%   airfoils, including an optional single compromise design.
 %
-% Every shape is analysed with 160 and 200 panel nodes and the lower CL/CD
-% is used at each lift coefficient. The analysis is quasi-steady (every
-% shape is analysed as if fixed).
-% Output folder: MATLAB/output/morph_envelope
-
-clear; clc; close all;
+%   Every shape is analysed with 160 and 200 panel nodes and the lower CL/CD
+%   is used at each lift coefficient. The analysis is quasi-steady (every
+%   shape is analysed as if fixed).
+%
+%   MORPH_ENVELOPE uses the cruise, loiter and weighted designs in
+%   results/optimize_airfoil and writes to MATLAB/output/morph_envelope.
+%   MORPH_ENVELOPE(sourceFile, targetFile, compromiseFile, outDir) uses other
+%   .dat files ('' as compromiseFile skips it) and another output folder.
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
 addpath(fullfile(root, 'NACA2412'), fullfile(root, 'Aerodynamics'));
-outDir = fullfile(root, 'output', 'morph_envelope');
-if ~exist(outDir, 'dir'), mkdir(outDir); end
 res = fullfile(root, '..', 'results', 'optimize_airfoil');
-
-sourceFile = fullfile(res, 'NACA_2412_cruise', 'NACA_2412_optimized.dat');     % cruise design
-targetFile = fullfile(res, 'NACA_2412_loiter', 'NACA_2412_optimized.dat');     % loiter design
-compromiseFile = fullfile(res, 'NACA_2412_weighted', 'NACA_2412_optimized.dat'); % '' to skip
+if nargin < 1 || isempty(sourceFile)
+    sourceFile = fullfile(res, 'NACA_2412_cruise', 'NACA_2412_optimized.dat');      % cruise design
+end
+if nargin < 2 || isempty(targetFile)
+    targetFile = fullfile(res, 'NACA_2412_loiter', 'NACA_2412_optimized.dat');      % loiter design
+end
+if nargin < 3
+    compromiseFile = fullfile(res, 'NACA_2412_weighted', 'NACA_2412_optimized.dat');
+end
+if nargin < 4 || isempty(outDir), outDir = fullfile(root, 'output', 'morph_envelope'); end
+if ~exist(outDir, 'dir'), mkdir(outDir); end
 names = {'cruise design', 'loiter design', 'weighted compromise'};
 nSteps = 10;
 Re = 1e6;
@@ -72,6 +80,7 @@ axis equal; grid on; xlim([0 1]); xlabel('x/c'); ylabel('y/c');
 legend(names(1:2), 'Location', 'southoutside', 'NumColumns', 2);
 title('Morphing end states');
 exportgraphics(f2, fullfile(outDir, 'morph_end_states.png'), 'Resolution', 150);
+end
 
 function [yu, yl] = onGridFile(file, x)
 [xu, yu, xl, yl] = readAirfoil(file);
