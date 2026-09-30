@@ -1,0 +1,82 @@
+{
+  "airfoil": "NACA 2412",
+  "started": "2026-09-30 05:16:14",
+  "runTimeSeconds": 1876,
+  "matlab": "24.2.0.3212159 (R2024b) Update 9",
+  "computer": "PCWIN64",
+  "parallelWorkers": 6,
+  "xfoil": {
+    "path": "xfoil.exe (XFOIL 6.99, not included)",
+    "bytes": 1.002125E+6,
+    "date": "25-Sep-2026 06:52:46"
+  },
+  "gitCommit": "000f7c9",
+  "options": {
+    "Algorithm": "ga",
+    "CmIncrease": 0.05,
+    "Curvature": true,
+    "CurvatureThreshold": 0.01,
+    "DesignCL": [
+      0.4,
+      1
+    ],
+    "Generations": 25,
+    "KeepCLmax": false,
+    "LocalSearch": true,
+    "MaxChange": 0.08,
+    "MinThickness": 1,
+    "NLPIterations": 15,
+    "Objective": "LDatCL",
+    "Order": 6,
+    "OutputDir": "MATLAB/output/paper/NACA_2412_weighted_s3",
+    "Population": 50,
+    "Re": 1.0E+6,
+    "Seed": 3,
+    "UseParallel": true,
+    "Weights": [
+      0.2,
+      0.8
+    ]
+  },
+  "cstFitError": 0.0020546256821506945,
+  "limits": {
+    "tMin": 0.12003686528200387,
+    "tMax": 0.25,
+    "cmMax": 0.098,
+    "clMaxMin": null,
+    "curvatureApplied": true,
+    "curvatureThreshold": 0.01,
+    "reversalsTop": 0,
+    "reversalsBot": 0,
+    "teCurvatureTop": 0.5,
+    "teCurvatureBot": 0.1,
+    "teCurvatureTolerance": 0.05
+  },
+  "objectiveOriginalFit": 85.310167321287736,
+  "objectiveGlobal": 114.72344716023679,
+  "objectiveLocal": 123.63472203478004,
+  "objectiveFinal": 123.63472203478004,
+  "designMeetsCurvatureLimits": true,
+  "evaluations": 1385,
+  "xfoilAnalysedDesigns": 1078,
+  "medianEvaluationSeconds": 7.645,
+  "globalExitFlag": 0,
+  "globalOutput": {
+    "generations": 25,
+    "funccount": 1228,
+    "message": "ga stopped because it exceeded options.MaxGenerations.",
+    "maxconstraint": 0,
+    "hybridflag": []
+  },
+  "localExitFlag": 2,
+  "localOutput": {
+    "iterations": 9,
+    "funcCount": 153,
+    "algorithm": "sqp",
+    "message": "Local minimum possible. Constraints satisfied.\n\nfmincon stopped because the size of the current step is less than\nthe value of the step size tolerance and constraints are \nsatisfied to within the value of the constraint tolerance.\n\n<stopping criteria details>\n\nOptimization stopped because the relative changes in all elements of x are\nless than options.StepTolerance = 1.000000e-04, and the relative maximum constraint\nviolation, 0.000000e+00, is less than options.ConstraintTolerance = 1.000000e-06.",
+    "constrviolation": 0,
+    "stepsize": 8.0266486593564968E-5,
+    "lssteplength": 0.057648009999999972,
+    "firstorderopt": 25.876093573609182
+  }
+}

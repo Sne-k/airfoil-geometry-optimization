@@ -5,6 +5,10 @@ All numbers in this file come from XFOIL. How close XFOIL comes to wind-tunnel d
 for NACA 0012, so absolute L/D values are optimistic; the comparisons between airfoils use the same
 analysis throughout.
 
+The optimisation runs below were made before the curvature limits. The results with the limits and three
+random seeds, the optimiser comparison, the updated Xoptfoil2 benchmark and the sensitivity study are in
+[paper/](paper/README.md).
+
 ## XFOIL comparison of all approaches (`xfoil/`)
 
 The final airfoil of every approach tried during the project was analysed with the same XFOIL
@@ -195,7 +199,9 @@ already fails it. Both results were re-analysed with the settings used here (low
 | `optimize_airfoil` (CST, GA → fmincon) | 72.9 | 143.2 | **129.2** | 143.3 | 0.121 | −0.060 | 38 min |
 | Xoptfoil2 (Bezier, particle swarm) | 69.6 | 130.8 | 118.5 | 130.9 | 0.131 | −0.052 | 1.5 min |
 
-`optimize_airfoil` scores 9 % higher but takes 25 times longer. It also has no curvature constraints,
+`optimize_airfoil` scores 9 % higher but takes 25 times longer. **Update:** with curvature limits the
+two reach the same result ([paper/](paper/README.md#benchmark-against-xoptfoil2)), so this advantage came
+from the waviness of our designs. It also has no curvature constraints,
 which Xoptfoil2 enforces; the next section shows what that means.
 
 ## Curvature check (`curvature_check.csv`)

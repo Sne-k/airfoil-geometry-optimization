@@ -1,0 +1,14 @@
+Quantity,Original,Optimized,Change_percent
+"max CL/CD",98.8511029411764,127.704326923077,29.1885706111648
+"alpha at max CL/CD (deg)",8,6.5,-18.75
+"max CL^1.5/CD",104.343644032943,131.634607188064,26.1548879263837
+"CL max",1.4621,1.3708,-6.24444292456056
+"alpha at CL max (deg)",15.5,15,-3.2258064516129
+"CD min",0.00583,0.00565,-3.08747855917668
+"CM at alpha = 0",-0.0033,-0.0322,-875.757575757576
+"t/c max",0.12004231656149,0.130376230419278,8.60855917629191
+"objective LDmax, lower of 160/200 panels",94.3566176470588,127.578313253012,35.2086546067379
+"curvature reversals, upper surface",0,0,NaN
+"curvature reversals, lower surface",0,0,NaN
+"trailing-edge curvature, upper surface",0.376505650191246,0.434844536478253,NaN
+"trailing-edge curvature, lower surface",0.627380911829605,0.529981822393977,NaN
