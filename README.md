@@ -7,9 +7,12 @@ for **XFLR5**.
 
 The project report used a geometric objective (camber/thickness) and analysed the result in XFLR5
 afterwards. This repository also runs **XFOIL inside the optimisation loop**, so the optimiser
-maximises lift-to-drag directly. The resulting airfoil has a **74 % higher peak lift-to-drag ratio than
-NACA 2412 at the same 12 % thickness**. The same approach is packaged as `optimize_airfoil`, which
-takes any airfoil.
+maximises lift-to-drag directly; the approach is packaged as `optimize_airfoil`, which takes any
+airfoil. With smooth shapes (curvature limits) and three random seeds, it raises the **peak
+lift-to-drag ratio of NACA 2412 by 33 % on average at the same thickness** (XFOIL, Re = 10⁶; see
+[results/paper](results/paper/README.md)). An earlier PARSEC design reached +74 %, but its surface is
+wavy and its advantage drops to +36 % when transition occurs earlier (Ncrit = 5), so part of it may be
+an XFOIL artefact.
 
 ![Morphing from NACA 2412 to the XFOIL-optimised airfoil](results/xfoil/morph_to_design.gif)
 
@@ -83,17 +86,23 @@ Results with the default options (XFOIL, Re = 10⁶; details in [results/README.
 All keep their thickness. Without the pitching-moment limit (`'CmIncrease', Inf`), NACA 2412 reaches
 166.8 (+59 %), 91 % of the PARSEC design. A run takes 30–50 minutes on 8 cores.
 
+These runs were made before the curvature limits. With the limits and three random seeds each
+([results/paper](results/paper/README.md)), the mean gains in peak CL/CD are: NACA 0012 +52 %,
+NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
+
 ### Further results
 
 - **More seeds and options.** Clark Y improves by +49 %. A particle swarm → pattern search option
   gives the same result as GA → fmincon. The tool also optimises for cruise, loiter, a weighted
   combination, or with maximum lift kept.
-- **Benchmark.** Given the same task as Xoptfoil2, `optimize_airfoil` scores 9 % higher but runs 25
-  times longer.
-- **Caveat.** The designs above have slightly wavy surfaces, which Xoptfoil2's curvature limits would
-  reject, so part of their advantage may be an XFOIL artefact. `optimize_airfoil` now applies such
-  curvature limits by default ([details](MATLAB/Optimization/README.md#curvature-limits)); the runs above
-  are being repeated with the limits and three random seeds each. A CFD check is the next step.
+- **Benchmark.** With smooth shapes on both sides, `optimize_airfoil` and Xoptfoil2 reach the same
+  result on the same task (mean weighted objective 121.9 against 122.2 over three runs each), and
+  Xoptfoil2 is about 20 times faster. An earlier comparison, in which our designs were wavy, had shown a
+  9 % advantage for `optimize_airfoil`; that advantage came from the waviness.
+- **Smooth shapes.** The designs in the tables above have slightly wavy surfaces. `optimize_airfoil` now
+  applies curvature limits by default ([details](MATLAB/Optimization/README.md#curvature-limits)), and
+  all runs were repeated with them and three random seeds: [results/paper](results/paper/README.md). On
+  NACA 2412 the limits cost about 4 % of peak lift-to-drag. A CFD check is the next step.
 - **Validation.** Against NACA 0012 wind-tunnel data (Ladson 1988), XFOIL's drag agrees within 3 % when
   transition is fixed at 5 % chord, but is 11–14 % too low with free transition, and its maximum lift is
   too high. Absolute L/D values from XFOIL are therefore optimistic; see
@@ -155,6 +164,7 @@ MATLAB/
                   optimize_xfoil_naca.m, optimize_naca_ga_nlp.m (report method), run_parsec_ga.m
   Morphing/       morph_airfoil.m (report morph), morph_to_design.m (morph to any .dat, with L/D per step)
   Validation/     validate_xfoil.m: XFOIL against NACA 0012 wind-tunnel data
+  Paper/          run_paper_batch.m (the 37 runs), collect_paper_results.m, benchmark and sensitivity
   CFD/            C-grid generator, Fluent mesh export and journals (work in progress)
   airfoils/       seed airfoils as .dat files (Clark Y)
   run_project.m   runs everything in order
@@ -165,6 +175,7 @@ results/
   xoptfoil2/      benchmark against Xoptfoil2
   morphing/       morphing envelope and nose/trailing-edge morphing
   validation/     XFOIL against wind-tunnel data (experimental data, polars, comparison)
+  paper/          smooth-shape results with three random seeds (basis of the planned paper)
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method

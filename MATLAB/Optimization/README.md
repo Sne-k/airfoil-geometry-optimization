@@ -97,8 +97,8 @@ A run takes about 20–35 min on 8 cores.
 
 The results in [results/optimize_airfoil](../../results/optimize_airfoil) were produced before the
 curvature limits were added, and their designs do not meet the limits (see the curvature check in
-[results/README.md](../../results/README.md)). They are being repeated with the limits and three random
-seeds each.
+[results/README.md](../../results/README.md)). They were repeated with the limits and three random seeds
+each; see [results/paper](../../results/paper/README.md).
 
 ## Report method and its XFOIL versions
 
