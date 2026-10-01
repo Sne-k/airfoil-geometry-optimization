@@ -183,9 +183,16 @@ Summary:
   turbulence 0.052 % with viscosity ratio 0.009 (the values of the NASA NACA 0012 case). 400 iterations
   with first-order upwinding, then blocks of 200 second-order iterations, with the force coefficients
   printed after each block (`CFD/fluentJournal.m`, `run_fluent_cases.m`).
-- **Verification.** NASA NACA 0012 case, Re = 6 × 10⁶, M = 0.15, SST. At α = 0 the drag coefficient is
-  0.00812, against 0.00809 from the reference codes. α = 10° and 15°, a mesh family and a larger far
-  field are in progress.
+- **Verification.** NASA NACA 0012 case, Re = 6 × 10⁶, M = 0.15, SST.
+  - At α = 0° the drag coefficient is 0.00812 (far field 20 c) and 0.00811 (500 c), against 0.00809 from
+    the reference codes.
+  - At α = 10° the lift is within 1 %, but the drag is too high by 14 % with a 20-chord far field and by
+    6 % with 100 chords. The design study therefore uses 500 chords.
+  - The solution diverges at M = 0.1 and converges at M = 0.15, so the design study runs at M = 0.15 and
+    XFOIL is compared at the same Mach number.
+  - Details and the open items are in [MATLAB/CFD/README.md](../MATLAB/CFD/README.md).
+- **Transition SST inflow.** 0.14 % turbulence with viscosity ratio 50 at a far field 500 chords away. By
+  the SST free-stream decay this arrives at the airfoil as about 0.07 %, the Mack equivalent of Ncrit = 9.
 
 ## 9. Software and hardware
 
