@@ -12,8 +12,12 @@ function collect_cfd_results(runDir, outDir)
 %                       Turbulence Modeling Resource, read from
 %                       reference_tmr.csv in that folder),
 %                       grid_convergence.csv (Celik et al. 2008),
-%                       farfield.csv, verification_forces.png,
-%                       grid_convergence.png, farfield.png
+%                       farfield.csv, surface.csv (pressure and skin
+%                       friction on the airfoil), surface_comparison.csv
+%                       (against the CFL3D distributions in the folder
+%                       reference), verification_forces.png,
+%                       grid_convergence.png, farfield.png,
+%                       verification_surface.png
 %     designs/          forces.csv, history.csv, meshes.csv, run_info.json,
 %                       comparison.csv (against XFOIL, if xfoil.csv from
 %                       design_study_xfoil.m is in that folder),
@@ -166,6 +170,72 @@ if any(D.far_field_chords == 500)
     D.CD_difference_times_distance = D.CD_difference .* D.far_field_chords;
 end
 writetable(D, fullfile(out, 'farfield.csv'));
+
+% Pressure and skin friction on the airfoil, against CFL3D (897 x 257 grid)
+T0 = 288.15;  Rgas = 8314.47 / 28.966;                 % as in fluentJournal
+qInf = 0.5 * (101325 / (Rgas * T0)) * (0.15 * sqrt(1.4 * Rgas * T0))^2;
+S = cell(0, 1);
+for i = 1:height(T)
+    prof = fullfile(in, strrep(T.transcript{i}, '.out', '.prof'));
+    wallFile = fullfile(in, ['n0012_' T.mesh{i} '_wall.csv']);
+    if ~isfile(prof) || ~isfile(wallFile), continue; end
+    s = fluentSurface(prof, readmatrix(wallFile), qInf);
+    s.mesh = repmat(T.mesh(i), height(s), 1);
+    s.alpha = repmat(T.alpha(i), height(s), 1);
+    S{end+1, 1} = s(:, {'mesh', 'alpha', 'surface', 'x', 'y', 'cp', 'cf'}); %#ok<AGROW>
+end
+S = vertcat(S{:});
+refDir = fullfile(out, 'reference');
+if ~isempty(S) && isfile(fullfile(refDir, 'n0012cf_cfl3d_sst.dat'))
+    writetable(S, fullfile(out, 'surface.csv'));
+    cfRef = readZones(fullfile(refDir, 'n0012cf_cfl3d_sst.dat'));     % upper surface, alpha 0, 10, 15
+    cpRef = readZones(fullfile(refDir, 'n0012cp_cfl3d_sst.dat'));
+    refAlpha = @(Z) cellfun(@(n) sscanf(n, 'alpha=%f'), {Z.name});
+    Q = cell(0, 7);
+    for mesh = unique(S.mesh, 'stable')'
+        for a = unique(S.alpha(strcmp(S.mesh, mesh{1})))'
+            u = sortrows(S(strcmp(S.mesh, mesh{1}) & S.alpha == a & strcmp(S.surface, 'upper'), :), 'x');
+            zf = cfRef(refAlpha(cfRef) == a);  zp = cpRef(refAlpha(cpRef) == a);
+            if isempty(zf) || isempty(zp) || isempty(u), continue; end
+            in95 = u.x >= 0.05 & u.x <= 0.95;
+            [xr, k] = unique(zf.data(:, 1));
+            cfC = interp1(xr, zf.data(k, 2), u.x(in95));
+            Q(end+1, :) = {mesh{1}, a, min(u.cp), min(zp.data(:, 2)), 100 * mean(abs(u.cf(in95) - cfC) ./ cfC), ...
+                100 * max(abs(u.cf(in95) - cfC) ./ cfC), sum(in95)}; %#ok<AGROW>
+        end
+    end
+    Q = cell2table(Q, 'VariableNames', {'mesh', 'alpha', 'cp_min', 'cp_min_CFL3D', ...
+        'cf_upper_mean_difference_percent', 'cf_upper_max_difference_percent', 'points_x_0p05_to_0p95'});
+    writetable(Q, fullfile(out, 'surface_comparison.csv'));
+
+    angles = unique(S.alpha(strcmp(S.mesh, 'medium')))';
+    if ~isempty(angles)
+        f = figure('Color', 'w', 'Position', [60 60 400 * numel(angles) 720], 'Visible', 'off');
+        tiledlayout(2, numel(angles), 'TileSpacing', 'compact', 'Padding', 'compact');
+        for row = 1:2
+            for a = angles
+                nexttile;  hold on;  box on;  grid on;
+                m = S(strcmp(S.mesh, 'medium') & S.alpha == a, :);
+                if row == 1
+                    zp = cpRef(refAlpha(cpRef) == a);
+                    plot(zp.data(:, 1), zp.data(:, 2), 'k-', 'LineWidth', 1.0, 'DisplayName', 'CFL3D (NASA TMR)');
+                    plot(m.x, m.cp, '.', 'Color', [0.85 0.33 0.10], 'MarkerSize', 7, 'DisplayName', 'Fluent, medium mesh');
+                    set(gca, 'YDir', 'reverse');  ylabel('C_p');  title(sprintf('\\alpha = %g\\circ', a));
+                    if a == angles(1), legend('Location', 'southeast'); end
+                else
+                    zf = cfRef(refAlpha(cfRef) == a);
+                    u = sortrows(m(strcmp(m.surface, 'upper'), :), 'x');
+                    plot(zf.data(:, 1), zf.data(:, 2), 'k-', 'LineWidth', 1.0);
+                    plot(u.x, u.cf, '.', 'Color', [0.85 0.33 0.10], 'MarkerSize', 7);
+                    ylabel('C_f, upper surface');  ylim([-0.002 0.03]);
+                end
+                xlabel('x / c');  xlim([0 1]);
+            end
+        end
+        exportgraphics(f, fullfile(out, 'verification_surface.png'), 'Resolution', 130);
+        close(f);
+    end
+end
 
 % Figures
 col = lines(7);
@@ -379,7 +449,9 @@ while true
         continue;
     end
     v = sscanf(line, '%f')';
+    if isempty(v), continue; end
     if isempty(Z), Z(1) = struct('name', '', 'data', zeros(0, numel(v))); end
-    if numel(v) == size(Z(end).data, 2) || isempty(Z(end).data), Z(end).data(end+1, 1:numel(v)) = v; end
+    if isempty(Z(end).data), Z(end).data = zeros(0, numel(v)); end
+    if numel(v) == size(Z(end).data, 2), Z(end).data(end+1, :) = v; end
 end
 end

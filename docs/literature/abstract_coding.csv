@@ -1,0 +1,239 @@
+openalex_id,year,doi,title,optimiser_genetic,optimiser_particle_swarm,optimiser_gradient,optimiser_surrogate_or_learning,param_cst,param_parsec,param_bezier_or_spline,param_hicks_henne,metric_lift_to_drag,multi_point_or_robust,mentions_transition,check_cfd,check_experiment,repeated_runs,smoothness_or_curvature
+W2120459501,2014,10.1002/we.1762,Aerofoil optimization for vertical‐axis wind turbines,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W4316038755,2023,10.1016/j.eswa.2023.119513,Aeroacoustic airfoil shape optimization enhanced by autoencoders,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0
+W4382896694,2023,10.32604/cmes.2023.028632,Airfoil Shape Optimisation Using a Multi-Fidelity Surrogate-Assisted Metaheuristic with a New Multi-Objective Infill Sampling Technique,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0
+W2043735456,2013,10.1016/j.proeng.2013.07.088,Aerodynamic Shape Optimization of Wind Turbine Blades Using a Parallel Genetic Algorithm,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+W2078264551,2014,10.1063/1.4895528,Multi-objective optimization of airfoil shape for efficiency improvement and noise reduction in small wind turbines,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+W3133197453,2021,10.3390/app11041664,Aerodynamic Design Optimization of a Morphing Leading Edge and Trailing Edge Airfoil–Application on the UAS-S45,0,1,0,0,0,1,1,0,1,0,1,1,0,0,0
+W426079852,2015,10.1016/j.egypro.2015.03.255,Design Optimization of Axial Hydraulic Turbine for Very Low Head Application,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2306296840,2016,10.1017/aer.2016.6,Drag optimisation of a wing equipped with a morphing upper surface,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0
+W1960585333,2013,10.1002/we.1668,Design and validation of the high performance and low noise CQU-DTU-LN1 airfoils,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1
+W3157090118,2021,10.3390/app11093791,CFD Analysis and Shape Optimization of Airfoils Using Class Shape Transformation and Genetic Algorithm—Part I,1,0,0,0,1,0,0,0,1,0,0,1,1,0,0
+W2600340903,2016,10.1109/icrera.2016.7884538,Comparison of Qblade and CFD results for small-scaled horizontal axis wind turbine analysis,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2020460990,2012,10.1109/iecon.2012.6388954,Low-speed aerodynamic characteristics improvement of ATR 42 airfoil using a morphing wing approach,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0
+W2797350742,2018,10.1002/we.2174,Airfoil optimization for wind turbine application,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W3134627361,2021,10.3390/app11052211,Aerodynamic Shape Optimization of NREL S809 Airfoil for Wind Turbine Blades Using Reynolds-Averaged Navier Stokes Model—Part II,1,0,0,0,1,1,0,0,1,0,0,1,1,0,0
+W2116089983,2014,10.1002/we.1780,Experimental investigation of an optimized airfoil for vertical‐axis wind turbines,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+W2402122912,2016,10.1017/aer.2016.30,Numerical and experimental validation of a morphed wing geometry using Price-Païdoussis wind-tunnel testing,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+W2598376730,2016,10.1109/icrera.2016.7884411,CFD vs. XFOIL of airfoil analysis at low reynolds numbers,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0
+W2332806700,2015,10.2514/6.2015-2558,Aero structural modeling of a wing using CATIA V5 and XFLR5 software and experimental validation using the Price- Païdoussis wing tunnel,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W2317479040,2016,10.1109/tste.2016.2522381,Comparison of Airfoil Precomputational Analysis Methods for Optimization of Wind Turbine Blades,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W4205884331,2022,10.3390/aerospace9010035,Multi-Objective Optimization of Low Reynolds Number Airfoil Using Convolutional Neural Network and Non-Dominated Sorting Genetic Algorithm,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0
+W3004489945,2020,10.1155/2020/9710189,Development of High Performance Airfoils for Application in Small Wind Turbine Power Generation,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+W4221086847,2022,10.3846/aviation.2022.16471,AIRFOIL SHAPE OPTIMIZATION USING BÉZIER CURVE AND GENETIC ALGORITHM,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0
+W2799748289,2018,10.1002/we.2186,Integrated free‐form method for aerostructural optimization of wind turbine blades,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W4220771829,2022,10.3390/aerospace9030153,Aircraft Propeller Design through Constrained Aero-Structural Particle Swarm Optimization,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0
+W4229055445,2022,10.1088/1742-6596/2217/1/012009,Airfoil optimization using a machine learning-based optimization algorithm,1,0,0,1,1,0,0,0,1,0,0,1,1,0,0
+W2889807763,2018,10.1177/1756829318794171,Numerical and experimental investigation of an airfoil design for a Martian micro rotorcraft,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W2268830795,2015,10.1177/0954410015605548,Aerodynamic performance improvement of the UAS-S4 Éhecatl morphing airfoil using novel optimization techniques,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0
+W2404940287,2010,10.2514/6.2010-56,New Aeroelastic Studies for a Morphing Wing,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W4210621059,2022,10.3390/designs6010010,Optimization and Design of a Flexible Droop-Nose Leading-Edge Morphing Wing Based on a Novel Black Widow Optimization Algorithm—Part I,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0
+W2742913933,2017,10.5028/jatm.v9i3.838,Aerofoil Design for Unmanned High-Altitude Aft-Swept Flying Wings,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0
+W4405894417,2024,10.1080/19942060.2024.2445144,A CNN-PINN-DRL driven method for shape optimization of airfoils,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0
+W1997117988,2014,10.2514/6.2014-2187,Control strategies for an experimental morphing wing model,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+W4407357076,2025,10.1016/j.jcp.2025.113846,The KAN-MHA model: A novel physical knowledge based multi-source data-driven adaptive method for airfoil flow field prediction,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0
+W2980688212,2019,10.1155/2019/3050824,"Aerodynamic Optimization of a UAV Wing subject to Weight, Geometric, Root Bending Moment, and Performance Constraints",0,0,1,0,0,0,0,0,0,0,1,1,0,0,0
+W3179196823,2021,10.1088/1757-899x/1154/1/012016,"Airfoil Shape Optimization: Comparative Study of Meta-heuristic Algorithms, Airfoil Parameterization Methods and Reynolds Number Impact",1,1,0,0,0,1,0,0,1,0,0,1,0,0,0
+W4392511268,2024,10.3390/computation12030052,Algorithm for Propeller Optimization Based on Differential Evolution,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0
+W2077836867,2014,10.4028/www.scientific.net/amm.664.111,Design Optimization and Analysis of NACA 0012 Airfoil Using Computational Fluid Dynamics and Genetic Algorithm,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2080370633,2012,10.2514/6.2012-1677,Enhancing and Developing the Practical Optimisation Capabilities and Intelligence of Automatic Design Software,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+W3195505684,2021,10.1017/aer.2021.71,Aerodynamic study of single corrugated variable-camber morphing aerofoil concept,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0
+W2800722868,2018,10.1002/we.2204,An integral boundary layer engineering model for vortex generators implemented in XFOIL,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0
+W4407903299,2025,10.3390/aerospace12030180,Airfoil Optimization and Analysis Using Global Sensitivity Analysis and Generative Design,0,1,0,1,1,0,1,0,1,0,0,1,0,0,0
+W2014699511,2014,10.1088/1742-6596/524/1/012022,Airfoil family design for large offshore wind turbine blades,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W2059232041,2012,10.13111/2066-8201.2012.4.2.2,New aeroelastic studies for a morphing wing,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W2887080891,2018,10.1002/we.2260,The development of a flatback wind turbine airfoil family,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+W1893815871,2013,10.21914/anziamj.v54i0.6154,A comparison of multi-objective optimisation metaheuristics on the 2D airfoil design problem,1,1,0,1,0,0,0,0,0,0,0,1,1,0,0
+W4401154744,2024,10.1016/j.jer.2024.07.020,Aerodynamic shape optimization of NACA airfoils based on a novel unconstrained conjugate gradient algorithm,0,0,1,0,0,0,1,0,1,1,0,0,0,0,0
+W2571542206,2016,10.20508/ijrer.v6i4.4642.g6930,Airfoil Selection Methodology for Small Wind Turbines,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0
+W3086090625,2018,,Airfoil optimization with CST-parameterization for (un-)conventional demands,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+W2081836664,2011,10.1115/es2011-54720,An Examination of the Effect of Reynolds Number on Airfoil Performance,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0
+W1964297633,2013,10.2514/6.2013-4918,Control of Actuation System Based Smart Material Actuators in a Morphing Wing Experimental Model,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0
+W4409264619,2025,10.1038/s41598-025-95848-4,Aerodynamic analysis and ANN-based optimization of NACA airfoils for enhanced UAV performance,1,0,0,1,0,0,0,0,1,0,0,1,0,0,0
+W3001206913,2020,10.1088/1742-6596/1446/1/012014,Airfoil aerodynamics optimization under uncertain operating conditions,0,0,0,0,0,1,0,0,1,1,0,0,1,1,0
+W4387310637,2023,10.1063/5.0166170,Airfoil optimization for rotors operating in the ultra-low Reynolds number regime,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0
+W2067453679,2013,10.1109/cec.2013.6557959,Application of the multi-objective Alliance Algorithm to a benchmark aerodynamic optimization problem,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+W2586049382,2016,,COMPARISON OF CFD AND XFOIL AIRFOIL ANALYSES FOR LOW REYNOLDS NUMBER,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0
+W2331447216,2014,10.2514/6.2014-0171,Experimental And Numerical Investigation Of An Optimized Airfoil For Vertical Axis Wind Turbines,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+W4395011112,2024,10.3390/app14083495,Interactive Airfoil Optimization Using Parsec Parametrization and Adjoint Method,1,0,1,1,0,1,0,0,1,1,0,0,0,0,0
+W2316857379,2015,10.2514/6.2015-3393,Optimization of Wind Turbine Airfoils Subject to Particle Erosion,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0
+W2208269253,2012,,Aero-Structural Optimization of a 5 MW Wind Turbine Rotor,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+W2883147410,2018,10.1098/rsos.180540,Aerofoil optimization for improving the power performance of a vertical axis wind turbine using multiple streamtube model and genetic algorithm,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0
+W2603632360,2016,,MINI-SCALED HORIZONTAL AXIS WIND TURBINE ANALYSIS BY QBLADE AND CFD,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2403830309,2016,10.21595/jve.2016.16705,Preliminary airfoil design of an innovative adaptive variable camber compliant wing,0,1,0,0,1,0,0,0,0,1,0,0,1,0,0
+W2918188686,2019,10.13111/2066-8201.2019.11.1.6,Using genetic algorithms to optimize airfoils in incompressible regime,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0
+W1980679154,2014,10.1115/esda2014-20355,A New Multi-Objective Evolutionary Algorithm for Optimizing the Aerodynamic Design of HAWT Rotor,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2188261019,2014,,Airfoil noise reduction using morphing trailing edge,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+W4382364894,2023,10.4050/f-0079-2023-18006,Blade Shape Optimization of Rotors using Neural Networks,1,0,0,1,1,0,0,0,0,0,0,1,0,0,0
+W4205726617,2022,10.3390/jmse10020132,Equivalent Aerodynamic Design of Blade for Offshore Floating Wind Turbine Model,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W4406832751,2025,10.47836/pjst.33.1.09,Experimental Investigation on a Trailing Edge Morphing Airfoil (TEMA) with Zigzag Rib Structure at Low Speed,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1
+W3035444848,2020,10.2514/6.2020-2781,Numerical Study of Camber Morphing in NACA0012 Airfoil,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0
+W2575439392,2016,10.48550/arxiv.1701.00817,Simple analytic equation for airfoil shape description,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2972552783,2019,10.1109/ccdc.2019.8832768,Design of an RBF Surrogate Model for Low Reynolds Number Airfoil Based on Transfer Learning,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0
+W3034213642,2020,10.2514/6.2020-2798,Exploratory Optimizations of Propeller Blades for a High-Altitude Pseudo-Satellite,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2120161449,2011,10.2514/6.2011-2782,Minimization of trailing edge noise by parametric airfoil shape modifications,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0
+W2748265036,2017,10.1115/gt2017-65153,Novel Curvature-Based Airfoil Parameterization for Wind Turbine Application and Optimization,1,0,0,0,0,0,1,0,0,1,0,0,0,0,1
+W2967354385,2019,10.1061/(asce)as.1943-5525.0001086,Optimization of Airfoils along High-Aspect-Ratio Wing of Long-Endurance Aircraft in Trimmed Flight,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2040810273,2011,10.3901/jme.2011.14.134,Research on the Aerodynamic Noise Optimization of Wind Turbine Airfoil,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W2058610515,2014,10.1155/2014/746319,A Hybrid Metaheuristic‐Based Approach for the Aerodynamic Optimization of Small Hybrid Wind Turbine Rotors,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W1965313996,2015,10.1063/1.4918748,A design and optimization method for matching the torque of the wind turbines,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0
+W4379877749,2023,10.2514/6.2023-4305,Accelerating Aerodynamic Design of Rotors using a Multi-Fidelity Approach in TORC: Tool for Optimization of Rotorcraft Concepts,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0
+W2189705348,2015,10.1155/2015/838674,An Integrated Method for Designing Airfoils Shapes,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2212054365,2015,10.1115/omae2015-41599,Rotor Scaling Methodologies for Small Scale Testing of Floating Wind Turbine Systems,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+W4388543865,2023,10.1109/access.2023.3331760,Single-Objective Optimal Design of a High-Performance Wind Turbine Airfoil Family,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0
+W2125853789,2012,10.2514/6.2012-4790,Two-dimensional airfoil shape optimization for airfoils at low speeds,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0
+W4402687479,2024,10.2514/6.2024-4435,Aerodynamic Performance Optimisation of an Aerofoil With Combined Leading-Edge and Trailing-Edge Morphing Transformations,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0
+W4283749458,2022,10.13164/mendel.2022.1.063,Improving Initial Aerofoil Geometry Using Aerofoil Particle Swarm Optimisation,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0
+W4402685692,2024,10.2514/6.2024-4140,"Multi-Fidelity Training Data Generation for the Development of DeepAirfoil, an Airfoil Design and Analysis Tool",0,0,0,1,1,0,0,0,0,0,0,1,0,0,0
+W3207843822,2021,10.36909/jer.10949,New airfoils for microhorizontal-axis wind turbines,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4402686213,2024,10.2514/6.2024-3665,SDF-GAN: Aerofoil Shape Parameterisation via an Adversarial Auto-Encoder,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1
+W2033233879,2012,10.2991/mems.2012.87,Airfoil Optimization Design by Panel Methods for Small Size Aerial Vehicle at Low Reynolds Number,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2027252875,2013,10.1109/cec.2013.6557845,Airfoil aerodynamic optimization for a high-altitude long-endurance aircraft using multi-objective genetic-algorithms,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+W4413984378,2025,10.1063/5.0283622,An integrated framework for multi-objective airfoil aerodynamic and aeroacoustic performance optimization combining a fast airfoil performance solver,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+W2489719043,2016,10.1109/aero.2016.7500867,Comparison of shape optimization techniques coupled with genetic algorithm for a wind turbine airfoil,1,0,0,0,1,1,0,0,1,0,0,1,0,0,0
+W4407039002,2025,10.1590/1517-7076-rmat-2024-0827,Enhancing the efficiency of wind energy conversion systems using Novel airfoil based small scale wind turbine,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0
+W3148133595,2021,10.1139/tcsme-2020-0122,Experimental investigations and aerodynamic shape optimization of small horizontal-axis wind turbine blades,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4387499605,2023,10.30630/joiv.7.3.1577,Geometry Representation Effectiveness in Improving Airfoil Aerodynamic Coefficient Prediction with Convolutional Neural Network,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0
+W2371552972,2011,,Optimal design on airfoil of vertical axis wind turbine based on complex optimum method,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2511285034,2016,10.20944/preprints201608.0136.v1,Optimization on Airfoil of Vertical Axis Wind Turbine Based on CST Parameterization and NSGA-II Aigorithm,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0
+W4379797258,2023,10.2514/6.2023-3379,ROT8: A Matlab App for Low Reynolds number Airfoil and Rotor Aerodynamic Design,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W2803237814,2018,10.1155/2018/5737359,Vibration Control of Wind Turbine Blade Based on Data Fitting and Pole Placement with Minimum‐Order Observer,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4402687456,2024,10.2514/6.2024-4664,A Comparative Evaluation of Select Shape Parameterization Approaches for Airfoil Optimization Using Neural Networks,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0
+W1986895107,2013,10.1115/fedsm2013-16157,A Numerical Investigation of High Lift Coefficient Airfoils Near Regions of Stall,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+W2330344156,2012,10.2514/6.2012-136,A Numerical Study on Improving Airfoil Performance at Low Reynolds Numbers for Small-Scale Wind Turbines using Intentional Roughness,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W4317632928,2023,10.2514/6.2023-1583,A Pareto Multi-Objective Optimization of a Camber Morphing Airfoil using Non-Dominated Sorting Genetic Algorithm,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0
+W4302010439,2022,10.48550/arxiv.2210.00101,Aeroacoustic airfoil shape optimization enhanced by autoencoders,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0
+W4390459841,2023,10.3390/aerospace11010044,Airfoil Lift Coefficient Optimization Using Genetic Algorithm and IGP Parameterization: Volume 1,1,0,0,0,0,0,0,0,0,1,0,1,1,0,0
+W2478507878,2016,10.1109/aero.2016.7500912,"Airfoil selection, optimization and analysis for a solar-powered unmanned aerial vehicles",0,0,0,0,0,0,1,0,1,0,0,0,0,0,1
+W2783552029,2017,10.1115/imece2017-71164,Analysis and Design of a Low Reynolds Propeller for Optimal Unmanned Aerial Vehicle (UAV) Flight,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0
+W2622534121,2013,10.4050/vfs-f69-0149,Design and Optimization of an Airfoil with Active Continuous Trailing-Edge Flap,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2433017098,2016,10.1017/aer.2016.62,Design and optimisation of an aerofoil with active continuous trailing-edge flap,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W4412674591,2025,10.1002/we.70046,"Designing High‐Performance, Manufacturing‐Friendly Rotor Blades for Micro Wind Turbines via Cambered Plate Airfoil Optimization",0,0,0,0,1,0,0,0,1,1,0,1,1,0,0
+W2792564685,2017,10.30518/jav.346425,Düz Uçuş için Kanat Profili Eniyilemesi,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+W3205213579,2021,10.36909/jer.10767,Experimental investigations of winglet effects on blade geometry of small horizontal axis wind turbine rotors,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0
+W4392139470,2024,10.47176/jafm.17.05.2169,Integral Airfoil Generation of Multi-rotor Aircraft Based on Optimization of Upper Wing Contour and CFD Simulation,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0
+W3112186913,2020,10.1063/5.0034319,Optimizations of small horizontal-axis wind turbine rotors at low Reynolds number,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W4414339178,2025,10.1061/jaeeez.aseng-6258,Rapid Lift-to-Drag Ratio Prediction for NACA Four-Digit Airfoils Using a Deep Neural Network,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0
+W2617791188,2016,10.7638/kqdlxxb-2015.0050,Rapid design and optimization of airfoil based on improved genetic algorithm,1,0,0,0,0,0,0,1,1,1,0,1,0,0,0
+W4327851968,2021,10.19080/jojms.2021.06.555692,Reducing Fuel Consumption by Aerofoil Optimization,1,0,0,0,0,1,1,0,0,1,0,1,0,0,1
+W4294344042,2022,10.3390/app12178757,Robust Optimization of Natural Laminar Flow Airfoil Based on Random Surface Contamination,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+W3088269319,2020,10.1088/1742-6596/1618/4/042007,Shape optimization of SG6043 airfoil for small wind turbine blades,1,0,0,0,0,0,0,0,1,0,1,1,1,0,0
+W4409229923,2025,10.59400/mea2486,The SG6043 airfoil optimization for low Reynolds number applications in wind turbines,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+W2526374889,2016,10.1088/1742-6596/753/2/022046,Thick airfoil designs for the root of the 10MW INNWIND.EU wind turbine,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W3091961626,2020,10.1109/icuas48674.2020.9213942,A Genetic Algorithm based Method for the Airfoil Optimization of a Tactical Blended-Wing-Body UAV,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W3034823447,2020,10.2514/6.2020-3118,A Novel Framework for Multi-Objective Optimization of Airfoils Using Invasive Weed Optimization,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W4387060459,2023,10.21203/rs.3.rs-3361965/v1,Aerodynamic Performance Analysis of an Optimized Aerofoil for Unmanned Aerial Vehicles,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W2787291223,2018,10.5772/intechopen.70895,Airfoil Boundary Layer Optimization Toward Aerodynamic Efficiency of Wind Turbines,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0
+W7164174386,2023,10.4050/f-0079-2023-1277,Blade Shape Optimization of Rotors using Neural Networks,1,0,0,1,1,0,0,0,0,0,0,1,0,0,0
+W3033872641,2019,10.1109/icpes47639.2019.9105431,Design and Optimisation of a 20kW Horizontal Axis Wind Turbine using HARP_Opt,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+W2527664744,2016,10.1088/1742-6596/753/2/022008,Design of advanced airfoil for stall-regulated wind turbines,0,0,1,0,0,0,1,0,0,1,1,1,0,0,0
+W3045850802,2013,,Integrated airfoil and blade design method for large wind turbines,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0
+W4415289243,2025,10.48550/arxiv.2503.16323,NeuralFoil: An Airfoil Aerodynamics Analysis Tool Using Physics-Informed Machine Learning,0,0,1,1,0,0,0,0,0,1,1,1,0,0,0
+W7117539326,2025,10.46810/tdfd.1762609,Task-Specific Airfoil Design for Fixed-Wing UAVs in High-Climb Reconnaissance Missions: A CST and XFOIL-Based Approach,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0
+W4400129633,2024,10.1088/1742-6596/2647/11/112012,Validation of an engineering model for vortex generators in a viscous-inviscid interaction method for airfoil analysis,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0
+W4389244271,2023,10.3397/in_2023_0538,A Deep Learning Approach to Optimize Airfoil Shape for Reduced Trailing Edge Noise in Urban Air Mobility Rotors,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0
+W7127497705,2026,10.2514/6.2026-2081,"A Multidisciplinary Design, Analysis, and Optimization (MDAO) Framework for Conceptual UAV Design",0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W4409214137,2025,10.2514/1.c038154,Aerodynamic Design of Prop-Rotor Blades Using Neural Networks,1,0,0,1,1,0,0,0,0,0,0,1,0,0,0
+W4380882797,2023,10.51983/arme-2023.12.1.3670,Aerodynamic Simulation and Optimization of Micro Aerial Vehicle Rotor Airfoil at Low Reynolds Number,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0
+W4309759291,2022,10.1088/1742-6596/2369/1/012006,Aerodynamic optimization of a propeller airfoil at low Reynolds numbers,0,1,0,0,0,0,0,0,1,1,0,1,0,0,0
+W4394506542,2017,10.6084/m9.figshare.5670967,Aerofoil Design for Unmanned High-Altitude Aft-Swept Flying Wings,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0
+W2045265283,2015,10.4018/ijamc.2015010102,Airfoil Topology Optimization using Teaching-Learning based Optimization,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0
+W3198373669,2021,10.24084/repqj19.330,Airfoil optimization for small horizontal axis wind turbine,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0
+W4379879395,2023,10.2514/6.2023-3722,Airfoil shape parameterization using reconstruction-error-minimizing generative adversarial networks,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0
+W4403546295,2024,10.21595/vp.2024.24392,Analysis of aerodynamic characteristics of drone wing based on CFD,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2604610033,2016,10.19249/ams.v95i4.286,Analysis on aerodynamic characteristics of a paraglider airfoil,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W7125509753,2026,10.1177/1475472x261419075,Application of airfoil parameterization methods to broadband noise reduction in rotors,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0
+W4393395380,2023,10.3103/s1068799823040190,Cessna 172 G1000 Aircraft Airfoil Optimization Using Particle Swarm Optimization Method Applying a Direct Airfoil Design Approach to Obtain the Maximum Lift-to-Drag Ratio,0,1,0,0,0,0,1,0,1,1,0,1,0,0,0
+W4402686085,2024,10.2514/6.2024-3506,Design Exploration of Airfoils at Moderate Reynolds Number Using Multi-Fidelity Optimization,1,0,0,0,0,0,0,0,0,1,0,1,1,0,0
+W1207358214,2015,,Design and Analysis of an Installed Pusher Propeller with Boundary Layer Inflow,0,0,1,0,0,0,0,0,0,1,0,1,1,0,0
+W7133530129,2025,10.1109/etfg61999.2025.11401936,Design and Optimization of Small-Scale Wind Turbine Rotor Integrating Aerodynamic and Structural Considerations,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W2997071458,2020,10.2514/6.2020-1977,Design of Flush Air Data Systems Insensitive to Manufacturing Variance,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4414524112,2025,10.2514/1.j065382,Design of Optimal Airfoils for Crosswind Kite Power Systems,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2043149870,2012,10.1115/imece2012-88572,Design of a Horizontal Axis Wind Turbine for Fiji,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W4241120937,2017,10.5194/wes-2017-5,Design of advanced airfoil for stall-regulated wind turbines,0,0,1,0,0,0,1,0,0,1,1,1,0,0,0
+W2587267810,2016,,"Design, development and tests in real time of control methodologies for a morphing wing in wind tunnel",0,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+W3205076375,2021,10.1515/ehs-2021-0009,Development of a new aerofoil profile with a high lift-to-drag ratio for wind turbines using a low fidelity accurate optimization flow solver,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0
+W4283214235,2022,10.2514/6.2022-3355,Development of an Optimization Framework for a Circulation Control Morphing Wing,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W4405538163,2024,10.5433/1679-0375.2024.v45.51520,Experimental Aerodynamics of a NACA 4424 Airfoil at Low Reynolds Number Flow,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4403755285,2024,10.48550/arxiv.2409.13328,Generative Aerodynamic Design with Diffusion Probabilistic Models,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1
+W4399119481,2024,10.4050/f-0080-2024-1115,Investigation of Airfoil Parameterizations and Optimization for Rotor Broadband Noise Reduction,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0
+W2100330237,2015,,Multiobjective Laminar-flow Airfoil Shape Optimization Using a Controlled Random Search Algorithm,0,0,0,0,0,0,1,0,1,0,0,1,0,0,0
+W2908829049,2018,,On Stall Behavior in Aerobatic Figures with an Aerobatic Glider,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+W1964944229,2014,10.4028/www.scientific.net/amm.668-669.230,Optimization and Design for Wind Turbine Airfoil at Multiple Working Conditions Based on Genetic Algorithm,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W3166293531,2021,10.20944/preprints202106.0148.v1,Radical Reduction of Aircraft Fuel Consumption by Optimizing Aerofoil by New Evolutionary Algorithms,1,0,0,0,0,1,1,0,0,1,0,1,0,0,1
+W4235845138,2021,10.20944/preprints202106.0219.v1,Radical Reduction of Aircraft Fuel Consumption by Optimizing Aerofoil by New Evolutionary Algorithms,1,0,0,0,0,1,1,0,0,1,0,1,0,0,1
+W2969280919,2019,10.1088/1742-6596/1300/1/012014,Shape Optimization and Analysis of a Low-resistance Mast,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W3019185189,2020,10.1063/5.0002610,Single- and multi-objective optimization of a low-speed airfoil using genetic algorithm,1,0,1,0,0,1,0,0,0,0,0,1,0,0,0
+W3191739047,2020,,The Design and Validation of a UAV Propeller Intended for Extremely Low Reynolds Number Environments,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W2981987936,2019,10.1109/icmae.2019.8880954,optimization of an Airfoil Characteristics to Minimize the Turn Radius of a Small Unmanned Aerial Vehicle,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+W4406574600,2024,10.1145/3704558.3707090,A Cubic B-spline Model based on CGAN for Blade Airfoil Design,0,0,0,1,0,0,1,0,1,0,0,0,0,0,1
+W4402685796,2024,10.2514/6.2024-3667,A Fully Data-Driven Generative Design Routine for Subsonic Airfoils Based on Adversarial Autoencoders,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+W7154082680,2026,10.1109/access.2026.3683048,Accelerated Airfoil Optimization via a Geometry-Based Discriminator Within Particle Swarm Optimization,0,1,0,0,0,0,0,0,1,1,0,0,0,0,1
+W7112024579,2025,,Accelerating low noise axial fan design space exploration: a surrogate modelling framework for multi-objective optimisation,1,0,0,1,0,0,0,0,0,1,0,1,1,0,0
+W7153838862,2026,10.5281/zenodo.19536212,AeroML: Physics-Informed Neural Networks for Aerodynamic Shape Optimization,1,0,1,1,1,0,0,0,1,0,0,1,1,0,0
+W7153758177,2026,10.5281/zenodo.19536213,AeroML: Physics-Informed Neural Networks for Aerodynamic Shape Optimization,1,0,1,1,1,0,0,0,1,0,0,1,1,0,0
+W7165177474,2026,10.2514/6.2026-114637,Aerodynamic Analysis of a Variable Camber Wing Design for Optimal Hybrid Pylon Racing Glider Capabilities,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0
+W7214715655,2026,10.3390/computers15100661,Aerodynamic Design Optimisation Through Machine Learning—GCAG-VAEGAN,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+W2892922461,2018,,Aerodynamic Optimisation of a Morphing Leading Edge Airfoil,1,0,1,1,0,0,0,0,0,0,1,1,0,0,0
+W7215414875,2023,,Aerodynamic analysis of a small-scale drone propeller using the blade element momentum method,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W7155516103,2026,10.1088/1742-6596/3215/1/012024,Aerodynamic and structural co-optimization of wind turbine airfoils based on fluid–structure interaction,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0
+W7213274302,2026,10.7638/kqdlxxb-2026.0027,Aerodynamic design of vertical axis wind turbine airfoils based on Gaussian process regression,1,0,0,1,0,0,0,0,1,0,0,1,0,0,0
+W4409591480,2025,10.30574/gjeta.2025.23.1.0100,Aerodynamic performance analysis of NACA 5518 airfoil for wind turbine applications using Q blade,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W7107962991,2025,10.5281/zenodo.17759432,Aerodynamic performance analysis of NACA 5518 airfoil for wind turbine applications using Q blade,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W7107947789,2025,10.5281/zenodo.17759433,Aerodynamic performance analysis of NACA 5518 airfoil for wind turbine applications using Q blade,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W4413935306,2025,10.20944/preprints202509.0154.v1,Airfoil Shape Optimization for Enhanced Aerodynamic Efficiency Using a Dual-Branch Deep Network Integrated with Genetic Algorithms,1,0,0,1,0,0,1,0,1,0,0,1,1,0,0
+W4410746075,2025,10.46632/aae/3/2/5,Airfoil Shape Optimization for Improved Aerodynamics,1,0,0,0,0,0,0,0,1,0,0,1,1,0,0
+W3005731184,2022,10.48550/arxiv.2211.17189,Airfoil Shape Optimization using Deep Q-Network,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0
+W7204110040,2026,10.1088/1742-6596/3271/1/012001,Airfoil shape optimization for mitigating adverse effects of icing in wind turbines,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0
+W7134970375,2026,10.1109/iisec69317.2026.11418479,An Aerodynamic Analysis Model for Bird-Inspired Morphing Wings: Leveraging Machine Learning for Performance Optimization,0,0,0,1,0,0,0,0,1,1,0,1,0,0,0
+W7132322182,2016,,Comparison of Qblade and CFD Results for Small-Scaled Horizontal Axis Wind Turbine Analysis,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W3176014390,2019,,Coupling an inviscid IGA--BEM solver with X-Foil’s boundary layer model for 2D flows,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0
+W3158598737,2021,,DESIGN OPTIMISATION AND PERFORMANCE ANALYSIS OF NACA 5 SERIES,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W4413191366,2025,10.2514/6.2025-99084,DEVELOPMENT OF AIRFOIL GEOMETRY FOR IMPROVED PERFORMANCE WITH A PASSIVE VARIABLE-PITCH AIRCRAFT PROPELLER,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0
+W7203479345,2026,10.2514/1.c038831,Design Exploration of Airfoils for Advanced Air Mobility Using Multifidelity Optimization,1,0,0,0,0,0,0,0,1,1,1,1,0,0,0
+W1965301178,2014,10.1115/gtindia2014-8296,Design Optimization of Wind Turbine Using Fluid Structural Interaction Analysis and Genetic Algorithm,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0
+W7108076518,2025,10.1088/1755-1315/1561/1/012024,Design and Surrogate-Based Optimization of a Rim-Driven Thruster for Reversible Pump-Turbine,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+W7171640886,2026,10.32865/2346/108861,"Design, Optimization, and Testing of Ventilation Fans for Sub-Ambient Pressure Environments",0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4404509592,2024,10.22541/au.173199821.17324875/v1,Designing manufacturable high performance rotor blades for micro wind turbines through cambered plate airfoil optimization,0,0,0,0,1,0,0,0,1,1,0,1,1,0,0
+W7161780014,2026,10.2514/6.2026-3470,Efficiency–Noise Trade–Off of Downscaled eVTOL Tiltrotor: A Low–Fidelity Multi-Objective Optimisation Framework,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+W4411233889,2024,10.1109/icece64886.2024.11024718,Efficient Foil Shape Optimization Using Artificial Neural Network-Based Surrogate Model with Adaptive Sampling Strategy,0,0,1,1,0,0,0,1,1,1,0,0,1,0,0
+W247602135,2011,,Fast procedure for two dimensional airfoil design,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0
+W4403415898,2014,10.4050/f-0070-2014-9692,Genetic Algorithm Based Aerodynamic Shape Optimization Tool for Wind Turbine Blades and Its Implementation to Helicopter Blades,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+W7110619965,2014,,Genetic Algorithm based aerodynamic shape optimization tool for wind turbine blades and its implementation to helicopter blades,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+W7169798102,2026,10.48550/arxiv.2607.15821,Global solutions for the sensors placement problem via weakly convex optimization,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2792728455,2017,,High-Lift Low Reynolds Number Aerofoils With Specified Pressure Drop for Ducted Wind Turbine,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
+W2391759098,2014,,Integrated design of high-lift laminar airfoil for MALE UAV,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0
+W7130504249,2026,10.1049/icp.2025.3819,Intelligent optimization design considering aerodynamic characteristics of airfoils,1,0,0,0,0,0,1,0,1,0,1,1,1,0,0
+W2787662058,2018,,Investigation into Integrated Free-Form and Precomputational Approaches for Aerostructural Optimization of Wind Turbine Blades,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0
+W3201804805,2021,,"Mathematical Modelling, Design and Optimization of Airfoils and Aircrafts operating at specific Reynolds Number",1,0,1,0,0,1,1,1,0,0,0,1,1,0,0
+W2598096382,2015,,Matlab-based Development of Intelligent Systems for Aerospace Applications,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W7170927224,2026,10.20944/preprints202607.1690.v1,Multi-Objective Hydrodynamic and Structural Design Optimization of Tidal Stream Turbine Airfoil Sections Using NSGA-II and RANS CFD Validation,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0
+W2587656483,2016,10.1115/imece2016-67930,Multi-Objective Optimal Airfoil Design for Cargo Aircrafts,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0
+W4403097269,2024,10.1016/j.ast.2024.109647,Multi-objective optimization of airfoils with integral tubular high-pressure tanks for hydrogen storage,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0
+W4290442470,2022,,Multidisciplinary Conceptual Design Methodology and Design Tool for Rotor Blades of Advanced Helicopters,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W2607674315,2017,10.13140/rg.2.2.14983.50088,New methodologies for calculation of flight parameters on reduced scale wings models in wind tunnel,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0
+W7111465501,2025,,On the Effectiveness of Low-Fidelity Optimization Methods for Propeller Design,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4415378675,2025,10.29008/etc2025-297,On the Effectiveness of Low-Fidelity Optimization Methods for Propeller Design,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0
+W2364820695,2010,,Optimization Design for Low Reynolds Number Foldable UAV Airfoil,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+W2380605808,2013,,Optimization Method and Aerodynamic Character Simulation of Morphing Wing,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W3148724773,2010,,Optimization design study of low-Reynolds-number high-lift airfoils for the high-efficiency propeller of low-dynamic vehicles in stratosphere,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+W4379389550,2023,10.21203/rs.3.rs-2980263/v1,Optimization of Low Reynolds number airfoil design using Full Inverse Design method,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0
+W7162676050,2026,10.1093/ce/zkag024,Optimization of airfoil geometry using the NSGA-II method to improve the performance and efficiency of a very low head turbine,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0
+W4313318895,2022,10.20535/0203-3771422021268886,Optimization of the geometry of the glider wing taking into account statistical data,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+W7139107917,2026,10.48550/arxiv.2603.17057,Optimization-Embedded Active Multi-Fidelity Surrogate Learning for Multi-Condition Airfoil Shape Optimization,1,0,0,1,1,0,0,0,1,1,0,1,0,0,0
+W4414100228,2025,10.1142/s0219876225500537,Optimizing Wind Turbine Airfoil Design Using Genetic Algorithm and Predicting Aerodynamic Performance Through CFD Analysis,1,0,0,0,0,0,0,0,1,0,0,1,1,0,0
+W4318260357,2021,10.37649/aengs.2021.171198,Optimum performance of rotor blade with different airfoil for Primus Wind power AIR 40 Wind Turbine 12VDC,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W4253283723,2014,10.1016/s0026-0657(14)70090-6,Quebec manufacturers launch AM aerospace project,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W7162421705,2026,10.31224/7158,Reduced-Order Model for Active Aerodynamics Prediction and Wing Control,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1
+W7161640269,2026,10.1016/j.ast.2026.112630,Reinterpreting aerodynamic optimality for morphing airfoils under continuous shape evolution,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0
+W4232727504,2012,10.4028/scientific5/amr.455-456.1486,Research on Design Methods and Aerodynamics Performance of CQU-DTU-B21 Airfoil,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W2095141406,2012,10.4028/www.scientific.net/amr.455-456.1486,Research on Design Methods and Aerodynamics Performance of CQU-DTU-B21 Airfoil,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+W4210712489,2021,10.1109/tocs53301.2021.9688951,Research on Topology Transformation Method of Wind Turbine Airfoil,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W2886267243,2018,,Simulation and Optimisation of unsteady aerodynamic performance of a 2D VAWT rotor: With emphasis on airfoil design,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W7126120549,2026,10.2514/6.2026-1863,Sundancer: A Solar UAV Platform for Emergency Communications,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W7167248400,2026,10.1016/j.ast.2026.113128,Surrogate-based constrained optimization of camber-morphing airfoils: Onset location as a design variable and quantification of adaptive versus robust morphing strategies,0,0,0,1,0,0,0,0,1,1,1,1,0,0,0
+W4385894241,2023,10.23967/marine.2023.021,System Modelling and Design Optimization of Wind Sails Under Different Sea and Wind Conditions,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+W7167830513,2026,10.21741/9781644904251-15,Tuning Machine Learning Outcomes for Airfoil Aerodynamics Seed Sensitivity in Predictive Performance,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0
+W4210593669,2021,10.1115/imece2021-73401,"Wind Energy Resource Assessment for Suva, Fiji and Design of a 30 kW Wind Turbine",1,0,0,1,0,0,1,0,0,0,0,0,0,1,0
+W4403747138,2024,10.48550/arxiv.2409.12345,Wing Optimisation for a tractor propeller driven Micro Aerial Vehicle,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+W4409083322,2025,10.52783/anvi.v28.3952,XFOIL Validation of a Particle Swarm Optimization of Low-Speed Wind Turbine Airfoils,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0

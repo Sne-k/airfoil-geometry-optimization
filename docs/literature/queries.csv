@@ -1,0 +1,7 @@
+query_id,database,field,query,published_from,date_searched,hits,retrieved
+Q1_xfoil_optimisation,OpenAlex,title and abstract,(airfoil OR aerofoil) AND XFOIL AND (optimization OR optimisation),2010-01-01,2026-10-04,329,329
+Q2_stochastic_optimisers,OpenAlex,title and abstract,"(airfoil OR aerofoil) AND (""shape optimization"" OR ""shape optimisation"") AND (""genetic algorithm"" OR ""particle swarm"" OR ""Bayesian optimization"")",2010-01-01,2026-10-04,190,190
+Q3_morphing,OpenAlex,title and abstract,morphing AND (airfoil OR aerofoil) AND (optimization OR optimisation) AND XFOIL,2010-01-01,2026-10-04,34,34
+Q4_curvature,OpenAlex,title and abstract,"(airfoil OR aerofoil) AND (optimization OR optimisation) AND (""curvature constraint"" OR ""curvature constraints"" OR ""surface waviness"" OR ""smoothness constraint"")",2010-01-01,2026-10-04,2,2
+Q5_xfoil_vs_rans,OpenAlex,title and abstract,"(airfoil OR aerofoil) AND XFOIL AND (RANS OR ""Navier-Stokes"") AND transition AND (optimization OR optimisation)",2010-01-01,2026-10-04,8,8
+Q6_robust_transition,OpenAlex,title and abstract,"(airfoil OR aerofoil) AND (robust OR uncertainty) AND (""laminar flow"" OR transition) AND (optimization OR optimisation)",2010-01-01,2026-10-04,115,115
