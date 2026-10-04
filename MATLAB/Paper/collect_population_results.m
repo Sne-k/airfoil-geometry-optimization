@@ -156,8 +156,9 @@ end
 if ~isempty(Z), writetable(vertcat(Z{:}), fullfile(outDir, 'seeds.csv')); end
 
 %% Figures
-f = figure('Color', 'w', 'Position', [60 60 1150 460], 'Visible', 'off');
 show = intersect({'peak', 'alpha2', 'cldes', 'nocurv'}, forms, 'stable');
+if isempty(show), show = forms(:).'; end               % only the robust runs so far
+f = figure('Color', 'w', 'Position', [60 60 1150 460], 'Visible', 'off');
 tiledlayout(1, numel(show), 'TileSpacing', 'compact', 'Padding', 'compact');
 for s = 1:numel(show)
     nexttile;  hold on;  box on;  grid on;
