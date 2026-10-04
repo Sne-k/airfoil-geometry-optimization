@@ -17,9 +17,19 @@ function result = optimize_airfoil(airfoil, varargin)
 %
 %   Options (name, value):
 %     'Re'            Reynolds number                            (1e6)
-%     'Objective'     'LDmax' | 'endurance' (CL^1.5/CD) | 'LDatCL'  ('LDmax')
+%     'Objective'     'LDmax' | 'endurance' (CL^1.5/CD) | 'LDatCL' |
+%                     'LDatAlpha' (CL/CD at a fixed angle)       ('LDmax')
 %     'DesignCL'      lift coefficient(s) used by 'LDatCL'       (0.5)
-%     'Weights'       weights of several design lift coefficients (equal)
+%     'DesignAlpha'   angle(s) of attack used by 'LDatAlpha', deg; they
+%                     must be multiples of 0.5 between -2 and 12   (2)
+%     'Weights'       weights of several design lift coefficients or
+%                     angles                                     (equal)
+%     'Ncrit'         XFOIL's transition parameter. With several values
+%                     the design is analysed at each of them (the search
+%                     takes that many times longer)                (9)
+%     'Aggregate'     how several design points and Ncrit values are
+%                     combined: 'mean' (weighted over the design points)
+%                     or 'worst' (the lowest value)              ('mean')
 %     'MinThickness'  minimum t/c as a fraction of the original  (1.0)
 %     'CmIncrease'    allowed increase of |CM| at alpha = 0      (0.05)
 %     'KeepCLmax'     do not let the maximum lift drop           (false)
@@ -62,7 +72,10 @@ ip = inputParser;
 ip.addParameter('Re', 1e6);
 ip.addParameter('Objective', 'LDmax');
 ip.addParameter('DesignCL', 0.5);
+ip.addParameter('DesignAlpha', 2);
 ip.addParameter('Weights', []);
+ip.addParameter('Ncrit', 9);
+ip.addParameter('Aggregate', 'mean');
 ip.addParameter('MinThickness', 1.0);
 ip.addParameter('CmIncrease', 0.05);
 ip.addParameter('KeepCLmax', false);
@@ -84,6 +97,11 @@ o.Algorithm = lower(o.Algorithm);
 if ~any(strcmp(o.Algorithm, {'ga', 'pso', 'bayesopt'}))
     error('optimize_airfoil:algorithm', 'Unknown algorithm ''%s''.', o.Algorithm);
 end
+if ~any(strcmp(o.Aggregate, {'mean', 'worst'}))
+    error('optimize_airfoil:aggregate', 'Unknown aggregate ''%s''.', o.Aggregate);
+end
+% The polars of the report use Ncrit = 9 if it is among the values, else the first
+if any(o.Ncrit == 9), flow0 = struct('Ncrit', 9); else, flow0 = struct('Ncrit', o.Ncrit(1)); end
 
 exe = getenv('XFOIL_EXE');
 if isempty(exe), exe = fullfile(root, 'Aerodynamics', 'xfoil.exe'); end
@@ -100,7 +118,7 @@ else
     mkdir(historyDir);
 end
 
-polBase = xfoilPolar(xu0, yu0, xl0, yl0, o.Re, [-2 18 0.5], exe);
+polBase = xfoilPolar(xu0, yu0, xl0, yl0, o.Re, [-2 18 0.5], exe, [], true, flow0);
 if isempty(polBase.alpha)
     error('optimize_airfoil:xfoil', 'XFOIL could not analyse %s.', name);
 end
@@ -128,8 +146,10 @@ else
         'XFOIL gave no pitching moment around alpha = 0; the pitching-moment limit is not applied.');
 end
 S.objective = o.Objective;
-S.designCL = o.DesignCL;
+if strcmp(o.Objective, 'LDatAlpha'), S.design = o.DesignAlpha; else, S.design = o.DesignCL; end
 S.weights = o.Weights;
+S.aggregate = o.Aggregate;
+S.flows = arrayfun(@(n) struct('Ncrit', n), o.Ncrit(:).', 'UniformOutput', false);
 S.clMaxMin = -Inf;
 S.checkAbove = 0;
 S.failValue = 0;
@@ -145,8 +165,8 @@ if o.KeepCLmax
     % The sweep must reach stall; the limit comes from the fitted original,
     % analysed like the candidates
     S.alphaRange = [-2 18 0.5];
-    p1 = xfoilPolar(x, yuF, x, ylF, o.Re, S.alphaRange, exe, [], false);
-    p2 = xfoilPolar(x, yuF, x, ylF, o.Re, S.alphaRange, exe, 200, false);
+    p1 = xfoilPolar(x, yuF, x, ylF, o.Re, S.alphaRange, exe, [], false, flow0);
+    p2 = xfoilPolar(x, yuF, x, ylF, o.Re, S.alphaRange, exe, 200, false, flow0);
     if ~isempty(p1.CL) && ~isempty(p2.CL)
         S.clMaxMin = 0.99 * min(max(p1.CL), max(p2.CL));
     end
@@ -245,7 +265,7 @@ fOpt = airfoilObjective(d, S);
 AuOpt = Au + d(1:n1);
 AlOpt = Al + d(n1+1:end);
 [yu, yl] = cstSurfaces(AuOpt, AlOpt, dte, x);
-polOpt = xfoilPolar(x, yu, x, yl, o.Re, [-2 18 0.5], exe);
+polOpt = xfoilPolar(x, yu, x, yl, o.Re, [-2 18 0.5], exe, [], true, flow0);
 mOpt = efficiencyMetrics(polOpt);
 [vCurv, cOpt] = curvatureViolation(AuOpt, AlOpt, dte, curvRef);
 [~, cFit] = curvatureViolation(Au, Al, dte, curvRef);
@@ -271,7 +291,7 @@ change(end-3:end) = NaN;                                 % curvature: compare th
 summary = table(rows, vb, vo, change, ...
     'VariableNames', {'Quantity', 'Original', 'Optimized', 'Change_percent'});
 writetable(summary, fullfile(o.OutputDir, 'summary.csv'));
-fprintf('\n%s at Re = %.3g (XFOIL, Ncrit 9):\n', name, o.Re);
+fprintf('\n%s at Re = %.3g (XFOIL, Ncrit %g):\n', name, o.Re, flow0.Ncrit);
 fprintf('(the curvature rows compare the CST fit of the original with the design)\n');
 disp(summary);
 
