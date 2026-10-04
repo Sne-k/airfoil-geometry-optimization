@@ -66,7 +66,8 @@ def check(entry, cache):
              "min": min, "max": max, "len": len, "abs": abs, "sum": sum, "set": set, "str": str,
              "float": float, "int": int, "round": round}
     try:
-        computed = eval(entry["expr"], {"__builtins__": {}}, names)  # the manifest is part of this repository
+        # the manifest is part of this repository; the names are globals so that generator expressions see them
+        computed = eval(entry["expr"], {"__builtins__": {}, **names})
     except Exception as error:  # noqa: BLE001
         return f"expression failed: {error}"
     target = float(written.replace("−", "-").replace(",", ""))

@@ -196,28 +196,50 @@ Summary:
   (x < 0.15) and the rear part (x > 0.65) are deflected by quadratic functions of the distance from the
   box, and a grid of deflections is analysed.
 
-## 8. CFD (in progress)
+## 8. CFD (`CFD/`)
 
-- **Mesh.** Structured C-grid (`CFD/airfoilCGrid.m`). By default: 201 points per surface, 80 along the
-  wake cut, 150 from the wall; first cell 10⁻⁵ c at Re = 10⁶ (2 × 10⁻⁶ c at 6 × 10⁶); far field and
-  wake length 20 c. The grid is marched from the wall to about one chord, then continues along straight
-  lines to the C-shaped far field. It is exported as a Fluent mesh by `writeFluentMesh.m`.
-- **Solver.** ANSYS Fluent 2026 R1 (student licence), 2-D double precision, pressure-based coupled
-  solver with pseudo-time stepping. Ideal-gas air at 288.15 K, with the viscosity set for the Reynolds
-  number. Pressure far field. k-ω SST (fully turbulent) or Transition SST (γ–Re_θ). Free-stream
-  turbulence 0.052 % with viscosity ratio 0.009 (the values of the NASA NACA 0012 case). 400 iterations
-  with first-order upwinding, then blocks of 200 second-order iterations, with the force coefficients
-  printed after each block (`CFD/fluentJournal.m`, `run_fluent_cases.m`).
-- **Verification.** NASA NACA 0012 case, Re = 6 × 10⁶, M = 0.15, SST.
-  - At α = 0° the drag coefficient is 0.00812 (far field 20 c) and 0.00811 (500 c), against 0.00809 from
-    the reference codes.
-  - At α = 10° the lift is within 1 %, but the drag is too high by 14 % with a 20-chord far field and by
-    6 % with 100 chords. The design study therefore uses 500 chords.
-  - The solution diverges at M = 0.1 and converges at M = 0.15, so the design study runs at M = 0.15 and
-    XFOIL is compared at the same Mach number.
-  - Details and the open items are in [MATLAB/CFD/README.md](../MATLAB/CFD/README.md).
-- **Transition SST inflow.** 0.14 % turbulence with viscosity ratio 50 at a far field 500 chords away. By
-  the SST free-stream decay this arrives at the airfoil as about 0.07 %, the Mack equivalent of Ncrit = 9.
+Results: [results/cfd](../results/cfd/README.md).
+
+- **Mesh** (`airfoilCGrid.m`, `writeFluentMesh.m`). Structured C-grid, marched from the wall to about
+  one chord and continued along straight lines to a C-shaped far field. Surface points are placed by arc
+  length. For the studies: 200 cells per surface, 80 along the wake cut, 179 from the wall, far field
+  and outlet 500 chords away; first cell 10⁻⁵ c at Re = 10⁶ and 2 × 10⁻⁶ c at 6 × 10⁶ (y+ about 0.5);
+  about 100,000 cells.
+- **Solver** (`fluentJournal.m`, `run_fluent_cases.m`). ANSYS Fluent 2026 R1 (student licence, 4
+  processes), 2-D double precision, pressure-based coupled solver with pseudo-time stepping. Ideal-gas
+  air at 288.15 K and M = 0.15, with the viscosity set for the Reynolds number. Pressure far field.
+  400 iterations with first-order upwinding, then second-order upwinding for momentum, turbulence and
+  energy and second-order pressure interpolation.
+- **Pseudo-time step.** Fixed at one chord passage (chord / free-stream speed). Fluent's automatic step
+  is tied to the domain size. With it the fine mesh did not reach a steady state, the 15° case fell onto
+  a stalled solution and M = 0.1 diverged; with the fixed step all converge, and where both settings
+  converge they give the same forces (`timestep_study.m`).
+- **Convergence.** The force coefficients are printed every 50 iterations. A run counts as steady if,
+  over its last reports, CL varies by less than 10⁻⁴ and CD by less than 10⁻⁵. The tables give the last
+  value, the mean and the range, and the scaled residuals at the last iteration.
+- **Models.** k-ω SST (fully turbulent) with the free-stream values of the NASA case (0.052 %, viscosity
+  ratio 0.009), and Transition SST (γ–Re_θ; Langtry & Menter 2009).
+- **Transition SST inflow.** XFOIL's Ncrit = 9 corresponds to Tu ≈ 0.07 % by Mack's relation
+  Tu = exp(−(Ncrit + 8.43)/2.4). A far-field value of 0.14 % with viscosity ratio 50 decays to 0.072 %
+  one chord ahead of the airfoil, which every run reports from a probe point. The first-order stage of
+  the design study uses a pseudo-time step of 20 chord passages, so that the turbulence from the far
+  field has reached the airfoil before the second-order stage; a repeat of the NASA case with this
+  start-up gives the same forces.
+- **Surface data.** Every run writes the pressure coefficient and the wall shear stress on the airfoil.
+  The transition location is taken where the skin friction rises fastest, and the separation location
+  where it first becomes negative (`transitionFromCf.m`).
+- **Verification** (`verify_naca0012.m`). NASA Turbulence Modeling Resource, 2D NACA 0012 case: SST,
+  M = 0.15, Re = 6 × 10⁶. Three geometrically similar meshes (refinement ratio √2; 50,292, 100,240 and
+  200,376 cells) at 0°, 10° and 15°, and the medium resolution with the far field at 20 and 100 chords.
+  - On the fine mesh the lift is within 1.2 % and the drag within 6.4 % of each of NASA's three codes;
+    the skin friction on the upper surface agrees with CFL3D within 1.2 % of its mean value.
+  - Discretisation uncertainty of the drag by the grid convergence index (Celik et al. 2008): 0.67 % on
+    the fine and 1.61 % on the medium mesh at 10°.
+  - A far field 20 chords away raises the drag at 10° by 9.4 %; 100 chords still by 1.5 %.
+- **Design study** (`run_design_study.m`, `design_study_xfoil.m`). NACA 2412, the smooth and the wavy
+  optimised design and the earlier PARSEC design at Re = 10⁶ and M = 0.15: Transition SST at 0°, 2°, 3°,
+  4°, 5°, 6°, 7° and 8° (4000 second-order iterations) and SST at 0°, 2°, 4°, 6° and 8° (3000). XFOIL is
+  run at the same Mach number with free transition and with transition fixed at 5 % chord.
 
 ## 9. Software and hardware
 
@@ -230,12 +252,17 @@ made on Windows 11, AMD Ryzen 7 7435HS (8 cores, 16 threads), with 6 parallel MA
 - Bashir, M., Longtin-Martel, S., Botez, R. M. & Wong, T. (2021). Aerodynamic design optimization of a
   morphing leading edge and trailing edge airfoil – application on the UAS-S45. *Applied Sciences*
   11(4), 1664.
+- Celik, I. B., Ghia, U., Roache, P. J., Freitas, C. J., Coleman, H. & Raad, P. E. (2008). Procedure for
+  estimation and reporting of uncertainty due to discretization in CFD applications. *Journal of Fluids
+  Engineering* 130(7), 078001.
 - Deb, K. (2000). An efficient constraint handling method for genetic algorithms. *Computer Methods in
   Applied Mechanics and Engineering* 186, 311–338.
 - Drela, M. (1989). XFOIL: an analysis and design system for low Reynolds number airfoils. In *Low
   Reynolds Number Aerodynamics*, Lecture Notes in Engineering 54, Springer, 1–12.
 - Kulfan, B. M. (2008). Universal parametric geometry representation method. *Journal of Aircraft*
   45(1), 142–158.
+- Langtry, R. B. & Menter, F. R. (2009). Correlation-based transition modeling for unstructured
+  parallelized computational fluid dynamics codes. *AIAA Journal* 47(12), 2894–2906.
 - Ladson, C. L. (1988). *Effects of independent variation of Mach and Reynolds numbers on the low-speed
   aerodynamic characteristics of the NACA 0012 airfoil section*. NASA TM-4074.
 - Xoptfoil2: J. Guenzel, <https://github.com/jxjo/Xoptfoil2> (version 2.0.0).
