@@ -15,22 +15,31 @@ function run_design_study(outDir, pilot)
 %                 Mack's relation Tu = exp(-(Ncrit + 8.43)/2.4). The value
 %                 at the airfoil is read from two probe points one and a
 %                 quarter chord upstream of the leading edge.
+%                 Angles 0, 2, 3, 4, 5, 6, 7 and 8 deg.
 %     sst         k-omega SST, fully turbulent (a pessimistic bound), with
-%                 the inflow of the NASA verification case (0.052 %, 0.009)
-%   Angles of attack: 0, 2, 3, 4, 4.5, 5, 5.5, 6, 7 and 8 deg with
-%   Transition SST (every design's XFOIL optimum is among them) and 0, 2, 4,
-%   6 and 8 deg with SST. The meshes are those of the medium mesh of
-%   verify_naca0012.m with a first cell of 1e-5 chords (y+ about 0.5 at this
-%   Reynolds number), and the solver set-up is the verified one: far field
-%   500 chords away, fixed pseudo-time step of one chord passage, 400
-%   first-order and 3000 second-order iterations, forces every 50
-%   iterations.
+%                 the inflow of the NASA verification case (0.052 %, 0.009).
+%                 Angles 0, 2, 4, 6 and 8 deg.
+%   The meshes are those of the medium mesh of verify_naca0012.m with a
+%   first cell of 1e-5 chords (y+ about 0.5 at this Reynolds number), the
+%   far field 500 chords away.
+%
+%   Solver set-up: as verified, with one difference. The first-order stage
+%   (400 iterations) uses a pseudo-time step of 20 chord passages instead of
+%   one, because the free-stream turbulence of the 500-chord domain needs
+%   about 2500 chord passages to settle, and the transition location depends
+%   on it. The second-order stage uses the verified step of one chord
+%   passage: 3000 iterations with SST and 4000 with Transition SST, forces
+%   every 50 iterations. The first run repeats the NASA NACA 0012 case
+%   (medium mesh, 10 deg) with this start-up, to show that it gives the same
+%   forces as verify_naca0012.m.
 %
 %   Results go to outDir (default MATLAB/output/cfd/designs): forces.csv
 %   (one row per run, with the mean and the range of CL and CD over the last
-%   1000 iterations), history.csv, meshes.csv, run_info.json and the Fluent
-%   transcripts. Complete runs are not repeated, so the batch can be stopped
-%   and started again. collect_cfd_results.m makes the tables and figures.
+%   1000 iterations with SST and 2000 with Transition SST), history.csv,
+%   meshes.csv, run_info.json, the Fluent transcripts and, for every run, a
+%   profile file with the pressure and wall shear on the airfoil. Complete
+%   runs are not repeated, so the batch can be stopped and started again.
+%   collect_cfd_results.m makes the tables and figures.
 %
 %   RUN_DESIGN_STUDY(outDir, true) runs a few iterations of both models on
 %   every mesh (a check of the meshes and journals). Fluent is needed: set
@@ -50,54 +59,70 @@ designs = {'naca2412', 'NACA 2412'
            'wavy_s1', fullfile(repo, 'results', 'paper', 'runs', 'NACA_2412_nocurv_s1', 'NACA_2412_optimized.dat')
            'parsec_t12', fullfile(repo, 'results', 'xfoil', 'NACA2412_parsec_t12_optimized.dat')};
 nD = size(designs, 1);
-M = cell(nD, 1);
+far = {'Radius', 500, 'WakeLength', 500, 'WakeFirstCell', 0.1, 'NNormal', 180};
+M = cell(nD + 1, 1);
 for k = 1:nD
     [xu, yu, xl, yl] = readAirfoil(designs{k, 2});
-    G = airfoilCGrid(xu, yu, xl, yl, 'Radius', 500, 'WakeLength', 500, 'WakeFirstCell', 0.1, 'NNormal', 180);
-    info = writeFluentMesh(fullfile(outDir, [designs{k, 1} '.msh']), G);
-    writematrix([G.X(G.iTE(1):G.iTE(2), 1), G.Y(G.iTE(1):G.iTE(2), 1)], fullfile(outDir, [designs{k, 1} '_wall.csv']));
-    fprintf('[MESH %s] %d cells, %d negative; growth %.5f, wake growth %.5f\n', designs{k, 1}, info.nCells, ...
-        info.nNegative, G.growth, G.wakeGrowth);
-    M{k} = {designs{k, 1}, info.nCells, info.nNegative, G.firstCell, G.growth, G.wakeGrowth};
+    G = airfoilCGrid(xu, yu, xl, yl, far{:});
+    M{k} = saveMesh(outDir, designs{k, 1}, G);
 end
+% NASA NACA 0012, medium mesh of verify_naca0012.m (first cell 2e-6)
+x = (1 - cos(linspace(0, pi, 2001)')) / 2;
+y = 0.594689181*(0.298222773*sqrt(x) - 0.127125232*x - 0.357907906*x.^2 + 0.291984971*x.^3 - 0.105174606*x.^4);
+G = airfoilCGrid(x, y, x, -y, far{:}, 'NSurface', 201, 'NWake', 80, 'FirstCell', 2e-6);
+M{nD + 1} = saveMesh(outDir, 'n0012_medium', G);
 M = cell2table(vertcat(M{:}), 'VariableNames', {'design', 'cells', 'negative_cells', 'first_cell', 'growth', 'wake_growth'});
 writetable(M, fullfile(outDir, 'meshes.csv'));
 
-common = {'Re', 1e6, 'Mach', 0.15, 'TimeStep', 1, 'FirstOrder', 400, 'BlockSize', 50, 'Blocks', 60, ...
-    'Probes', [1 0.25], 'Tail', 20};
-models = {'transition', {'Model', 'transition', 'Intensity', 0.14, 'ViscRatio', 50}, [4 5 6 2 0 8 3 7 4.5 5.5]
-          'sst', {'Model', 'sst', 'Intensity', 0.052, 'ViscRatio', 0.009}, [4 6 2 0 8]};
+common = {'Mach', 0.15, 'TimeStep', 1, 'StartTimeStep', 20, 'FirstOrder', 400, 'BlockSize', 50, 'Probes', [1 0.25]};
+models = {'transition', {'Model', 'transition', 'Re', 1e6, 'Intensity', 0.14, 'ViscRatio', 50, 'Blocks', 80, 'Tail', 40}, [4 5 6 2 0 8 3 7]
+          'sst', {'Model', 'sst', 'Re', 1e6, 'Intensity', 0.052, 'ViscRatio', 0.009, 'Blocks', 60, 'Tail', 20}, [4 6 2 0 8]};
+check = {'Model', 'sst', 'Re', 6e6, 'Intensity', 0.052, 'ViscRatio', 0.009, 'Blocks', 60, 'Tail', 20};
 if pilot
-    common = {'Re', 1e6, 'Mach', 0.15, 'TimeStep', 1, 'FirstOrder', 20, 'BlockSize', 10, 'Blocks', 3, ...
-        'Probes', [1 0.25], 'Tail', 20};
-    models{1, 3} = 4.5;  models{2, 3} = 4;
+    common = {'Mach', 0.15, 'TimeStep', 1, 'StartTimeStep', 20, 'FirstOrder', 20, 'BlockSize', 10, 'Probes', [1 0.25]};
+    models{1, 2}(end-3:end) = {'Blocks', 3, 'Tail', 40};  models{1, 3} = 5;
+    models{2, 2}(end-3:end) = {'Blocks', 3, 'Tail', 20};  models{2, 3} = 4;
+    check(end-3:end) = {'Blocks', 3, 'Tail', 20};
+end
+
+% {model, options, design, alpha}: the start-up check first, then the angles
+% near the optima for every design
+runs = {'check', check, 'n0012_medium', 10};
+for m = 1:size(models, 1)
+    for a = models{m, 3}
+        for k = 1:nD, runs(end+1, :) = {models{m, 1}, models{m, 2}, designs{k, 1}, a}; end %#ok<AGROW>
+    end
 end
 
 allT = {};  allH = {};
-for m = 1:size(models, 1)
-    for a = models{m, 3}                      % the angles near the optima first, for every design
-        for k = 1:nD
-            try
-                [T, H] = run_fluent_cases(fullfile(outDir, [designs{k, 1} '.msh']), a, common{:}, models{m, 2}{:}, ...
-                    'Tag', [models{m, 1} '_'], 'Reuse', true, 'WriteTables', false, 'Surface', true);
-                T.design = repmat(designs(k, 1), height(T), 1);
-                T.model = repmat(models(m, 1), height(T), 1);
-                H.design = repmat(designs(k, 1), height(H), 1);
-                H.model = repmat(models(m, 1), height(H), 1);
-                allT{end+1} = T;  allH{end+1} = H; %#ok<AGROW>
-                writetable(vertcat(allT{:}), fullfile(outDir, 'forces.csv'));
-                writetable(vertcat(allH{:}), fullfile(outDir, 'history.csv'));
-            catch err
-                fprintf('[FAIL %s %s alpha %g] %s\n', models{m, 1}, designs{k, 1}, a, ...
-                    getReport(err, 'extended', 'hyperlinks', 'off'));
-            end
-            fprintf('[%s %s alpha %g finished %s]\n', models{m, 1}, designs{k, 1}, a, ...
-                char(datetime('now', 'Format', 'HH:mm:ss')));
-        end
+for k = 1:size(runs, 1)
+    try
+        [T, H] = run_fluent_cases(fullfile(outDir, [runs{k, 3} '.msh']), runs{k, 4}, common{:}, runs{k, 2}{:}, ...
+            'Tag', [runs{k, 1} '_'], 'Reuse', true, 'WriteTables', false, 'Surface', true);
+        T.design = repmat(runs(k, 3), height(T), 1);
+        T.model = repmat(runs(k, 1), height(T), 1);
+        H.design = repmat(runs(k, 3), height(H), 1);
+        H.model = repmat(runs(k, 1), height(H), 1);
+        allT{end+1} = T;  allH{end+1} = H; %#ok<AGROW>
+        writetable(vertcat(allT{:}), fullfile(outDir, 'forces.csv'));
+        writetable(vertcat(allH{:}), fullfile(outDir, 'history.csv'));
+    catch err
+        fprintf('[FAIL %s %s alpha %g] %s\n', runs{k, 1}, runs{k, 3}, runs{k, 4}, ...
+            getReport(err, 'extended', 'hyperlinks', 'off'));
     end
+    fprintf('[%d of %d: %s %s alpha %g finished %s]\n', k, size(runs, 1), runs{k, 1}, runs{k, 3}, runs{k, 4}, ...
+        char(datetime('now', 'Format', 'yyyy-MM-dd HH:mm:ss')));
 end
 first = dir(fullfile(outDir, '*.out'));
-writeRunInfo(fullfile(outDir, 'run_info.json'), here, started, [common, {'transition', models{1, 2}, 'sst', models{2, 2}}], ...
-    fullfile(outDir, first(1).name));
+writeRunInfo(fullfile(outDir, 'run_info.json'), here, started, ...
+    [common, {'transition', models{1, 2}, 'sst', models{2, 2}}], fullfile(outDir, first(1).name));
 fprintf('[DESIGN STUDY DONE]\n');
+end
+
+function row = saveMesh(outDir, name, G)
+info = writeFluentMesh(fullfile(outDir, [name '.msh']), G);
+writematrix([G.X(G.iTE(1):G.iTE(2), 1), G.Y(G.iTE(1):G.iTE(2), 1)], fullfile(outDir, [name '_wall.csv']));
+fprintf('[MESH %s] %d cells, %d negative; growth %.5f, wake growth %.5f\n', name, info.nCells, info.nNegative, ...
+    G.growth, G.wakeGrowth);
+row = {name, info.nCells, info.nNegative, G.firstCell, G.growth, G.wakeGrowth};
 end

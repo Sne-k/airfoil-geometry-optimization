@@ -31,6 +31,10 @@ function plan = fluentJournal(file, meshFile, alpha, varargin)
 %     'BlockSize'   iterations per block                            (200)
 %     'TimeStep'    pseudo-time step in units of chord / free-stream
 %                   speed; [] keeps Fluent's automatic time step      ([])
+%     'StartTimeStep'  pseudo-time step of the first-order stage, in the
+%                   same units; [] uses TimeStep. A larger step lets the
+%                   free-stream turbulence of a large domain settle
+%                   before the second-order stage                     ([])
 %     'Limiter'     slope limiter: 'default', 'multi-dimensional' or
 %                   'differentiable'                          ('default')
 %     'Probes'      distances upstream of the leading edge, in chords
@@ -60,6 +64,7 @@ ip.addParameter('FirstOrder', 400);
 ip.addParameter('Blocks', 8);
 ip.addParameter('BlockSize', 200);
 ip.addParameter('TimeStep', []);
+ip.addParameter('StartTimeStep', []);
 ip.addParameter('Limiter', 'default');
 ip.addParameter('Probes', []);
 ip.addParameter('Surface', '');
@@ -92,9 +97,8 @@ for i = 1:numel(alpha)                              % point surfaces p<angle>d<d
         w('/surface/point-surface p%dd%d %.6f %.6f', i, j, -o.Probes(j) * cosd(alpha(i)), -o.Probes(j) * sind(alpha(i)));
     end
 end
-if ~isempty(o.TimeStep)
-    w('/solve/set/pseudo-time-method/global-time-step-settings no %.6e', o.TimeStep / U);
-end
+if isempty(o.StartTimeStep), o.StartTimeStep = o.TimeStep; end
+timeStep(w, o.StartTimeStep, U);
 if ~strcmpi(o.Limiter, 'default')
     w('/solve/set/slope-limiter-set %s yes no', o.Limiter);
 end
@@ -109,6 +113,13 @@ w('/solve/iterate %d', o.FirstOrder);
 forces(w, alpha(1));
 probes(w, o, 1);
 scheme(w, eqs, 1, 12);
+if ~isequal(o.StartTimeStep, o.TimeStep)
+    if isempty(o.TimeStep)
+        w('/solve/set/pseudo-time-method/global-time-step-settings yes 1 1');     % back to automatic
+    else
+        timeStep(w, o.TimeStep, U);
+    end
+end
 it = o.FirstOrder;
 rows = [alpha(1), it, 1];
 for i = 1:numel(alpha)
@@ -138,6 +149,13 @@ if transition
 else
     w('/define/boundary-conditions/pressure-far-field farfield no 0 no %g no %g no %.6f no %.6f no no yes %g %g', ...
         o.Mach, T0, ca, sa, o.Intensity, o.ViscRatio);
+end
+end
+
+function timeStep(w, tau, U)
+% Fixed pseudo-time step of tau chord passages (chord 1 m); nothing for tau = []
+if ~isempty(tau)
+    w('/solve/set/pseudo-time-method/global-time-step-settings no %.6e', tau / U);
 end
 end
 
