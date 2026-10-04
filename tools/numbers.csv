@@ -254,3 +254,21 @@ results/population/README.md,   `robusttripworst` raises the tripped CL/CD by 6.
 results/population/README.md,"   design space, about 7 % is what fully turbulent flow allows for NACA 2412; the larger gains are gains",7,results/population/conditions.csv,"one(tag='NACA_2412_robusttripworst_s1', condition='tripped')['LDmax_gain_percent']"
 README.md,  with tripped boundary layers keeps a gain of 25 to 32 % with free transition and loses nothing when,25,results/population/conditions.csv,"min(r['LDmax_gain_percent'] for r in sel(formulation='robusttrip', condition='design'))"
 README.md,  with tripped boundary layers keeps a gain of 25 to 32 % with free transition and loses nothing when,32,results/population/conditions.csv,"max(r['LDmax_gain_percent'] for r in sel(formulation='robusttrip', condition='design'))"
+results/paper/README.md,"| As reported: CL/CD at 0°, the 8 % thick airfoil of the report, XFLR5 | +142.6 % |",142.6,results/paper/gain_decomposition.csv,one(step=1)['gain_percent']
+results/paper/README.md,| The same metric with the XFOIL analysis used here | +187.4 % |,187.4,results/paper/gain_decomposition.csv,one(step=2)['gain_percent']
+results/paper/README.md,"| The same airfoil, peak CL/CD against peak CL/CD | +71.0 % |",71.0,results/paper/gain_decomposition.csv,one(step=3)['gain_percent']
+results/paper/README.md,"| Thickness and pitching moment kept, XFOIL in the loop, no curvature limits (three seeds) | +38.5 % (36.5 to 39.7) |",38.5,results/paper/gain_decomposition.csv,one(step=4)['gain_percent']
+results/paper/README.md,"| Thickness and pitching moment kept, XFOIL in the loop, no curvature limits (three seeds) | +38.5 % (36.5 to 39.7) |",36.5,results/paper/gain_decomposition.csv,one(step=4)['gain_low_percent']
+results/paper/README.md,"| Thickness and pitching moment kept, XFOIL in the loop, no curvature limits (three seeds) | +38.5 % (36.5 to 39.7) |",39.7,results/paper/gain_decomposition.csv,one(step=4)['gain_high_percent']
+results/paper/README.md,| Smooth shape: with curvature limits (three seeds) | +33.2 % (31.6 to 35.5) |,33.2,results/paper/gain_decomposition.csv,one(step=5)['gain_percent']
+results/paper/README.md,| Smooth shape: with curvature limits (three seeds) | +33.2 % (31.6 to 35.5) |,31.6,results/paper/gain_decomposition.csv,one(step=5)['gain_low_percent']
+results/paper/README.md,| Smooth shape: with curvature limits (three seeds) | +33.2 % (31.6 to 35.5) |,35.5,results/paper/gain_decomposition.csv,one(step=5)['gain_high_percent']
+results/paper/README.md,| The smooth design at other Ncrit (5 to 11) and Reynolds numbers (0.5 to 2 million) | +25.9 to +49.5 % |,25.9,results/paper/gain_decomposition.csv,one(step=6)['gain_low_percent']
+results/paper/README.md,| The smooth design at other Ncrit (5 to 11) and Reynolds numbers (0.5 to 2 million) | +25.9 to +49.5 % |,49.5,results/paper/gain_decomposition.csv,one(step=6)['gain_high_percent']
+results/paper/README.md,| The smooth design with boundary layers tripped at 5 % chord | −5.9 % |,−5.9,results/paper/gain_decomposition.csv,one(step=7)['gain_percent']
+results/paper/README.md,  142.6 % and 187.4 % for the same pair of airfoils.,142.6,results/paper/gain_decomposition.csv,one(step=1)['gain_percent']
+results/paper/README.md,  142.6 % and 187.4 % for the same pair of airfoils.,187.4,results/paper/gain_decomposition.csv,one(step=2)['gain_percent']
+results/paper/README.md,"- **Peak against peak, the same airfoil gains 71.0 %,** and it is a third thinner than NACA 2412.",71.0,results/paper/gain_decomposition.csv,one(step=3)['gain_percent']
+results/paper/README.md,"- **With thickness and pitching moment kept, 33 to 38 % remain,** and the smooth shape costs about five",33,results/paper/gain_decomposition.csv,one(step=5)['gain_percent']
+results/paper/README.md,"- **With thickness and pitching moment kept, 33 to 38 % remain,** and the smooth shape costs about five",38,results/paper/gain_decomposition.csv,one(step=4)['gain_percent']
+README.md,| CL/CD at α = 0° | 43.2 | 104.8 | **+142.6 %** |,142.6,results/paper/report_values.csv,100*(one(quantity='CL/CD at 0 deg')['report_airfoil']/one(quantity='CL/CD at 0 deg')['NACA_2412']-1)

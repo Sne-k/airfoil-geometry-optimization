@@ -1,0 +1,4 @@
+quantity,NACA_2412,report_airfoil,source
+CL at 0 deg,0.247,0.591,"project report (2025), XFLR5 analysis"
+CD at 0 deg,0.00572,0.00564,"project report (2025), XFLR5 analysis"
+CL/CD at 0 deg,43.2,104.8,"project report (2025), XFLR5 analysis"

@@ -118,6 +118,35 @@ gain in peak CL/CD for all designs.
 | NACA 2412 weighted | 0.2 × CL/CD at 0.4 + 0.8 × at 1.0 | +1 % | +38 % | +43 % | +42 % | +38 % | +1 % |
 | NACA 2412 PARSEC design (earlier) | peak CL/CD | +36 % | +59 % | +74 % | +71 % | +49 % | +64 % |
 
+## One reported gain taken apart (NACA 2412)
+
+`MATLAB/Paper/gain_decomposition.m` puts numbers that are already in this repository in one line
+([gain_decomposition.csv](gain_decomposition.csv)): how the gain over NACA 2412 changes from the figure
+of the project report to what is left under stricter conditions.
+
+![One reported gain taken apart](gain_decomposition.png)
+
+| Step | Gain in lift-to-drag ratio over NACA 2412 |
+|---|---:|
+| As reported: CL/CD at 0°, the 8 % thick airfoil of the report, XFLR5 | +142.6 % |
+| The same metric with the XFOIL analysis used here | +187.4 % |
+| The same airfoil, peak CL/CD against peak CL/CD | +71.0 % |
+| Thickness and pitching moment kept, XFOIL in the loop, no curvature limits (three seeds) | +38.5 % (36.5 to 39.7) |
+| Smooth shape: with curvature limits (three seeds) | +33.2 % (31.6 to 35.5) |
+| The smooth design at other Ncrit (5 to 11) and Reynolds numbers (0.5 to 2 million) | +25.9 to +49.5 % |
+| The smooth design with boundary layers tripped at 5 % chord | −5.9 % |
+
+- **A gain at a fixed angle is the largest number, and it depends on the analysis.** The original has a
+  small CL/CD at 0°, so the ratio reacts strongly to details: XFLR5 in the report and XFOIL here give
+  142.6 % and 187.4 % for the same pair of airfoils.
+- **Peak against peak, the same airfoil gains 71.0 %,** and it is a third thinner than NACA 2412.
+- **With thickness and pitching moment kept, 33 to 38 % remain,** and the smooth shape costs about five
+  points of that.
+- **The gain survives other values of Ncrit and Reynolds number, but not the loss of laminar flow.**
+
+The two last steps, RANS with and without a transition model, are added by the same script when the
+Fluent design study is complete ([results/cfd](../cfd/README.md)).
+
 ## Morphing between the smooth cruise and loiter designs
 
 [morph_envelope.m](../../MATLAB/Morphing/morph_envelope.m) with the best cruise, loiter and weighted designs
