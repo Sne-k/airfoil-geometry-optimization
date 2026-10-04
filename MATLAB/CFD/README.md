@@ -12,12 +12,14 @@ design study of the NACA 2412 designs is running. Results and their discussion:
 | `writeFluentMesh.m` | Writes the grid as a Fluent ASCII mesh (zones `airfoil`, `farfield`, `fluid`) |
 | `fluentJournal.m` | Batch journal for one case: ideal-gas air, viscosity for the Reynolds number, pressure far field, SST or Transition SST, first-order then second-order iterations, forces printed after every block |
 | `run_fluent_cases.m` | Runs Fluent for a list of angles and collects forces, their history, residuals and probe values. Finished runs are not repeated |
-| `fluentForces.m`, `fluentResiduals.m`, `fluentProbes.m`, `fluentSurface.m` | Read forces, residuals, probe values and surface distributions from Fluent's output |
+| `fluentForces.m`, `fluentResiduals.m`, `fluentProbes.m`, `fluentSurface.m` | Read forces (total, pressure and friction parts), residuals, probe values and surface distributions from Fluent's output |
 | `transitionFromCf.m` | Transition and separation locations from a skin-friction distribution |
+| `cycleStatistics.m` | Mean forces of a run that does not settle: finds the period of the force cycle and averages over whole periods |
 | `gridConvergence.m` | Discretisation error from three meshes (Celik et al. 2008) |
 | `timestep_study.m` | Compares Fluent's automatic pseudo-time step with a fixed one on the NASA case |
 | `verify_naca0012.m` | The verification: three meshes at 0°, 10° and 15°, and two smaller domains |
-| `run_design_study.m` | The four NACA 2412 designs with Transition SST and SST |
+| `run_design_study.m` | The four NACA 2412 designs with SST and Transition SST, and NACA 2412 on a refined mesh |
+| `transition_tests.m` | NACA 2412 at 4° with Transition SST under five solver settings |
 | `design_study_xfoil.m` | XFOIL polars of the same designs at the same condition |
 | `collect_cfd_results.m` | Turns the outputs into the tables and figures of `results/cfd` |
 | `writeRunInfo.m` | Records the code version, software and options of a batch |
@@ -46,6 +48,13 @@ laminar boundary layers are not disturbed. The turbulence has to travel 500 chor
 so the design study runs its first-order stage with a pseudo-time step of 20 chord passages. After the
 switch to second order, the intensity at the probe settles within about 800 iterations.
 
+**The Transition SST runs do not settle.** The laminar shear layer of the separation bubble rolls up
+into a train of small separation cells. The train drifts slowly during the iterations, and lift and
+drag cycle with it. `transition_tests.m` holds the solver settings that were tried against this. The
+design study therefore runs these cases for 5000 second-order iterations, writes the wall data every
+200 iterations over the last 2400, and `collect_cfd_results.m` reports means over whole cycles
+together with the lowest and highest value (`cycleStatistics.m`). The fully turbulent SST runs settle.
+
 ## Verification in short
 
 On NASA's NACA 0012 case (SST, M = 0.15, Re = 6 × 10⁶) the fine mesh gives a lift within 1.2 % and a
@@ -60,7 +69,8 @@ Fluent must be installed. Set `FLUENT_EXE` to `fluent.exe`, then, from this fold
 ```matlab
 timestep_study      % 13 runs, about 4 hours
 verify_naca0012     % 11 runs, about 4 hours
-run_design_study    % 53 runs, about 15 hours
+run_design_study    % 55 runs, about 35 hours
+transition_tests    % 5 runs, about 3 hours
 design_study_xfoil  % XFOIL side of the comparison (needs XFOIL)
 collect_cfd_results % tables and figures in results/cfd
 ```
