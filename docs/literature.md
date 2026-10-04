@@ -238,7 +238,11 @@ Web of Science must still be checked.
    - **With tripped boundary layers, XFOIL rates all three optimised NACA 2412 designs below the
      original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).
    - Physical drag filters removed spurious XFOIL optima such as L/D 836 and 984.
-   - CFD: verification done for SST; the design study is running.
+   - The steps are collected in one table and figure (`results/paper/gain_decomposition.csv`).
+   - CFD: verification done for SST; the design study is running. Its Transition SST runs cycle
+     instead of settling, which is itself a point for the comparison: Eça et al. (2022) name the
+     iterative error as a difficulty of these models and find that γ–Re_θ gives the largest separation
+     bubble on the Eppler 387.
 2. **Metric choice.** In the audit, 9 of the 14 in-scope works whose objective could be classified pose
    it at fixed angles of attack. At a fixed angle a cambered design gains mostly because it carries
    more lift.
@@ -259,6 +263,10 @@ Web of Science must still be checked.
      intermediate lift.
    - Its advantage can vanish off-design: +43 % at the design point, about +1 % at Ncrit = 5 or
      Re = 2 × 10⁶.
+   - For NACA 2412 the single-point design for peak CL/CD keeps its gain between Ncrit 5 and 11 and
+     loses it only with tripped boundary layers. A design optimised for the mean of free and tripped
+     flow keeps 25 to 32 % with free transition and is 2 to 4 % better than the original when tripped
+     (`results/population/README.md`). The population study will show how general this is.
 
 ## 12. Tasks that follow from the gaps
 
