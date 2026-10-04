@@ -27,6 +27,11 @@ function result = optimize_airfoil(airfoil, varargin)
 %     'Ncrit'         XFOIL's transition parameter. With several values
 %                     the design is analysed at each of them (the search
 %                     takes that many times longer)                (9)
+%     'Conditions'    flow conditions as a cell array of structs for
+%                     xfoilPolar, e.g. {struct('Ncrit', 9), struct('Xtr',
+%                     [0.05 0.05])} for free and tripped transition. It
+%                     replaces 'Ncrit'; the polars of the report use the
+%                     first condition                              ({})
 %     'Aggregate'     how several design points and Ncrit values are
 %                     combined: 'mean' (weighted over the design points)
 %                     or 'worst' (the lowest value)              ('mean')
@@ -75,6 +80,7 @@ ip.addParameter('DesignCL', 0.5);
 ip.addParameter('DesignAlpha', 2);
 ip.addParameter('Weights', []);
 ip.addParameter('Ncrit', 9);
+ip.addParameter('Conditions', {});
 ip.addParameter('Aggregate', 'mean');
 ip.addParameter('MinThickness', 1.0);
 ip.addParameter('CmIncrease', 0.05);
@@ -102,6 +108,8 @@ if ~any(strcmp(o.Aggregate, {'mean', 'worst'}))
 end
 % The polars of the report use Ncrit = 9 if it is among the values, else the first
 if any(o.Ncrit == 9), flow0 = struct('Ncrit', 9); else, flow0 = struct('Ncrit', o.Ncrit(1)); end
+if ~isempty(o.Conditions), flow0 = o.Conditions{1}; end
+if ~isfield(flow0, 'Ncrit'), flow0.Ncrit = 9; end
 
 exe = getenv('XFOIL_EXE');
 if isempty(exe), exe = fullfile(root, 'Aerodynamics', 'xfoil.exe'); end
@@ -150,6 +158,7 @@ if strcmp(o.Objective, 'LDatAlpha'), S.design = o.DesignAlpha; else, S.design = 
 S.weights = o.Weights;
 S.aggregate = o.Aggregate;
 S.flows = arrayfun(@(n) struct('Ncrit', n), o.Ncrit(:).', 'UniformOutput', false);
+if ~isempty(o.Conditions), S.flows = o.Conditions(:).'; end
 S.clMaxMin = -Inf;
 S.checkAbove = 0;
 S.failValue = 0;

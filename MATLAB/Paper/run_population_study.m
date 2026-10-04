@@ -13,9 +13,12 @@ function run_population_study(outDir, airfoilDir, workers, pilot)
 %   sd7062, sg6043, fx63137, nlf416, rg15, e423, mh32, ah79100b, goe398.
 %   Missing files are skipped with a message.
 %
-%   Runs, in this order (184 for 30 airfoils):
+%   Runs, in this order (188 for 30 airfoils):
 %     robust   NACA 2412 only: peak CL/CD averaged over Ncrit = 5 and 9
-%              (seeds 1-3) and its worst case over the two (seed 1)
+%              (seeds 1-3) and its worst case over the two (seed 1); and the
+%              same for free transition (Ncrit 9) together with transition
+%              fixed at 5 % chord on both surfaces (seeds 1-3; worst case
+%              seed 1)
 %     peak     peak CL/CD, seed 1                          (every airfoil)
 %     alpha2   CL/CD at alpha = 2 deg, seed 1              (every airfoil)
 %     cldes    CL/CD at the lift coefficient at which the original has
@@ -31,7 +34,7 @@ function run_population_study(outDir, airfoilDir, workers, pilot)
 %
 %   RUN_POPULATION_STUDY(outDir, airfoilDir, workers) sets the number of
 %   parallel workers (default 6; a run takes about 35 minutes with 6).
-%   RUN_POPULATION_STUDY(outDir, airfoilDir, workers, true) runs five very
+%   RUN_POPULATION_STUDY(outDir, airfoilDir, workers, true) runs six very
 %   short searches (a check of the set-up).
 
 here = fileparts(mfilename('fullpath'));
@@ -81,6 +84,11 @@ for s = 1:3
     runs(end+1, :) = {sprintf('NACA_2412_robustmean_s%d', s), {'NACA 2412', 'Seed', s, 'Ncrit', [5 9]}}; %#ok<AGROW>
 end
 runs(end+1, :) = {'NACA_2412_robustworst_s1', {'NACA 2412', 'Seed', 1, 'Ncrit', [5 9], 'Aggregate', 'worst'}};
+trip = {struct('Ncrit', 9), struct('Xtr', [0.05 0.05])};         % free transition and tripped at 5 % chord
+for s = 1:3
+    runs(end+1, :) = {sprintf('NACA_2412_robusttrip_s%d', s), {'NACA 2412', 'Seed', s, 'Conditions', trip}}; %#ok<AGROW>
+end
+runs(end+1, :) = {'NACA_2412_robusttripworst_s1', {'NACA 2412', 'Seed', 1, 'Conditions', trip, 'Aggregate', 'worst'}};
 forms = {'peak', {}; 'alpha2', {'Objective', 'LDatAlpha', 'DesignAlpha', 2}; ...
          'cldes', {'Objective', 'LDatCL'}; 'nocurv', {'Curvature', false}};
 for f = 1:size(forms, 1)
@@ -101,7 +109,8 @@ for s = 2:3
 end
 if pilot                                             % one run of every kind
     last = A{end, 1};
-    keep = {'NACA_2412_robustmean_s1', 'NACA_2412_peak_s1', [last '_alpha2_s1'], [last '_cldes_s1'], [last '_nocurv_s1']};
+    keep = {'NACA_2412_robustmean_s1', 'NACA_2412_robusttrip_s1', 'NACA_2412_peak_s1', [last '_alpha2_s1'], ...
+        [last '_cldes_s1'], [last '_nocurv_s1']};
     runs = runs(ismember(runs(:, 1), keep), :);
 end
 fprintf('[BATCH] %d runs, %d airfoils\n', size(runs, 1), size(A, 1));

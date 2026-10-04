@@ -46,7 +46,7 @@ B = table();
 if isfile(fullfile(runDir, 'baselines.csv')), B = readtable(fullfile(runDir, 'baselines.csv'), 'TextType', 'char'); end
 for k = 1:numel(d)
     [~, tag] = fileparts(d(k).folder);
-    tok = regexp(tag, '^(.*)_(robustmean|robustworst|peak|alpha2|cldes|cl05|nocurv)_s(\d+)$', 'tokens', 'once');
+    tok = regexp(tag, '^(.*)_(robustmean|robustworst|robusttripworst|robusttrip|peak|alpha2|cldes|cl05|nocurv)_s(\d+)$', 'tokens', 'once');
     if isempty(tok) || ~isfile(fullfile(d(k).folder, 'run_info.json')), continue; end
     S = load(fullfile(d(k).folder, 'result.mat'));
     r = S.result;  i = r.runInfo;  o = r.options;

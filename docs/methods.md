@@ -86,10 +86,11 @@ results depend on machine speed.
 analyses with 160 and 200 panel nodes. The second analysis is skipped when the first already scores
 below the fitted seed; such a design cannot become the result.
 
-**Several transition conditions** (`'Ncrit'` with more than one value). The design is analysed at
-every Ncrit, each with both panellings, and the values are combined by their mean or, with
+**Several transition conditions** (`'Ncrit'` with more than one value, or `'Conditions'` with a list
+of flow settings such as free transition and transition fixed at 5 % chord). The design is analysed at
+every condition, each with both panellings, and the values are combined by their mean or, with
 `'Aggregate', 'worst'`, by the lowest. The search then takes that many times longer. The polars in the
-report of a run are at Ncrit = 9 if it is among the values.
+report of a run are at Ncrit = 9 if it is among the values, or at the first condition of the list.
 
 **Constraints.**
 
@@ -182,7 +183,8 @@ Summary:
     all airfoils was not used: five of the highly cambered seeds do not reach CL = 0.5 within the angle
     range of the search.
   - NACA 2412 is also optimised for the mean of the peak CL/CD at Ncrit = 5 and 9 (seeds 1 to 3) and for
-    the lower of the two (seed 1).
+    the lower of the two (seed 1), and in the same way for free transition (Ncrit 9) together with
+    transition fixed at 5 % chord on both surfaces.
   - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
     against the seed at the same condition.
