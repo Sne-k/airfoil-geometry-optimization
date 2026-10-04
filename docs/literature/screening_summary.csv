@@ -1,0 +1,18 @@
+item,count
+works in the sample,33
+in scope (XFOIL evaluates the candidates of a section or morphing-shape optimisation),18
+partly in scope,4
+not in scope or not assessed,11
+"in scope, read in full",8
+"in scope, abstract only",10
+"in scope, objective posed as: fixed angle",9
+"in scope, objective posed as: peak",2
+"in scope, objective posed as: multi-condition",1
+"in scope, objective posed as: robust",1
+"in scope, objective posed as: single condition",1
+"in scope, objective posed as: not in abstract",4
+"in scope, read in full: several independent optimisation runs reported",1
+in scope: optimum checked with RANS,8
+in scope: optimum checked in a wind tunnel (done or announced),2
+"in scope, read in full: no check of the optimum with another flow solver or an experiment",3
+"in scope, read in full: surface smoothness or curvature limited explicitly",0

@@ -16,6 +16,12 @@ function f = airfoilObjective(d, S)
 %   value S.failValue (0 = worse than any valid design; NaN for bayesopt,
 %   which treats it as a failed evaluation).
 %
+%   S.flows lists the flow conditions (structs for xfoilPolar, e.g. several
+%   Ncrit values); the design is analysed at each of them and the values
+%   are combined as S.aggregate says: 'mean' or 'worst' (the lowest). S.design
+%   holds the design lift coefficients or angles of the objectives 'LDatCL'
+%   and 'LDatAlpha'; they are combined in the same way.
+%
 %   The efficiency is computed with XFOIL's default 160 panel nodes and
 %   again with 200, and the lower value counts. Optimisers are good at
 %   finding numerical artefacts; an XFOIL result that appears with only one
@@ -46,14 +52,18 @@ if v > 0
 end
 e = Inf;
 for panels = {[], 200}
-    pol = xfoilPolar(S.x, yu, S.x, yl, S.Re, S.alphaRange, S.exe, panels{1}, false);
-    nXfoil = nXfoil + 1;
-    if numel(pol.alpha) < 12 || pol.alpha(1) > 0 || pol.alpha(end) < 0 || ...
-            abs(interp1(pol.alpha, pol.CM, 0)) > S.cmMax || max(pol.CL) < S.clMaxMin
-        f = S.failValue;
-        return;
+    ec = zeros(1, numel(S.flows));
+    for c = 1:numel(S.flows)
+        pol = xfoilPolar(S.x, yu, S.x, yl, S.Re, S.alphaRange, S.exe, panels{1}, false, S.flows{c});
+        nXfoil = nXfoil + 1;
+        if numel(pol.alpha) < 12 || pol.alpha(1) > 0 || pol.alpha(end) < 0 || ...
+                abs(interp1(pol.alpha, pol.CM, 0)) > S.cmMax || max(pol.CL) < S.clMaxMin
+            f = S.failValue;
+            return;
+        end
+        ec(c) = efficiencyValue(pol, S.objective, S.design, S.weights, S.aggregate);
     end
-    e = min(e, efficiencyValue(pol, S.objective, S.designCL, S.weights));
+    if strcmp(S.aggregate, 'worst'), e = min(e, min(ec)); else, e = min(e, mean(ec)); end
     if e < S.checkAbove, break; end
 end
 if ~isfinite(e) || e <= 0

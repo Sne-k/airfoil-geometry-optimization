@@ -1,0 +1,16 @@
+rule,abstracts_mentioning,abstracts_coded,percent
+optimiser_genetic,88,238,37.0
+optimiser_particle_swarm,18,238,7.6
+optimiser_gradient,21,238,8.8
+optimiser_surrogate_or_learning,48,238,20.2
+param_cst,30,238,12.6
+param_parsec,19,238,8.0
+param_bezier_or_spline,34,238,14.3
+param_hicks_henne,4,238,1.7
+metric_lift_to_drag,78,238,32.8
+multi_point_or_robust,47,238,19.7
+mentions_transition,30,238,12.6
+check_cfd,129,238,54.2
+check_experiment,81,238,34.0
+repeated_runs,4,238,1.7
+smoothness_or_curvature,13,238,5.5
