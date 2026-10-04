@@ -1,10 +1,10 @@
 function collect_cfd_results(runDir, outDir)
 %COLLECT_CFD_RESULTS  Tables and figures of the Fluent runs.
 %   COLLECT_CFD_RESULTS(runDir, outDir) reads the output folders of
-%   timestep_study.m, verify_naca0012.m and run_design_study.m in runDir
-%   (default MATLAB/output/cfd, with the folders timestep_study,
-%   verification and designs; missing folders are skipped) and writes to
-%   outDir (default results/cfd):
+%   timestep_study.m, verify_naca0012.m, run_design_study.m and
+%   transition_tests.m in runDir (default MATLAB/output/cfd, with the
+%   folders timestep_study, verification, designs and transition_tests;
+%   missing folders are skipped) and writes to outDir (default results/cfd):
 %     timestep_study/   forces.csv, history.csv, meshes.csv,
 %                       timestep_history.png
 %     verification/     forces.csv, history.csv, meshes.csv, run_info.json,
@@ -31,6 +31,8 @@ function collect_cfd_results(runDir, outDir)
 %                       cycle_naca2412_a4.csv, transition_cycle.png,
 %                       design_polars.png, design_gains.png,
 %                       design_surface.png
+%     transition_tests/ forces.csv (one row per solver setting), history.csv,
+%                       meshes.csv, run_info.json, transition_tests.png
 %   A run counts as steady if, over its last force reports (500 iterations
 %   in the NACA 0012 runs; 1000 with SST and 2400 with Transition SST in
 %   the design study), CL varies by less than 1e-4 and CD by less than
@@ -55,6 +57,9 @@ if isfile(fullfile(runDir, 'verification', 'forces.csv'))
 end
 if isfile(fullfile(runDir, 'designs', 'forces.csv'))
     designs(fullfile(runDir, 'designs'), fullfile(outDir, 'designs'), tol);
+end
+if isfile(fullfile(runDir, 'transition_tests', 'forces.csv'))
+    transitionTests(fullfile(runDir, 'transition_tests'), fullfile(outDir, 'transition_tests'), tol);
 end
 end
 
@@ -554,12 +559,12 @@ if ~isempty(i) && ~isempty(snap{i})
     plot(h.iteration, h.CD_viscous, '-', 'Color', [0 0.45 0.74], 'LineWidth', 1.1, 'DisplayName', 'friction');
     xline(F.window_first_iteration(i), ':', 'averaged from here', 'HandleVisibility', 'off', ...
         'LabelVerticalAlignment', 'top', 'LabelOrientation', 'horizontal');
-    xlabel('iteration');  ylabel('C_D');  ylim([0 0.009]);  ytickformat('%.3f');  legend('Location', 'southeast');
+    xlabel('iteration');  ylabel('C_D');  ylim([0 0.009]);  plainTicks(gca, '%.3f');  legend('Location', 'southeast');
     title('NACA 2412, \alpha = 4\circ, Transition SST');
     nexttile;  hold on;  box on;  grid on;
     plot(h.iteration, h.CL, 'k-', 'LineWidth', 1.3);
     xline(F.window_first_iteration(i), ':', 'HandleVisibility', 'off');
-    xlabel('iteration');  ylabel('C_L');  ytickformat('%.3f');
+    xlabel('iteration');  ylabel('C_L');  plainTicks(gca, '%.3f');
     nexttile;  hold on;  box on;  grid on;
     u = strcmp(sn.surface, 'upper');
     [xs, k2] = sort(sn.x(u));
@@ -567,7 +572,7 @@ if ~isempty(i) && ~isempty(snap{i})
     plot(xs, c, '-', 'Color', [0.7 0.7 0.7], 'LineWidth', 0.5, 'HandleVisibility', 'off');
     plot(xs, mean(c, 2), 'k-', 'LineWidth', 1.4, 'DisplayName', 'mean of the snapshots');
     yline(0, '-', 'Color', [0.85 0.33 0.10], 'HandleVisibility', 'off');
-    xlabel('x / c');  ylabel('C_f, upper surface');  xlim([0.2 1]);  ylim([-0.003 0.006]);  ytickformat('%.3f');
+    xlabel('x / c');  ylabel('C_f, upper surface');  xlim([0.2 1]);  ylim([-0.003 0.006]);  plainTicks(gca, '%.3f');
     legend('Location', 'northwest');
     title(sprintf('%d wall snapshots (grey)', size(c, 2)));
     exportgraphics(f, fullfile(out, 'transition_cycle.png'), 'Resolution', 130);
@@ -654,17 +659,76 @@ if ~isempty(S) && any(strcmp(S.model, 'transition') & S.alpha == 4)
     xlabel(ax(1), 'x / c');  ylabel(ax(1), 'C_p');  title(ax(1), 'Transition SST, \alpha = 4\circ');
     legend(ax(1), 'Location', 'southeast');
     xlabel(ax(2), 'x / c');  ylabel(ax(2), 'C_f, upper surface');  ylim(ax(2), [-0.002 0.008]);
-    ytickformat(ax(2), '%.3f');  title(ax(2), 'triangles: transition in XFOIL');
+    plainTicks(ax(2), '%.3f');  title(ax(2), 'triangles: transition in XFOIL');
     xlabel(ax(3), 'x / c');  ylabel(ax(3), 'C_f, lower surface');  ylim(ax(3), [-0.002 0.008]);
-    ytickformat(ax(3), '%.3f');
-    xlabel(ax(4), '\alpha (deg)');  ylabel(ax(4), 'C_D (mean and range)');  ytickformat(ax(4), '%.4f');
+    plainTicks(ax(3), '%.3f');
+    xlabel(ax(4), '\alpha (deg)');  ylabel(ax(4), 'C_D (mean and range)');  plainTicks(ax(4), '%.4f');
     title(ax(4), 'drag at all angles');
     exportgraphics(f, fullfile(out, 'design_surface.png'), 'Resolution', 130);
     close(f);
 end
 end
 
+%% ------------------------------------------------------------------ transition tests
+function transitionTests(in, out, tol)
+if ~exist(out, 'dir'), mkdir(out); end
+T = readtable(fullfile(in, 'forces.csv'), 'Delimiter', ',');
+if isfile(fullfile(in, 'meshes.csv')), copyfile(fullfile(in, 'meshes.csv'), fullfile(out, 'meshes.csv')); end
+if isfile(fullfile(in, 'run_info.json')), copyfile(fullfile(in, 'run_info.json'), fullfile(out, 'run_info.json')); end
+label = struct('S', 'settings of the design study', 'R', 'relaxation factor 0.3 for the transition equations', ...
+    'U', 'first-order upwinding for the transition equations', 'O', 'step of one chord passage from the start', ...
+    'A', 'automatic pseudo-time step');
+rows = cell(0, 15);
+Hall = cell(0, 1);
+for i = 1:height(T)
+    file = fullfile(in, T.transcript{i});
+    if ~isfile(file), continue; end
+    [cd, cl, it, parts] = fluentForces(file);
+    n = numel(cd);
+    if n < 3, continue; end
+    h = table(repmat(T.setting(i), n, 1), it, [1; 2 * ones(n - 1, 1)], cl, cd, parts.CD_pressure, parts.CD_viscous, ...
+        'VariableNames', {'setting', 'iteration', 'order', 'CL', 'CD', 'CD_pressure', 'CD_viscous'});
+    Hall{end+1, 1} = h; %#ok<AGROW>
+    k = h.order == 2;
+    s = cycleStatistics(h.iteration(k), h.CL(k), h.CD(k), 'Window', 2400, 'Tol', [tol.CL tol.CD]);
+    rows(end+1, :) = {T.setting{i}, label.(T.setting{i}), max(it), s.steady, s.period, s.mismatch, s.cycles, s.window, ...
+        s.CL, s.CD, s.LD, s.CL_min, s.CL_max, s.CD_min, s.CD_max}; %#ok<AGROW>
+end
+if isempty(rows), return; end
+F = cell2table(rows, 'VariableNames', {'setting', 'description', 'iterations', 'steady', 'period_iterations', ...
+    'period_mismatch', 'cycles_averaged', 'window_iterations', 'CL', 'CD', 'LD', 'CL_min', 'CL_max', 'CD_min', 'CD_max'});
+writetable(F, fullfile(out, 'forces.csv'));
+Hall = vertcat(Hall{:});
+writetable(Hall, fullfile(out, 'history.csv'));
+
+col = lines(height(F));
+f = figure('Color', 'w', 'Position', [80 80 1150 430], 'Visible', 'off');
+tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+qty = {'CD', 'CL'};  ylab = {'C_D', 'C_L'};
+for q = 1:2
+    nexttile;  hold on;  box on;  grid on;
+    for i = 1:height(F)
+        h = Hall(strcmp(Hall.setting, F.setting{i}) & Hall.order == 2, :);
+        plot(h.iteration, h.(qty{q}), '-', 'Color', col(i, :), 'LineWidth', 1.1, ...
+            'DisplayName', [F.setting{i} ': ' F.description{i}]);
+    end
+    xlabel('iteration');  ylabel(ylab{q});  plainTicks(gca, '%.4f');
+    if q == 1
+        ylim([0.005 0.0075]);  legend('Location', 'southoutside');
+        title('NACA 2412, \alpha = 4\circ, Transition SST');
+    end
+end
+exportgraphics(f, fullfile(out, 'transition_tests.png'), 'Resolution', 130);
+close(f);
+end
+
 %% ------------------------------------------------------------------ helpers
+function plainTicks(ax, fmt)
+% Tick labels of the y axis as plain decimal numbers (no common power of ten)
+ax.YAxis.Exponent = 0;
+ytickformat(ax, fmt);
+end
+
 function Z = readZones(file)
 % Zones of a Tecplot-style text file from the NASA Turbulence Modeling
 % Resource: struct array with the fields name and data
