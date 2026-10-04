@@ -92,8 +92,10 @@ fixed step of one chord passage ([forces.csv](timestep_study/forces.csv)).
 
 ## Design study
 
-The four airfoils (NACA 2412, the smooth and the wavy optimised design, the earlier PARSEC design) at
-Re = 10⁶ and M = 0.15.
+Six airfoils at Re = 10⁶ and M = 0.15 (`MATLAB/CFD/designStudyAirfoils.m`): NACA 2412; three designs
+optimised for the peak CL/CD with free transition (the smooth and the wavy design of `results/paper` and
+the earlier PARSEC design); and two designs optimised for free and tripped flow together
+(`results/population`).
 
 **XFOIL at the same condition** ([designs/xfoil.csv](designs/xfoil.csv)), best CL/CD between −2° and 12°:
 
@@ -103,10 +105,16 @@ Re = 10⁶ and M = 0.15.
 | optimised, smooth | 140.7 | 68.3 |
 | optimised, no curvature limits | 146.0 | 70.1 |
 | PARSEC design | 182.1 | 53.2 |
+| optimised for free and tripped flow (mean) | 138.1 | 74.5 |
+| optimised for the worse of free and tripped | 103.4 | 77.4 |
 
-- **With tripped boundary layers all three optimised designs are worse than the original.** Their gain
-  comes from laminar flow.
-- **The Mach number matters little:** at M = 0 the free-transition values are 104.6, 141.6, 145.9 and 182.5.
+- **With tripped boundary layers the three designs optimised for free transition alone are worse than
+  the original.** Their gain comes from laminar flow.
+- **The two designs that had the tripped condition in their objective are not.** The first keeps almost
+  the whole free-transition gain; the second gives it up for the best tripped value.
+- **The Mach number matters little:** at M = 0 the free-transition values of the first four are 104.6,
+  141.6, 145.9 and 182.5.
 
-**Fluent.** The runs are in progress. The first run repeats the NASA case with the start-up of the
-design study and gives the same forces as the verification (CL 1.0757, CD 0.01284).
+**Fluent.** The runs are in progress: the fully turbulent SST runs first, then Transition SST. The first
+run repeats the NASA case with the start-up of the design study and gives the same forces as the
+verification (CL 1.0757, CD 0.01284).
