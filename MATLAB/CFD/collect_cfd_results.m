@@ -28,10 +28,11 @@ function collect_cfd_results(runDir, outDir)
 %                       design_study_xfoil.m is in that folder), peaks.csv,
 %                       design_polars.png, design_gains.png
 %   A run counts as steady if, over its last force reports (500 iterations
-%   in the NACA 0012 runs, 1000 in the design study), CL varies by less
-%   than 1e-4 and CD by less than 1e-5. The tables give the mean over those
-%   reports as well as the last value. Run times and file names of the
-%   transcripts are left out.
+%   in the NACA 0012 runs; 1000 with SST and 2400 with Transition SST in
+%   the design study), CL varies by less than 1e-4 and CD by less than
+%   1e-5. The design-study tables give the mean, the lowest and the highest
+%   value over those reports. Run times and file names of the transcripts
+%   are left out.
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
@@ -325,12 +326,28 @@ H = readtable(fullfile(in, 'history.csv'));
 copyfile(fullfile(in, 'meshes.csv'), fullfile(out, 'meshes.csv'));
 if isfile(fullfile(in, 'run_info.json')), copyfile(fullfile(in, 'run_info.json'), fullfile(out, 'run_info.json')); end
 
+% Forces: mean, lowest and highest value over the last second-order iterations. The Transition SST
+% runs do not all settle: lift and drag can cycle slowly between two states of the laminar
+% separation bubble, with a period of about 2400 iterations, so they are averaged over that window.
+window = struct('transition', 2400, 'sst', 1000, 'check', 500);
+stat = nan(height(T), 10);
+for i = 1:height(T)
+    h = H(strcmp(H.model, T.model{i}) & strcmp(H.design, T.design{i}) & H.alpha == T.alpha(i) & H.order == 2, :);
+    if isempty(h), continue; end
+    h = h(h.iteration > max(h.iteration) - window.(T.model{i}), :);
+    ld = h.CL ./ h.CD;
+    stat(i, :) = [max(h.iteration), max(h.iteration) - min(h.iteration) + 50, mean(h.CL), mean(h.CD), ...
+        min(h.CL), max(h.CL), min(h.CD), max(h.CD), min(ld), max(ld)];
+end
 F = T(:, {'model', 'design', 'alpha'});
-F.iterations = arrayfun(@(i) max(H.iteration(strcmp(H.model, T.model{i}) & strcmp(H.design, T.design{i}) & ...
-    H.alpha == T.alpha(i))), (1:height(T))');
-F = [F, T(:, {'CL', 'CD', 'CL_mean', 'CD_mean', 'CL_range', 'CD_range'})];
-F.steady = T.CL_range <= tol.CL & T.CD_range <= tol.CD;
-F.LD = T.CL_mean ./ T.CD_mean;                       % from the means over the last reports
+F.iterations = stat(:, 1);
+F.window_iterations = stat(:, 2);
+F.CL = stat(:, 3);  F.CD = stat(:, 4);
+F.LD = stat(:, 3) ./ stat(:, 4);                     % ratio of the mean lift to the mean drag
+F.CL_min = stat(:, 5);  F.CL_max = stat(:, 6);
+F.CD_min = stat(:, 7);  F.CD_max = stat(:, 8);
+F.LD_min = stat(:, 9);  F.LD_max = stat(:, 10);
+F.steady = (F.CL_max - F.CL_min) <= tol.CL & (F.CD_max - F.CD_min) <= tol.CD;
 F.Tu_1chord_percent = T.Tu_probe_1;                  % one chord upstream of the leading edge
 F.Tu_quarter_chord_percent = T.Tu_probe_2;
 F.viscosity_ratio_1chord = T.visc_ratio_probe_1;
@@ -338,19 +355,20 @@ F.Ncrit_equivalent = -8.43 - 2.4 * log(T.Tu_probe_1 / 100);     % Mack's relatio
 F = [F, T(:, {'res_continuity', 'res_x_velocity', 'res_y_velocity', 'res_energy', 'res_k', 'res_omega', ...
     'res_intermit', 'res_retheta'})];
 
-% Pressure and skin friction on the airfoil; transition and separation from the skin friction
+% Pressure and skin friction on the airfoil at the last iteration; transition and separation from
+% the skin friction (a snapshot when the run is not steady)
 T0 = 288.15;  Rgas = 8314.47 / 28.966;                 % as in fluentJournal
 qInf = 0.5 * (101325 / (Rgas * T0)) * (0.15 * sqrt(1.4 * Rgas * T0))^2;
 loc = nan(height(T), 4);                               % xtr upper, xtr lower, xsep upper, xsep lower
 S = cell(0, 1);
+sides = {'upper', 'lower'};
 for i = 1:height(T)
     prof = fullfile(in, strrep(T.transcript{i}, '.out', '.prof'));
     wallFile = fullfile(in, [T.design{i} '_wall.csv']);
     if ~isfile(prof) || ~isfile(wallFile), continue; end
     s = fluentSurface(prof, readmatrix(wallFile), qInf);
     for side = 1:2
-        names = {'upper', 'lower'};
-        u = s(strcmp(s.surface, names{side}), :);
+        u = s(strcmp(s.surface, sides{side}), :);
         [loc(i, side), loc(i, side + 2)] = transitionFromCf(u.x, u.cf);
     end
     s.model = repmat(T.model(i), height(s), 1);
@@ -359,17 +377,19 @@ for i = 1:height(T)
     S{end+1, 1} = s(:, {'model', 'design', 'alpha', 'surface', 'x', 'y', 'cp', 'cf'}); %#ok<AGROW>
 end
 F.xtr_upper = loc(:, 1);  F.xtr_lower = loc(:, 2);  F.xsep_upper = loc(:, 3);  F.xsep_lower = loc(:, 4);
-if ~isempty(S), writetable(vertcat(S{:}), fullfile(out, 'surface.csv')); end
 
 % The first run repeats the NASA NACA 0012 case with the start-up of the design study
 check = F(strcmp(F.model, 'check'), :);
 if ~isempty(check), writetable(check, fullfile(out, 'startup_check.csv')); end
-keep = ~strcmp(F.model, 'check');
-F = sortrows(F(keep, :), {'model', 'design', 'alpha'});
+F = sortrows(F(~strcmp(F.model, 'check'), :), {'model', 'design', 'alpha'});
 H = H(~strcmp(H.model, 'check'), :);
 if isempty(F), return; end                           % only the start-up check has run so far
 writetable(F, fullfile(out, 'forces.csv'));
 writetable(H(:, {'model', 'design', 'alpha', 'iteration', 'order', 'CL', 'CD'}), fullfile(out, 'history.csv'));
+if ~isempty(S)
+    S = vertcat(S{:});
+    writetable(S(~strcmp(S.model, 'check'), :), fullfile(out, 'surface.csv'));
+end
 
 order = {'naca2412', 'smooth_s1', 'wavy_s1', 'parsec_t12'};
 label = struct('naca2412', 'NACA 2412', 'smooth_s1', 'optimised, smooth', 'wavy_s1', 'optimised, no curvature limits', ...
@@ -380,49 +400,52 @@ if hasX, X = readtable(fullfile(out, 'xfoil.csv')); end
 
 % CFD against XFOIL at the same angles
 if hasX
-    C = cell(0, 16);
+    C = cell(0, 18);
     for i = 1:height(F)
         cond = pairs{strcmp(pairs(:, 1), F.model{i}), 2};
         x = X(strcmp(X.condition, cond) & strcmp(X.design, F.design{i}) & abs(X.alpha - F.alpha(i)) < 1e-9, :);
         if isempty(x) || isnan(x.CL), continue; end
-        C(end+1, :) = {F.model{i}, F.design{i}, F.alpha(i), F.CL_mean(i), F.CD_mean(i), F.LD(i), x.CL, x.CD, x.CL / x.CD, ...
-            100 * (F.CL_mean(i) - x.CL) / x.CL, 100 * (F.CD_mean(i) - x.CD) / x.CD, 100 * (F.LD(i) - x.CL / x.CD) / (x.CL / x.CD), ...
-            F.xtr_upper(i), x.xtrTop, F.xtr_lower(i), x.xtrBot}; %#ok<AGROW>
+        C(end+1, :) = {F.model{i}, F.design{i}, F.alpha(i), F.CL(i), F.CD(i), F.LD(i), F.LD_min(i), F.LD_max(i), ...
+            x.CL, x.CD, x.CL / x.CD, 100 * (F.CL(i) - x.CL) / x.CL, 100 * (F.CD(i) - x.CD) / x.CD, ...
+            100 * (F.LD(i) - x.CL / x.CD) / (x.CL / x.CD), F.xtr_upper(i), x.xtrTop, F.xtr_lower(i), x.xtrBot}; %#ok<AGROW>
     end
-    C = cell2table(C, 'VariableNames', {'model', 'design', 'alpha', 'CL_cfd', 'CD_cfd', 'LD_cfd', 'CL_xfoil', 'CD_xfoil', ...
-        'LD_xfoil', 'CL_difference_percent', 'CD_difference_percent', 'LD_difference_percent', 'xtr_upper_cfd', ...
-        'xtr_upper_xfoil', 'xtr_lower_cfd', 'xtr_lower_xfoil'});
+    C = cell2table(C, 'VariableNames', {'model', 'design', 'alpha', 'CL_cfd', 'CD_cfd', 'LD_cfd', 'LD_cfd_min', ...
+        'LD_cfd_max', 'CL_xfoil', 'CD_xfoil', 'LD_xfoil', 'CL_difference_percent', 'CD_difference_percent', ...
+        'LD_difference_percent', 'xtr_upper_cfd', 'xtr_upper_xfoil', 'xtr_lower_cfd', 'xtr_lower_xfoil'});
     writetable(C, fullfile(out, 'comparison.csv'));
 end
 
-% Best CL/CD over the angles that were run, and the gain over NACA 2412
-P = cell(0, 8);
+% Best CL/CD over the angles that were run, and the gain over NACA 2412. For CFD the lowest and the
+% highest CL/CD within the averaging window at that angle are given as well.
+P = cell(0, 10);
 for m = 1:size(pairs, 1)
     for src = {'cfd', 'xfoil'}
         if strcmp(src{1}, 'xfoil') && ~hasX, continue; end
-        best = nan(numel(order), 3);
+        best = nan(numel(order), 5);
         for k = 1:numel(order)
             f = F(strcmp(F.model, pairs{m, 1}) & strcmp(F.design, order{k}), :);
             if isempty(f), continue; end
             if strcmp(src{1}, 'cfd')
-                a = f.alpha;  ld = f.LD;  cl = f.CL_mean;
+                [v, j] = max(f.LD);
+                best(k, :) = [v, f.alpha(j), f.CL(j), f.LD_min(j), f.LD_max(j)];
             else                                          % XFOIL at the angles of the CFD runs
-                x = X(strcmp(X.condition, pairs{m, 2}) & strcmp(X.design, order{k}) & ismember(round(X.alpha, 6), round(f.alpha, 6)), :);
-                a = x.alpha;  ld = x.CL ./ x.CD;  cl = x.CL;
+                x = X(strcmp(X.condition, pairs{m, 2}) & strcmp(X.design, order{k}) & ...
+                    ismember(round(X.alpha, 6), round(f.alpha, 6)), :);
+                if isempty(x), continue; end
+                [v, j] = max(x.CL ./ x.CD);
+                best(k, :) = [v, x.alpha(j), x.CL(j), NaN, NaN];
             end
-            [v, j] = max(ld);
-            if ~isempty(j), best(k, :) = [v, a(j), cl(j)]; end
         end
         for k = 1:numel(order)
             if strcmp(src{1}, 'cfd'), method = pairs{m, 1}; else, method = ['xfoil_' pairs{m, 2}]; end
-            n = sum(strcmp(F.model, pairs{m, 1}) & strcmp(F.design, order{k}));
-            P(end+1, :) = {method, order{k}, n, best(k, 1), best(k, 2), best(k, 3), 100 * (best(k, 1) / best(1, 1) - 1), ...
-                all(F.steady(strcmp(F.model, pairs{m, 1}) & strcmp(F.design, order{k})))}; %#ok<AGROW>
+            sel = strcmp(F.model, pairs{m, 1}) & strcmp(F.design, order{k});
+            P(end+1, :) = {method, order{k}, sum(sel), best(k, 1), best(k, 2), best(k, 3), best(k, 4), best(k, 5), ...
+                100 * (best(k, 1) / best(1, 1) - 1), all(F.steady(sel))}; %#ok<AGROW>
         end
     end
 end
-P = cell2table(P, 'VariableNames', {'method', 'design', 'angles', 'best_LD', 'alpha_best', 'CL_best', ...
-    'gain_over_naca2412_percent', 'all_cfd_runs_steady'});
+P = cell2table(P, 'VariableNames', {'method', 'design', 'angles', 'best_LD', 'alpha_best', 'CL_best', 'LD_min_at_best', ...
+    'LD_max_at_best', 'gain_over_naca2412_percent', 'all_cfd_runs_steady'});
 writetable(P, fullfile(out, 'peaks.csv'));
 
 % Figures
@@ -435,14 +458,16 @@ for m = 1:size(pairs, 1)
         nexttile;  hold on;  box on;  grid on;
         for k = 1:numel(order)
             if hasX
-                x = sortrows(X(strcmp(X.condition, pairs{m, 2}) & strcmp(X.design, order{k}) & X.alpha >= -0.01 & X.alpha <= 8.01, :), 'alpha');
+                x = sortrows(X(strcmp(X.condition, pairs{m, 2}) & strcmp(X.design, order{k}) & X.alpha >= -0.01 & ...
+                    X.alpha <= 8.01, :), 'alpha');
                 xv = struct('CL', x.CL, 'CD', x.CD, 'LD', x.CL ./ x.CD);
                 plot(x.alpha, xv.(qty{q}), '-', 'Color', col(k, :), 'LineWidth', 1.1, 'HandleVisibility', 'off');
             end
             c = sortrows(F(strcmp(F.model, pairs{m, 1}) & strcmp(F.design, order{k}), :), 'alpha');
-            cv = struct('CL', c.CL_mean, 'CD', c.CD_mean, 'LD', c.LD);
-            plot(c.alpha, cv.(qty{q}), 'o', 'Color', col(k, :), 'MarkerFaceColor', col(k, :), 'MarkerSize', 5, ...
-                'DisplayName', label.(order{k}));
+            if isempty(c), continue; end
+            lo = c.([qty{q} '_min']);  hi = c.([qty{q} '_max']);
+            errorbar(c.alpha, c.(qty{q}), c.(qty{q}) - lo, hi - c.(qty{q}), 'o', 'Color', col(k, :), ...
+                'MarkerFaceColor', col(k, :), 'MarkerSize', 5, 'CapSize', 3, 'DisplayName', label.(order{k}));
         end
         xlabel('\alpha (deg)');  ylabel(ylab{q});
         if q == 1
@@ -455,7 +480,6 @@ end
 exportgraphics(f, fullfile(out, 'design_polars.png'), 'Resolution', 130);
 close(f);
 
-f = figure('Color', 'w', 'Position', [80 80 760 430], 'Visible', 'off');
 methods = unique(P.method, 'stable');
 V = nan(numel(order), numel(methods));
 for j = 1:numel(methods)
@@ -464,6 +488,7 @@ for j = 1:numel(methods)
         if ~isempty(v), V(k, j) = v; end
     end
 end
+f = figure('Color', 'w', 'Position', [80 80 760 430], 'Visible', 'off');
 bar(V);  box on;  grid on;
 set(gca, 'XTickLabel', cellfun(@(d) label.(d), order, 'UniformOutput', false));
 ylabel('best C_L / C_D over the angles run');
