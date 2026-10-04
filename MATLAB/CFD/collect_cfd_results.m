@@ -465,10 +465,11 @@ if ~isempty(S)
     if ~isempty(S), writetable(S, fullfile(out, 'surface.csv')); end
 end
 
-order = {'naca2412', 'smooth_s1', 'wavy_s1', 'parsec_t12'};
-label = struct('naca2412', 'NACA 2412', 'smooth_s1', 'optimised, smooth', 'wavy_s1', 'optimised, no curvature limits', ...
-    'parsec_t12', 'PARSEC design');
-pairs = {'transition', 'free'; 'sst', 'tripped'};    % CFD model and the XFOIL condition it is compared with
+D = designStudyAirfoils();
+D = D(ismember(D.name, F.design), :);                % the airfoils that have been run, NACA 2412 first
+order = D.name';
+label = cell2struct(D.label, D.name, 1);
+pairs ={'transition', 'free'; 'sst', 'tripped'};    % CFD model and the XFOIL condition it is compared with
 hasX = isfile(fullfile(out, 'xfoil.csv'));
 if hasX, X = readtable(fullfile(out, 'xfoil.csv')); end
 

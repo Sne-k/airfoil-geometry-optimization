@@ -1,12 +1,10 @@
 function run_design_study(outDir, pilot)
 %RUN_DESIGN_STUDY  RANS check of the XFOIL-optimised NACA 2412 designs.
-%   RUN_DESIGN_STUDY runs Fluent for four airfoils at Re = 1e6 and M = 0.15:
-%     naca2412    the original NACA 2412
-%     smooth_s1   optimised for peak CL/CD with curvature limits (seed 1,
-%                 the best of three; results/paper/runs/NACA_2412_s1)
-%     wavy_s1     the same without curvature limits (seed 1, the best of
-%                 three; results/paper/runs/NACA_2412_nocurv_s1)
-%     parsec_t12  the earlier PARSEC design (results/xfoil)
+%   RUN_DESIGN_STUDY runs Fluent for the airfoils of designStudyAirfoils.m
+%   at Re = 1e6 and M = 0.15: the original NACA 2412, three designs
+%   optimised for the peak CL/CD with free transition (smooth_s1, wavy_s1,
+%   parsec_t12), and two designs optimised for free and tripped flow
+%   together (robust_trip_s3, trip_worst_s1),
 %   with two models:
 %     transition  Transition SST (gamma-Re_theta). The far field has a
 %                 turbulence intensity of 0.14 % and a viscosity ratio of
@@ -18,7 +16,8 @@ function run_design_study(outDir, pilot)
 %                 Angles 0, 2, 3, 4, 5, 6, 7 and 8 deg.
 %     sst         k-omega SST, fully turbulent (a pessimistic bound), with
 %                 the inflow of the NASA verification case (0.052 %, 0.009).
-%                 Angles 0, 2, 4, 6 and 8 deg.
+%                 Angles 0, 2, 4, 6, 8 and 10 deg (with fully turbulent
+%                 flow the best CL/CD lies at 8 to 10 deg).
 %   The meshes are those of the medium mesh of verify_naca0012.m with a
 %   first cell of 1e-5 chords (y+ about 0.5 at this Reynolds number), the
 %   far field 500 chords away.
@@ -61,17 +60,14 @@ function run_design_study(outDir, pilot)
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
-repo = fullfile(root, '..');
 if nargin < 1 || isempty(outDir), outDir = fullfile(root, 'output', 'cfd', 'designs'); end
 if nargin < 2, pilot = false; end
 if ~exist(outDir, 'dir'), mkdir(outDir); end
 addpath(here, fullfile(root, 'Aerodynamics'), fullfile(root, 'NACA2412'));
 started = datetime('now', 'TimeZone', 'UTC');
 
-designs = {'naca2412', 'NACA 2412'
-           'smooth_s1', fullfile(repo, 'results', 'paper', 'runs', 'NACA_2412_s1', 'NACA_2412_optimized.dat')
-           'wavy_s1', fullfile(repo, 'results', 'paper', 'runs', 'NACA_2412_nocurv_s1', 'NACA_2412_optimized.dat')
-           'parsec_t12', fullfile(repo, 'results', 'xfoil', 'NACA2412_parsec_t12_optimized.dat')};
+D = designStudyAirfoils();
+designs = [D.name, D.source];
 nD = size(designs, 1);
 far = {'Radius', 500, 'WakeLength', 500, 'WakeFirstCell', 0.1, 'NNormal', 180};
 M = cell(nD + 2, 1);
@@ -97,7 +93,7 @@ M = cell2table(vertcat(M{:}), 'VariableNames', {'design', 'cells', 'negative_cel
 writetable(M, fullfile(outDir, 'meshes.csv'));
 
 common = {'Mach', 0.15, 'TimeStep', 1, 'StartTimeStep', 20, 'FirstOrder', 400, 'BlockSize', 50, 'Probes', [1 0.25]};
-models = {'sst', {'Model', 'sst', 'Re', 1e6, 'Intensity', 0.052, 'ViscRatio', 0.009, 'Blocks', 60, 'Tail', 20}, [4 6 2 0 8]
+models = {'sst', {'Model', 'sst', 'Re', 1e6, 'Intensity', 0.052, 'ViscRatio', 0.009, 'Blocks', 60, 'Tail', 20}, [4 6 2 0 8 10]
           'transition', {'Model', 'transition', 'Re', 1e6, 'Intensity', 0.14, 'ViscRatio', 50, 'SurfaceEvery', [200 2400], ...
                          'Blocks', 100, 'Tail', 48}, [4 5 6 2 0 8 3 7]};
 check = {'Model', 'sst', 'Re', 6e6, 'Intensity', 0.052, 'ViscRatio', 0.009, 'Blocks', 60, 'Tail', 20};

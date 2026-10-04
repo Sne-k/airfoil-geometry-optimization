@@ -262,14 +262,15 @@ Web of Science must still be checked.
 
 ## 12. Tasks that follow from the gaps
 
-| Task | Fills gap | State on 4 October 2026 |
+| Task | Fills gap | State on 5 October 2026 |
 |---|---|---|
-| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 184 runs started (`MATLAB/Paper/run_population_study.m`) |
-| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | to write (`collect_population_results.m`) |
-| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | to write (same script) |
-| Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | four runs for NACA 2412 are at the start of the population batch |
-| Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | four runs for NACA 2412 added to the population batch |
-| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | verification done; design study queued |
+| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 188 runs running (`MATLAB/Paper/run_population_study.m`); 11 done |
+| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | written (`collect_population_results.m`); applied to the finished runs in `results/population` |
+| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | written (same script); waits for the batch |
+| Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | done for NACA 2412 (four runs): the single-point design was not sensitive to Ncrit in the first place (`results/population/README.md`) |
+| Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped |
+| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | verification done; design study running, extended by two of the robust designs |
+| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | cause found (drifting separation cells in the laminar bubble); runs and tests queued (`MATLAB/CFD/transition_tests.m`) |
 | Reporting checklist | 2, 3 | draft in section 13 |
 | Optimise with RANS in the loop to see how the optimum itself moves | 1 | not feasible on the laptop; name as future work |
 | Wind-tunnel test of a design | 1 | outside this project; name as a limitation |

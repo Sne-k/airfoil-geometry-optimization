@@ -18,7 +18,8 @@ design study of the NACA 2412 designs is running. Results and their discussion:
 | `gridConvergence.m` | Discretisation error from three meshes (Celik et al. 2008) |
 | `timestep_study.m` | Compares Fluent's automatic pseudo-time step with a fixed one on the NASA case |
 | `verify_naca0012.m` | The verification: three meshes at 0°, 10° and 15°, and two smaller domains |
-| `run_design_study.m` | The four NACA 2412 designs with SST and Transition SST, and NACA 2412 on a refined mesh |
+| `designStudyAirfoils.m` | The six airfoils of the design study: NACA 2412 and five optimised designs |
+| `run_design_study.m` | These airfoils with SST and Transition SST, and NACA 2412 on a refined mesh |
 | `transition_tests.m` | NACA 2412 at 4° with Transition SST under five solver settings |
 | `design_study_xfoil.m` | XFOIL polars of the same designs at the same condition |
 | `collect_cfd_results.m` | Turns the outputs into the tables and figures of `results/cfd` |
@@ -69,7 +70,7 @@ Fluent must be installed. Set `FLUENT_EXE` to `fluent.exe`, then, from this fold
 ```matlab
 timestep_study      % 13 runs, about 4 hours
 verify_naca0012     % 11 runs, about 4 hours
-run_design_study    % 55 runs, about 35 hours
+run_design_study    % 87 runs, about 50 hours
 transition_tests    % 5 runs, about 3 hours
 design_study_xfoil  % XFOIL side of the comparison (needs XFOIL)
 collect_cfd_results % tables and figures in results/cfd
