@@ -1,0 +1,70 @@
+file,text,value,source,expr
+README.md,lift-to-drag ratio of NACA 2412 by 33 % on average,33,results/paper/cases.csv,100*(one(case_name='NACA_2412')['LDmax_mean']/one(case_name='NACA_2412')['LDmax_original']-1)
+README.md,"the mean gains in peak CL/CD are: NACA 0012 +52 %,",52,results/paper/cases.csv,100*(one(case_name='NACA_0012')['LDmax_mean']/one(case_name='NACA_0012')['LDmax_original']-1)
+README.md,"NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.",33,results/paper/cases.csv,100*(one(case_name='NACA_2412')['LDmax_mean']/one(case_name='NACA_2412')['LDmax_original']-1)
+README.md,"NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.",29,results/paper/cases.csv,100*(one(case_name='NACA_4412')['LDmax_mean']/one(case_name='NACA_4412')['LDmax_original']-1)
+README.md,"NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.",32,results/paper/cases.csv,100*(one(case_name='NACA_23012')['LDmax_mean']/one(case_name='NACA_23012')['LDmax_original']-1)
+README.md,"NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.",50,results/paper/cases.csv,100*(one(case_name='CLARK_Y')['LDmax_mean']/one(case_name='CLARK_Y')['LDmax_original']-1)
+README.md,"An earlier PARSEC design reached +74 %, but its surface is",74,results/paper/sensitivity.csv,"one(design='NACA 2412 PARSEC design (earlier)', Re=1000000, Ncrit=9)['LDmax_gain_percent']"
+README.md,wavy and its advantage drops to +36 % when transition occurs earlier,36,results/paper/sensitivity.csv,"one(design='NACA 2412 PARSEC design (earlier)', Re=1000000, Ncrit=5)['LDmax_gain_percent']"
+README.md,NACA 2412 the limits cost about 4 % of peak lift-to-drag,4,results/paper/cases.csv,100*(1-one(case_name='NACA_2412')['LDmax_mean']/one(case_name='NACA_2412_nocurv')['LDmax_mean'])
+docs/literature.md,- Smoothness limits cost 3.8 % of peak CL/CD on NACA 2412.,3.8,results/paper/cases.csv,100*(1-one(case_name='NACA_2412')['LDmax_mean']/one(case_name='NACA_2412_nocurv')['LDmax_mean'])
+docs/literature.md,- The earlier wavy PARSEC design keeps +36 % of its +74 % at Ncrit = 5.,36,results/paper/sensitivity.csv,"one(design='NACA 2412 PARSEC design (earlier)', Re=1000000, Ncrit=5)['LDmax_gain_percent']"
+docs/literature.md,- The earlier wavy PARSEC design keeps +36 % of its +74 % at Ncrit = 5.,74,results/paper/sensitivity.csv,"one(design='NACA 2412 PARSEC design (earlier)', Re=1000000, Ncrit=9)['LDmax_gain_percent']"
+docs/literature.md,"original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).",68.3,results/cfd/designs/xfoil.csv,"max(r['CL']/r['CD'] for r in sel(design='smooth_s1', condition='tripped'))"
+docs/literature.md,"original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).",70.1,results/cfd/designs/xfoil.csv,"max(r['CL']/r['CD'] for r in sel(design='wavy_s1', condition='tripped'))"
+docs/literature.md,"original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).",53.2,results/cfd/designs/xfoil.csv,"max(r['CL']/r['CD'] for r in sel(design='parsec_t12', condition='tripped'))"
+docs/literature.md,"original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).",72.6,results/cfd/designs/xfoil.csv,"max(r['CL']/r['CD'] for r in sel(design='naca2412', condition='tripped'))"
+docs/literature.md,| Q1 | (airfoil OR aerofoil) AND XFOIL AND (optimization OR optimisation) | 329 |,329,docs/literature/queries.csv,one(query_id='Q1_xfoil_optimisation')['hits']
+docs/literature.md,"| Q2 | (airfoil OR aerofoil) AND (""shape optimization"" OR ""shape optimisation"") AND (""genetic algorithm"" OR ""particle swarm"" OR ""Bayesian optimization"") | 190 |",190,docs/literature/queries.csv,one(query_id='Q2_stochastic_optimisers')['hits']
+docs/literature.md,| Q3 | morphing AND (airfoil OR aerofoil) AND (optimization OR optimisation) AND XFOIL | 34 |,34,docs/literature/queries.csv,one(query_id='Q3_morphing')['hits']
+docs/literature.md,"| Q4 | (airfoil OR aerofoil) AND (optimization OR optimisation) AND (""curvature constraint"" OR ""curvature constraints"" OR ""surface waviness"" OR ""smoothness constraint"") | 2 |",2,docs/literature/queries.csv,one(query_id='Q4_curvature')['hits']
+docs/literature.md,"| Q5 | (airfoil OR aerofoil) AND XFOIL AND (RANS OR ""Navier-Stokes"") AND transition AND (optimization OR optimisation) | 8 |",8,docs/literature/queries.csv,one(query_id='Q5_xfoil_vs_rans')['hits']
+docs/literature.md,"| Q6 | (airfoil OR aerofoil) AND (robust OR uncertainty) AND (""laminar flow"" OR transition) AND (optimization OR optimisation) | 115 |",115,docs/literature/queries.csv,one(query_id='Q6_robust_transition')['hits']
+docs/literature.md,"Together 598 different works; 329 of them name XFOIL (Q1, Q3 or Q5).",598,docs/literature/candidates.csv,len(rows)
+docs/literature.md,"Together 598 different works; 329 of them name XFOIL (Q1, Q3 or Q5).",329,docs/literature/candidates.csv,"len([r for r in rows if set(str(r['queries']).split()) & {'Q1', 'Q3', 'Q5'}])"
+docs/literature.md,| genetic or evolutionary algorithm | 88 | 37.0 % |,88,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_genetic')['abstracts_mentioning']
+docs/literature.md,| genetic or evolutionary algorithm | 88 | 37.0 % |,37.0,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_genetic')['percent']
+docs/literature.md,| particle swarm | 18 | 7.6 % |,18,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_particle_swarm')['abstracts_mentioning']
+docs/literature.md,| particle swarm | 18 | 7.6 % |,7.6,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_particle_swarm')['percent']
+docs/literature.md,| gradient-based or adjoint method | 21 | 8.8 % |,21,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_gradient')['abstracts_mentioning']
+docs/literature.md,| gradient-based or adjoint method | 21 | 8.8 % |,8.8,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_gradient')['percent']
+docs/literature.md,"| surrogate, neural network or other learning method | 48 | 20.2 % |",48,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_surrogate_or_learning')['abstracts_mentioning']
+docs/literature.md,"| surrogate, neural network or other learning method | 48 | 20.2 % |",20.2,docs/literature/abstract_coding_summary.csv,one(rule='optimiser_surrogate_or_learning')['percent']
+docs/literature.md,| CST | 30 | 12.6 % |,30,docs/literature/abstract_coding_summary.csv,one(rule='param_cst')['abstracts_mentioning']
+docs/literature.md,| CST | 30 | 12.6 % |,12.6,docs/literature/abstract_coding_summary.csv,one(rule='param_cst')['percent']
+docs/literature.md,| PARSEC | 19 | 8.0 % |,19,docs/literature/abstract_coding_summary.csv,one(rule='param_parsec')['abstracts_mentioning']
+docs/literature.md,| PARSEC | 19 | 8.0 % |,8.0,docs/literature/abstract_coding_summary.csv,one(rule='param_parsec')['percent']
+docs/literature.md,| Bézier or spline | 34 | 14.3 % |,34,docs/literature/abstract_coding_summary.csv,one(rule='param_bezier_or_spline')['abstracts_mentioning']
+docs/literature.md,| Bézier or spline | 34 | 14.3 % |,14.3,docs/literature/abstract_coding_summary.csv,one(rule='param_bezier_or_spline')['percent']
+docs/literature.md,| lift-to-drag ratio as a measure | 78 | 32.8 % |,78,docs/literature/abstract_coding_summary.csv,one(rule='metric_lift_to_drag')['abstracts_mentioning']
+docs/literature.md,| lift-to-drag ratio as a measure | 78 | 32.8 % |,32.8,docs/literature/abstract_coding_summary.csv,one(rule='metric_lift_to_drag')['percent']
+docs/literature.md,"| several design points, off-design or robustness | 47 | 19.7 % |",47,docs/literature/abstract_coding_summary.csv,one(rule='multi_point_or_robust')['abstracts_mentioning']
+docs/literature.md,"| several design points, off-design or robustness | 47 | 19.7 % |",19.7,docs/literature/abstract_coding_summary.csv,one(rule='multi_point_or_robust')['percent']
+docs/literature.md,| transition | 30 | 12.6 % |,30,docs/literature/abstract_coding_summary.csv,one(rule='mentions_transition')['abstracts_mentioning']
+docs/literature.md,| transition | 30 | 12.6 % |,12.6,docs/literature/abstract_coding_summary.csv,one(rule='mentions_transition')['percent']
+docs/literature.md,| CFD or RANS | 129 | 54.2 % |,129,docs/literature/abstract_coding_summary.csv,one(rule='check_cfd')['abstracts_mentioning']
+docs/literature.md,| CFD or RANS | 129 | 54.2 % |,54.2,docs/literature/abstract_coding_summary.csv,one(rule='check_cfd')['percent']
+docs/literature.md,| experiment or wind tunnel | 81 | 34.0 % |,81,docs/literature/abstract_coding_summary.csv,one(rule='check_experiment')['abstracts_mentioning']
+docs/literature.md,| experiment or wind tunnel | 81 | 34.0 % |,34.0,docs/literature/abstract_coding_summary.csv,one(rule='check_experiment')['percent']
+docs/literature.md,"| repeated runs, seeds or run statistics | 4 | 1.7 % |",4,docs/literature/abstract_coding_summary.csv,one(rule='repeated_runs')['abstracts_mentioning']
+docs/literature.md,"| repeated runs, seeds or run statistics | 4 | 1.7 % |",1.7,docs/literature/abstract_coding_summary.csv,one(rule='repeated_runs')['percent']
+docs/literature.md,| curvature or smoothness | 13 | 5.5 % |,13,docs/literature/abstract_coding_summary.csv,one(rule='smoothness_or_curvature')['abstracts_mentioning']
+docs/literature.md,| curvature or smoothness | 13 | 5.5 % |,5.5,docs/literature/abstract_coding_summary.csv,one(rule='smoothness_or_curvature')['percent']
+docs/literature.md,title and abstract of the 238 works of,238,docs/literature/abstract_coding_summary.csv,one(rule='check_cfd')['abstracts_coded']
+docs/literature.md,| in the sample | 33 |,33,docs/literature/screening_summary.csv,one(item='works in the sample')['count']
+docs/literature.md,| in scope: XFOIL evaluates the candidates of a section or morphing-shape optimisation | 18 |,18,docs/literature/screening_summary.csv,one(item='in scope (XFOIL evaluates the candidates of a section or morphing-shape optimisation)')['count']
+docs/literature.md,"| partly in scope (noise objective, turbine blade, parametric study, XFOIL only as a check) | 4 |",4,docs/literature/screening_summary.csv,one(item='partly in scope')['count']
+docs/literature.md,| not in scope or not assessed | 11 |,11,docs/literature/screening_summary.csv,one(item='not in scope or not assessed')['count']
+docs/literature.md,| in scope and read in full | 8 |,8,docs/literature/screening_summary.csv,"one(item='in scope, read in full')['count']"
+docs/literature.md,"| in scope, judged from the abstract | 10 |",10,docs/literature/screening_summary.csv,"one(item='in scope, abstract only')['count']"
+docs/literature.md,| at one or several fixed angles of attack | 9 |,9,docs/literature/screening_summary.csv,"one(item='in scope, objective posed as: fixed angle')['count']"
+docs/literature.md,| peak over the angle of attack | 2 |,2,docs/literature/screening_summary.csv,"one(item='in scope, objective posed as: peak')['count']"
+docs/literature.md,"| one condition, not classified further | 1 |",1,docs/literature/screening_summary.csv,"one(item='in scope, objective posed as: single condition')['count']"
+docs/literature.md,| not stated in the abstract | 4 |,4,docs/literature/screening_summary.csv,"one(item='in scope, objective posed as: not in abstract')['count']"
+docs/literature.md,"| several conditions combined, or robustness | 2 |",2,docs/literature/screening_summary.csv,"one(item='in scope, objective posed as: multi-condition')['count'] + one(item='in scope, objective posed as: robust')['count']"
+docs/literature.md,- **Repeated runs:** 1 of the 8 works read in full reports several independent optimisation runs,1,docs/literature/screening_summary.csv,"one(item='in scope, read in full: several independent optimisation runs reported')['count']"
+docs/literature.md,- **Check of the optimum:** 8 of the 18 works check it with RANS and 2 with a wind tunnel (one,8,docs/literature/screening_summary.csv,one(item='in scope: optimum checked with RANS')['count']
+docs/literature.md,- **Check of the optimum:** 8 of the 18 works check it with RANS and 2 with a wind tunnel (one,2,docs/literature/screening_summary.csv,one(item='in scope: optimum checked in a wind tunnel (done or announced)')['count']
+docs/literature.md,announced). 3 of the 8 works read in full have no check with another flow solver or an experiment.,3,docs/literature/screening_summary.csv,"one(item='in scope, read in full: no check of the optimum with another flow solver or an experiment')['count']"
+docs/literature.md,"2. **Metric choice.** In the audit, 9 of the 14 in-scope works whose objective could be classified pose",14,docs/literature/screening_summary.csv,"one(item='in scope (XFOIL evaluates the candidates of a section or morphing-shape optimisation)')['count'] - one(item='in scope, objective posed as: not in abstract')['count']"
