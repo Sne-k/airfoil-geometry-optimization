@@ -40,20 +40,25 @@ ip.parse(varargin{:});
 o = ip.Results;
 
 %% Surface points: clustered at the leading edge, moderately at the trailing edge
+% The points are placed by arc length along each surface. Just behind the
+% nose of a cambered section the upper surface reaches slightly ahead of
+% x = 0 (NACA 2412: x = -7.5e-5), so y is not a function of x there;
+% interpolating y(x) corrupted the nose and made the CFD diverge.
 t = linspace(0, 1, o.NSurface)';
 w = 0.8;
-xs = w * (1 - cos(pi*t)) / 2 + (1 - w) * (1 - cos(pi*t/2));
-yus = interp1(xu, yu, xs, 'pchip');
-yls = interp1(xl, yl, xs, 'pchip');
-yus([1 end]) = 0;  yls([1 end]) = 0;             % closed at (0,0) and (1,0)
+f = w * (1 - cos(pi*t)) / 2 + (1 - w) * (1 - cos(pi*t/2));
+[xus, yus] = alongSurface(xu, yu, f);
+[xls, yls] = alongSurface(xl, yl, f);
+xus([1 end]) = [0 1];  yus([1 end]) = 0;          % closed at (0,0) and (1,0)
+xls([1 end]) = [0 1];  yls([1 end]) = 0;
 
 %% Wake cut: geometric growth from the trailing-edge spacing to the outlet
-h0 = 1 - xs(end-1);
+h0 = mean([hypot(1 - xus(end-1), yus(end-1)), hypot(1 - xls(end-1), yls(end-1))]);
 r = fzero(@(r) h0 * (r^(o.NWake) - 1) / (r - 1) - o.WakeLength, [1.0001 2]);
 xw = 1 + h0 * (r.^(1:o.NWake)' - 1) / (r - 1);
 
 %% Inner boundary (j = 1), clockwise: lower wake -> lower surface -> upper surface -> upper wake
-xin = [flipud(xw); flipud(xs); xs(2:end); xw];
+xin = [flipud(xw); flipud(xls); xus(2:end); xw];
 yin = [zeros(o.NWake, 1); flipud(yls); yus(2:end); zeros(o.NWake, 1)];
 Ni = numel(xin);
 iTE = [o.NWake + 1, o.NWake + 2*o.NSurface - 1];
@@ -140,4 +145,15 @@ for k = jSwitch+1:Nj
 end
 
 G = struct('X', X, 'Y', Y, 'iTE', iTE, 'firstCell', o.FirstCell, 'growth', rj, 'wakeGrowth', r);
+end
+
+function [xs, ys] = alongSurface(x, y, f)
+% Points at the fractions f of the arc length of a surface (x, y), ordered
+% from the leading edge to the trailing edge
+x = x(:);  y = y(:);
+s = [0; cumsum(hypot(diff(x), diff(y)))];
+[s, i] = unique(s);
+s = s / s(end);
+xs = interp1(s, x(i), f, 'pchip');
+ys = interp1(s, y(i), f, 'pchip');
 end
