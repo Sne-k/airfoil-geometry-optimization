@@ -7,8 +7,8 @@ lead to, and a draft reporting checklist.
 
 **How the references were checked.**
 - The bibliographic data (authors, year, title, journal, volume, pages, DOI) of every entry with a DOI
-  were looked up on Crossref, on 1 October 2026 or, for the entries added later, on 4 October 2026 with
-  `docs/literature/check_crossref.py` (result: `docs/literature/crossref_check.csv`).
+  were looked up on Crossref, on 1 October 2026 or, for the entries added later, on 4 and 5 October
+  2026 with `docs/literature/check_crossref.py` (result: `docs/literature/crossref_check.csv`).
 - Reports and books were checked on the NASA Technical Reports Server or the publisher's page.
 - The column "content" says how well the statement about the work is supported: **read** (the full
   text was read for this project), **abstract** (only the abstract or the publisher's summary), or

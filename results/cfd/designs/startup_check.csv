@@ -1,2 +1,2 @@
-model,design,alpha,iterations,window_iterations,CL,CD,LD,CL_min,CL_max,CD_min,CD_max,LD_min,LD_max,steady,Tu_1chord_percent,Tu_quarter_chord_percent,viscosity_ratio_1chord,Ncrit_equivalent,res_continuity,res_x_velocity,res_y_velocity,res_energy,res_k,res_omega,res_intermit,res_retheta,xtr_upper,xtr_lower,xsep_upper,xsep_lower
-check,n0012_medium,10,3400,500,1.07568632,0.0128374455,83.7928636191679,1.0756843,1.075687,0.012837319,0.012837802,83.7903793811433,83.7937422915174,1,0.0003424027,0.00034460459,0.0051571066,21.7732637140844,0.00029134,2.792e-10,3.0728e-10,6.4208e-11,5.5591e-08,4.4295e-08,NaN,NaN,NaN,0.0303129850977176,NaN,NaN
+model,design,alpha,iterations,steady,CL,CD,LD,CL_min,CL_max,CD_min,CD_max,res_continuity,res_x_velocity,res_y_velocity,res_energy,res_k,res_omega
+check,n0012_medium,10,3400,1,1.07568632,0.0128374455,83.7928636191679,1.0756843,1.075687,0.012837319,0.012837802,0.00029134,2.792e-10,3.0728e-10,6.4208e-11,5.5591e-08,4.4295e-08
