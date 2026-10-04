@@ -31,8 +31,22 @@ function plan = fluentJournal(file, meshFile, alpha, varargin)
 %     'BlockSize'   iterations per block                            (200)
 %     'TimeStep'    pseudo-time step in units of chord / free-stream
 %                   speed; [] keeps Fluent's automatic time step      ([])
+%     'StartTimeStep'  pseudo-time step of the first-order stage, in the
+%                   same units; [] uses TimeStep. A larger step lets the
+%                   free-stream turbulence of a large domain settle
+%                   before the second-order stage                     ([])
 %     'Limiter'     slope limiter: 'default', 'multi-dimensional' or
 %                   'differentiable'                          ('default')
+%     'Probes'      distances upstream of the leading edge, in chords
+%                   along the free-stream direction, at which the
+%                   turbulence intensity, the turbulent viscosity ratio
+%                   and the speed are printed after every force report
+%                   (fluentProbes reads them)                         ([])
+%     'Surface'     name (without extension) of a profile file with the
+%                   pressure coefficient and the wall shear stress on the
+%                   airfoil, written after the last block; with several
+%                   angles the files are <name>_1.prof, <name>_2.prof, ...
+%                   (fluentSurface reads them)                         ('')
 %
 %   The default free-stream turbulence is that of the NASA Turbulence
 %   Modeling Resource NACA 0012 case. The command sequences were checked
@@ -40,6 +54,7 @@ function plan = fluentJournal(file, meshFile, alpha, varargin)
 %   reproduces that case (see MATLAB/CFD/README.md).
 
 ip = inputParser;
+ip.PartialMatching = false;
 ip.addParameter('Model', 'sst');
 ip.addParameter('Re', 1e6);
 ip.addParameter('Mach', 0.15);
@@ -49,7 +64,10 @@ ip.addParameter('FirstOrder', 400);
 ip.addParameter('Blocks', 8);
 ip.addParameter('BlockSize', 200);
 ip.addParameter('TimeStep', []);
+ip.addParameter('StartTimeStep', []);
 ip.addParameter('Limiter', 'default');
+ip.addParameter('Probes', []);
+ip.addParameter('Surface', '');
 ip.parse(varargin{:});
 o = ip.Results;
 alpha = alpha(:).';
@@ -64,6 +82,7 @@ transition = strcmpi(o.Model, 'transition');
 fid = fopen(file, 'w');
 cleaner = onCleanup(@() fclose(fid));
 w = @(varargin) fprintf(fid, [varargin{1} '\n'], varargin{2:end});
+w('/file/confirm-overwrite no');
 w('/file/read-case %s', meshFile);
 w('/define/models/energy yes'); w(''); w(''); w(''); w('');
 w('/define/models/viscous/kw-sst yes');
@@ -73,9 +92,13 @@ end
 w('/define/materials/change-create air air yes ideal-gas no no yes constant %.6e no no no', mu);
 farfield(w, o, T0, alpha(1), transition);
 w('/report/reference-values/compute/pressure-far-field farfield');
-if ~isempty(o.TimeStep)
-    w('/solve/set/pseudo-time-method/global-time-step-settings no %.6e', o.TimeStep / U);
+for i = 1:numel(alpha)                              % point surfaces p<angle>d<distance>
+    for j = 1:numel(o.Probes)
+        w('/surface/point-surface p%dd%d %.6f %.6f', i, j, -o.Probes(j) * cosd(alpha(i)), -o.Probes(j) * sind(alpha(i)));
+    end
 end
+if isempty(o.StartTimeStep), o.StartTimeStep = o.TimeStep; end
+timeStep(w, o.StartTimeStep, U);
 if ~strcmpi(o.Limiter, 'default')
     w('/solve/set/slope-limiter-set %s yes no', o.Limiter);
 end
@@ -88,7 +111,15 @@ w('/solve/initialize/compute-defaults/pressure-far-field farfield');
 w('/solve/initialize/initialize-flow');
 w('/solve/iterate %d', o.FirstOrder);
 forces(w, alpha(1));
+probes(w, o, 1);
 scheme(w, eqs, 1, 12);
+if ~isequal(o.StartTimeStep, o.TimeStep)
+    if isempty(o.TimeStep)
+        w('/solve/set/pseudo-time-method/global-time-step-settings yes 1 1');     % back to automatic
+    else
+        timeStep(w, o.TimeStep, U);
+    end
+end
 it = o.FirstOrder;
 rows = [alpha(1), it, 1];
 for i = 1:numel(alpha)
@@ -96,8 +127,13 @@ for i = 1:numel(alpha)
     for b = 1:o.Blocks
         w('/solve/iterate %d', o.BlockSize);
         forces(w, alpha(i));
+        probes(w, o, i);
         it = it + o.BlockSize;
         rows(end+1, :) = [alpha(i), it, 2]; %#ok<AGROW>
+    end
+    if ~isempty(o.Surface)
+        if isscalar(alpha), name = o.Surface; else, name = sprintf('%s_%d', o.Surface, i); end
+        w('/file/write-profile %s.prof airfoil () pressure-coefficient x-wall-shear y-wall-shear ()', name);
     end
 end
 w('/exit yes');
@@ -116,6 +152,13 @@ else
 end
 end
 
+function timeStep(w, tau, U)
+% Fixed pseudo-time step of tau chord passages (chord 1 m); nothing for tau = []
+if ~isempty(tau)
+    w('/solve/set/pseudo-time-method/global-time-step-settings no %.6e', tau / U);
+end
+end
+
 function scheme(w, eqs, order, pressure)
 % order 0 = first-order upwind, 1 = second-order upwind; pressure 10 =
 % standard, 12 = second order
@@ -123,6 +166,16 @@ w('/solve/set/discretization-scheme');
 for k = 1:numel(eqs), w('%s %d', eqs{k}, order); end
 w('pressure %d', pressure);
 w('q');
+end
+
+function probes(w, o, i)
+% Turbulence intensity, viscosity ratio and speed at the probe points of angle i
+if isempty(o.Probes), return; end
+names = sprintf('p%dd%%d ', i);
+names = sprintf(names, 1:numel(o.Probes));
+for field = {'turb-intensity', 'viscosity-ratio', 'velocity-magnitude'}
+    w('/report/surface-integrals/vertex-avg %s() %s no', names, field{1});
+end
 end
 
 function forces(w, alpha)

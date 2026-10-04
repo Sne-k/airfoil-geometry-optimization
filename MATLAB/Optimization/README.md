@@ -62,8 +62,11 @@ designs only. `'Curvature', false` switches the limits off.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `Objective` | `'LDmax'` | `'LDmax'` (peak CL/CD), `'endurance'` (peak CL^1.5/CD), `'LDatCL'` (CL/CD at `DesignCL`) |
+| `Objective` | `'LDmax'` | `'LDmax'` (peak CL/CD), `'endurance'` (peak CL^1.5/CD), `'LDatCL'` (CL/CD at `DesignCL`), `'LDatAlpha'` (CL/CD at `DesignAlpha`) |
 | `DesignCL`, `Weights` | 0.5, equal | One or more design lift coefficients for `'LDatCL'` and their weights (weighted mean of CL/CD) |
+| `DesignAlpha` | 2 | One or more angles of attack (deg, multiples of 0.5 between −2 and 12) for `'LDatAlpha'`. Many papers pose the objective this way; a gain at a fixed angle is not a gain at fixed lift |
+| `Ncrit` | 9 | XFOIL's transition parameter. With several values, e.g. `[5 9]`, every design is analysed at each of them (the search takes that many times longer) |
+| `Aggregate` | `'mean'` | How several design points and `Ncrit` values are combined: `'mean'` or `'worst'` (the lowest) |
 | `KeepCLmax` | false | Reject shapes whose maximum lift is below the original's (the sweep then runs to 18°) |
 | `Curvature` | true | Curvature limits from the original (see above) |
 | `CurvatureThreshold` | 0.01 | Curvature below which a sign change is not counted as a reversal |
