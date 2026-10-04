@@ -25,9 +25,9 @@ function run_design_study(outDir, pilot)
 %
 %   Solver set-up: as verified, with one difference. The first-order stage
 %   (400 iterations) uses a pseudo-time step of 20 chord passages instead of
-%   one, because the free-stream turbulence of the 500-chord domain needs
-%   about 2500 chord passages to settle, and the transition location depends
-%   on it. The second-order stage uses the verified step of one chord
+%   one, because the free-stream turbulence has to travel 500 chords from
+%   the far field before it is settled at the airfoil, and the transition
+%   location depends on it. The second-order stage uses the verified step of one chord
 %   passage: 3000 iterations with SST and 4000 with Transition SST, forces
 %   every 50 iterations. The first run repeats the NASA NACA 0012 case
 %   (medium mesh, 10 deg) with this start-up, to show that it gives the same

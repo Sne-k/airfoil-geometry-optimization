@@ -18,10 +18,15 @@ function collect_cfd_results(runDir, outDir)
 %                       reference), verification_forces.png,
 %                       grid_convergence.png, farfield.png,
 %                       verification_surface.png
-%     designs/          forces.csv, history.csv, meshes.csv, run_info.json,
-%                       comparison.csv (against XFOIL, if xfoil.csv from
-%                       design_study_xfoil.m is in that folder),
-%                       peaks.csv, design_polars.png, design_gains.png
+%     designs/          forces.csv (with the turbulence intensity reaching
+%                       the airfoil and the transition and separation
+%                       locations read from the skin friction), history.csv,
+%                       meshes.csv, run_info.json, surface.csv,
+%                       startup_check.csv (the NASA case repeated with the
+%                       start-up of the design study), comparison.csv
+%                       (against XFOIL, if xfoil.csv from
+%                       design_study_xfoil.m is in that folder), peaks.csv,
+%                       design_polars.png, design_gains.png
 %   A run counts as steady if, over its last force reports (500 iterations
 %   in the NACA 0012 runs, 1000 in the design study), CL varies by less
 %   than 1e-4 and CD by less than 1e-5. The tables give the mean over those
@@ -142,7 +147,7 @@ C = cell2table(C, 'VariableNames', {'mesh', 'alpha', 'code', 'CL_reference', 'CD
 writetable(C, fullfile(out, 'comparison.csv'));
 
 % Mesh convergence (far field 500 chords away)
-get = @(mesh, a, q) F.(q)(strcmp(F.mesh, mesh) & F.alpha == a);
+get = @(mesh, a, q) F.(q)(strcmp(F.mesh, mesh) & F.alpha == a & F.steady);      % steady solutions only
 cells = [M.cells(strcmp(M.mesh, 'fine')), M.cells(strcmp(M.mesh, 'medium')), M.cells(strcmp(M.mesh, 'coarse'))];
 G = cell(0, 15);
 for a = unique(F.alpha)'
@@ -191,17 +196,21 @@ if ~isempty(S) && isfile(fullfile(refDir, 'n0012cf_cfl3d_sst.dat'))
     cfRef = readZones(fullfile(refDir, 'n0012cf_cfl3d_sst.dat'));     % upper surface, alpha 0, 10, 15
     cpRef = readZones(fullfile(refDir, 'n0012cp_cfl3d_sst.dat'));
     refAlpha = @(Z) cellfun(@(n) sscanf(n, 'alpha=%f'), {Z.name});
+    % Skin friction on the upper surface between x = 0.05 and 0.95: mean and largest
+    % difference from CFL3D, as a percentage of CFL3D's mean value over that range
+    % (not point by point: near separation the skin friction passes through zero)
     Q = cell(0, 7);
     for mesh = unique(S.mesh, 'stable')'
         for a = unique(S.alpha(strcmp(S.mesh, mesh{1})))'
+            if ~F.steady(strcmp(F.mesh, mesh{1}) & F.alpha == a), continue; end
             u = sortrows(S(strcmp(S.mesh, mesh{1}) & S.alpha == a & strcmp(S.surface, 'upper'), :), 'x');
             zf = cfRef(refAlpha(cfRef) == a);  zp = cpRef(refAlpha(cpRef) == a);
             if isempty(zf) || isempty(zp) || isempty(u), continue; end
             in95 = u.x >= 0.05 & u.x <= 0.95;
             [xr, k] = unique(zf.data(:, 1));
             cfC = interp1(xr, zf.data(k, 2), u.x(in95));
-            Q(end+1, :) = {mesh{1}, a, min(u.cp), min(zp.data(:, 2)), 100 * mean(abs(u.cf(in95) - cfC) ./ cfC), ...
-                100 * max(abs(u.cf(in95) - cfC) ./ cfC), sum(in95)}; %#ok<AGROW>
+            Q(end+1, :) = {mesh{1}, a, min(u.cp), min(zp.data(:, 2)), 100 * mean(abs(u.cf(in95) - cfC)) / mean(cfC), ...
+                100 * max(abs(u.cf(in95) - cfC)) / mean(cfC), sum(in95)}; %#ok<AGROW>
         end
     end
     Q = cell2table(Q, 'VariableNames', {'mesh', 'alpha', 'cp_min', 'cp_min_CFL3D', ...
@@ -218,15 +227,15 @@ if ~isempty(S) && isfile(fullfile(refDir, 'n0012cf_cfl3d_sst.dat'))
                 m = S(strcmp(S.mesh, 'medium') & S.alpha == a, :);
                 if row == 1
                     zp = cpRef(refAlpha(cpRef) == a);
-                    plot(zp.data(:, 1), zp.data(:, 2), 'k-', 'LineWidth', 1.0, 'DisplayName', 'CFL3D (NASA TMR)');
-                    plot(m.x, m.cp, '.', 'Color', [0.85 0.33 0.10], 'MarkerSize', 7, 'DisplayName', 'Fluent, medium mesh');
+                    plot(m.x, m.cp, 'o', 'Color', [0.85 0.33 0.10], 'MarkerSize', 3, 'DisplayName', 'Fluent, medium mesh');
+                    plot(zp.data(:, 1), zp.data(:, 2), 'k-', 'LineWidth', 0.9, 'DisplayName', 'CFL3D (NASA TMR)');
                     set(gca, 'YDir', 'reverse');  ylabel('C_p');  title(sprintf('\\alpha = %g\\circ', a));
                     if a == angles(1), legend('Location', 'southeast'); end
                 else
                     zf = cfRef(refAlpha(cfRef) == a);
                     u = sortrows(m(strcmp(m.surface, 'upper'), :), 'x');
-                    plot(zf.data(:, 1), zf.data(:, 2), 'k-', 'LineWidth', 1.0);
-                    plot(u.x, u.cf, '.', 'Color', [0.85 0.33 0.10], 'MarkerSize', 7);
+                    plot(u.x, u.cf, 'o', 'Color', [0.85 0.33 0.10], 'MarkerSize', 3);
+                    plot(zf.data(:, 1), zf.data(:, 2), 'k-', 'LineWidth', 0.9);
                     ylabel('C_f, upper surface');  ylim([-0.002 0.03]);
                 end
                 xlabel('x / c');  xlim([0 1]);
@@ -260,7 +269,7 @@ for c = 1:numel(codes)
 end
 names = {'coarse', 'medium', 'fine'};
 for k = 1:3
-    r = sortrows(F(strcmp(F.mesh, names{k}), :), 'alpha');
+    r = sortrows(F(strcmp(F.mesh, names{k}) & F.steady, :), 'alpha');
     plot(ax1, r.alpha, r.CL, 'o', 'Color', col(k, :), 'MarkerFaceColor', col(k, :), 'MarkerSize', 5, 'HandleVisibility', 'off');
     plot(ax2, r.CL, r.CD, 'o', 'Color', col(k, :), 'MarkerFaceColor', col(k, :), 'MarkerSize', 5, ...
         'DisplayName', ['Fluent, ' names{k} ' mesh']);
@@ -283,13 +292,14 @@ if ~isempty(G)
         plot(hh / hh(1), [g.fine, g.medium, g.coarse], 'o-', 'Color', col(1, :), 'MarkerFaceColor', col(1, :), ...
             'DisplayName', 'Fluent');
         plot(0, g.extrapolated, 'p', 'Color', col(1, :), 'MarkerSize', 11, 'DisplayName', 'extrapolated');
-        for c = 1:numel(codes)
-            r = ref(strcmp(ref.code, codes{c}) & ref.alpha == a, :);
-            yline(r.CD, ':', codes{c}, 'Color', [0.3 0.3 0.3], 'HandleVisibility', 'off', 'LabelHorizontalAlignment', 'left');
+        r = ref(ref.alpha == a, :);
+        for v = unique(r.CD)'                               % codes with the same value share a label
+            yline(v, ':', strjoin(r.code(r.CD == v), ', '), 'Color', [0.3 0.3 0.3], 'HandleVisibility', 'off', ...
+                'LabelHorizontalAlignment', 'right');
         end
         xlabel('cell size / cell size of the fine mesh');  ylabel('C_D');  xlim([-0.1 2.2]);
         title(sprintf('\\alpha = %g\\circ', a));
-        if a == angles(1), legend('Location', 'northwest'); end
+        if a == angles(1), legend('Location', 'south'); end
     end
     exportgraphics(f, fullfile(out, 'grid_convergence.png'), 'Resolution', 130);
     close(f);
@@ -327,7 +337,37 @@ F.viscosity_ratio_1chord = T.visc_ratio_probe_1;
 F.Ncrit_equivalent = -8.43 - 2.4 * log(T.Tu_probe_1 / 100);     % Mack's relation
 F = [F, T(:, {'res_continuity', 'res_x_velocity', 'res_y_velocity', 'res_energy', 'res_k', 'res_omega', ...
     'res_intermit', 'res_retheta'})];
-F = sortrows(F, {'model', 'design', 'alpha'});
+
+% Pressure and skin friction on the airfoil; transition and separation from the skin friction
+T0 = 288.15;  Rgas = 8314.47 / 28.966;                 % as in fluentJournal
+qInf = 0.5 * (101325 / (Rgas * T0)) * (0.15 * sqrt(1.4 * Rgas * T0))^2;
+loc = nan(height(T), 4);                               % xtr upper, xtr lower, xsep upper, xsep lower
+S = cell(0, 1);
+for i = 1:height(T)
+    prof = fullfile(in, strrep(T.transcript{i}, '.out', '.prof'));
+    wallFile = fullfile(in, [T.design{i} '_wall.csv']);
+    if ~isfile(prof) || ~isfile(wallFile), continue; end
+    s = fluentSurface(prof, readmatrix(wallFile), qInf);
+    for side = 1:2
+        names = {'upper', 'lower'};
+        u = s(strcmp(s.surface, names{side}), :);
+        [loc(i, side), loc(i, side + 2)] = transitionFromCf(u.x, u.cf);
+    end
+    s.model = repmat(T.model(i), height(s), 1);
+    s.design = repmat(T.design(i), height(s), 1);
+    s.alpha = repmat(T.alpha(i), height(s), 1);
+    S{end+1, 1} = s(:, {'model', 'design', 'alpha', 'surface', 'x', 'y', 'cp', 'cf'}); %#ok<AGROW>
+end
+F.xtr_upper = loc(:, 1);  F.xtr_lower = loc(:, 2);  F.xsep_upper = loc(:, 3);  F.xsep_lower = loc(:, 4);
+if ~isempty(S), writetable(vertcat(S{:}), fullfile(out, 'surface.csv')); end
+
+% The first run repeats the NASA NACA 0012 case with the start-up of the design study
+check = F(strcmp(F.model, 'check'), :);
+if ~isempty(check), writetable(check, fullfile(out, 'startup_check.csv')); end
+keep = ~strcmp(F.model, 'check');
+F = sortrows(F(keep, :), {'model', 'design', 'alpha'});
+H = H(~strcmp(H.model, 'check'), :);
+if isempty(F), return; end                           % only the start-up check has run so far
 writetable(F, fullfile(out, 'forces.csv'));
 writetable(H(:, {'model', 'design', 'alpha', 'iteration', 'order', 'CL', 'CD'}), fullfile(out, 'history.csv'));
 
@@ -340,16 +380,18 @@ if hasX, X = readtable(fullfile(out, 'xfoil.csv')); end
 
 % CFD against XFOIL at the same angles
 if hasX
-    C = cell(0, 12);
+    C = cell(0, 16);
     for i = 1:height(F)
         cond = pairs{strcmp(pairs(:, 1), F.model{i}), 2};
         x = X(strcmp(X.condition, cond) & strcmp(X.design, F.design{i}) & abs(X.alpha - F.alpha(i)) < 1e-9, :);
         if isempty(x) || isnan(x.CL), continue; end
         C(end+1, :) = {F.model{i}, F.design{i}, F.alpha(i), F.CL_mean(i), F.CD_mean(i), F.LD(i), x.CL, x.CD, x.CL / x.CD, ...
-            100 * (F.CL_mean(i) - x.CL) / x.CL, 100 * (F.CD_mean(i) - x.CD) / x.CD, 100 * (F.LD(i) - x.CL / x.CD) / (x.CL / x.CD)}; %#ok<AGROW>
+            100 * (F.CL_mean(i) - x.CL) / x.CL, 100 * (F.CD_mean(i) - x.CD) / x.CD, 100 * (F.LD(i) - x.CL / x.CD) / (x.CL / x.CD), ...
+            F.xtr_upper(i), x.xtrTop, F.xtr_lower(i), x.xtrBot}; %#ok<AGROW>
     end
     C = cell2table(C, 'VariableNames', {'model', 'design', 'alpha', 'CL_cfd', 'CD_cfd', 'LD_cfd', 'CL_xfoil', 'CD_xfoil', ...
-        'LD_xfoil', 'CL_difference_percent', 'CD_difference_percent', 'LD_difference_percent'});
+        'LD_xfoil', 'CL_difference_percent', 'CD_difference_percent', 'LD_difference_percent', 'xtr_upper_cfd', ...
+        'xtr_upper_xfoil', 'xtr_lower_cfd', 'xtr_lower_xfoil'});
     writetable(C, fullfile(out, 'comparison.csv'));
 end
 

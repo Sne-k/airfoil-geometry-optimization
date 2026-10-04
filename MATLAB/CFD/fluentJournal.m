@@ -37,6 +37,10 @@ function plan = fluentJournal(file, meshFile, alpha, varargin)
 %                   before the second-order stage                     ([])
 %     'Limiter'     slope limiter: 'default', 'multi-dimensional' or
 %                   'differentiable'                          ('default')
+%     'TransitionOrder'  1 keeps first-order upwinding for the two
+%                   equations of the transition model in the second stage (2)
+%     'TransitionRelax'  pseudo-time relaxation factor of the two equations
+%                   of the transition model; [] keeps Fluent's 0.75    ([])
 %     'Probes'      distances upstream of the leading edge, in chords
 %                   along the free-stream direction, at which the
 %                   turbulence intensity, the turbulent viscosity ratio
@@ -66,6 +70,8 @@ ip.addParameter('BlockSize', 200);
 ip.addParameter('TimeStep', []);
 ip.addParameter('StartTimeStep', []);
 ip.addParameter('Limiter', 'default');
+ip.addParameter('TransitionOrder', 2);
+ip.addParameter('TransitionRelax', []);
 ip.addParameter('Probes', []);
 ip.addParameter('Surface', '');
 ip.parse(varargin{:});
@@ -102,6 +108,10 @@ timeStep(w, o.StartTimeStep, U);
 if ~strcmpi(o.Limiter, 'default')
     w('/solve/set/slope-limiter-set %s yes no', o.Limiter);
 end
+if transition && ~isempty(o.TransitionRelax)
+    w('/solve/set/pseudo-time-method/relaxation-factors/intermit %g', o.TransitionRelax);
+    w('/solve/set/pseudo-time-method/relaxation-factors/retheta %g', o.TransitionRelax);
+end
 eqs = {'mom', 'k', 'omega', 'temperature', 'density'};
 if transition, eqs = [eqs, {'intermit', 'retheta'}]; end
 scheme(w, eqs, 0, 10);
@@ -113,6 +123,9 @@ w('/solve/iterate %d', o.FirstOrder);
 forces(w, alpha(1));
 probes(w, o, 1);
 scheme(w, eqs, 1, 12);
+if transition && o.TransitionOrder == 1
+    scheme(w, {'intermit', 'retheta'}, 0, 12);
+end
 if ~isequal(o.StartTimeStep, o.TimeStep)
     if isempty(o.TimeStep)
         w('/solve/set/pseudo-time-method/global-time-step-settings yes 1 1');     % back to automatic
