@@ -7,7 +7,7 @@ analysis throughout.
 
 The optimisation runs below were made before the curvature limits. The results with the limits and three
 random seeds, the optimiser comparison, the updated Xoptfoil2 benchmark and the sensitivity study are in
-[paper/](paper/README.md).
+[paper/](paper/README.md). The RANS checks with Fluent are in [cfd/](cfd/README.md).
 
 ## XFOIL comparison of all approaches (`xfoil/`)
 

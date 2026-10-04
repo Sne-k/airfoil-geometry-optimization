@@ -46,7 +46,7 @@ B = table();
 if isfile(fullfile(runDir, 'baselines.csv')), B = readtable(fullfile(runDir, 'baselines.csv'), 'TextType', 'char'); end
 for k = 1:numel(d)
     [~, tag] = fileparts(d(k).folder);
-    tok = regexp(tag, '^(.*)_(robustmean|robustworst|peak|alpha2|cldes|cl05|nocurv)_s(\d+)$', 'tokens', 'once');
+    tok = regexp(tag, '^(.*)_(robustmean|robustworst|robusttripworst|robusttrip|peak|alpha2|cldes|cl05|nocurv)_s(\d+)$', 'tokens', 'once');
     if isempty(tok) || ~isfile(fullfile(d(k).folder, 'run_info.json')), continue; end
     S = load(fullfile(d(k).folder, 'result.mat'));
     r = S.result;  i = r.runInfo;  o = r.options;
@@ -156,8 +156,9 @@ end
 if ~isempty(Z), writetable(vertcat(Z{:}), fullfile(outDir, 'seeds.csv')); end
 
 %% Figures
-f = figure('Color', 'w', 'Position', [60 60 1150 460], 'Visible', 'off');
 show = intersect({'peak', 'alpha2', 'cldes', 'nocurv'}, forms, 'stable');
+if isempty(show), show = forms(:).'; end               % only the robust runs so far
+f = figure('Color', 'w', 'Position', [60 60 1150 460], 'Visible', 'off');
 tiledlayout(1, numel(show), 'TileSpacing', 'compact', 'Padding', 'compact');
 for s = 1:numel(show)
     nexttile;  hold on;  box on;  grid on;
