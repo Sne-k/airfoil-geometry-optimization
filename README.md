@@ -102,7 +102,13 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
 - **Smooth shapes.** The designs in the tables above have slightly wavy surfaces. `optimize_airfoil` now
   applies curvature limits by default ([details](MATLAB/Optimization/README.md#curvature-limits)), and
   all runs were repeated with them and three random seeds: [results/paper](results/paper/README.md). On
-  NACA 2412 the limits cost about 4 % of peak lift-to-drag. A CFD check is the next step.
+  NACA 2412 the limits cost about 4 % of peak lift-to-drag.
+- **The gains depend on laminar flow.** With boundary layers tripped at 5 % chord, XFOIL rates the
+  optimised NACA 2412 designs below the original ([results/cfd](results/cfd/README.md)). A lower Ncrit
+  alone does not remove the gain of the smooth design.
+- **CFD.** The Fluent set-up is verified on NASA's NACA 0012 case: lift within 1.2 % and drag within
+  6.4 % of each of NASA's three reference codes, skin friction within 1.2 % of CFL3D
+  ([results/cfd](results/cfd/README.md)). The RANS runs of the NACA 2412 designs are in progress.
 - **Validation.** Against NACA 0012 wind-tunnel data (Ladson 1988), XFOIL's drag agrees within 3 % when
   transition is fixed at 5 % chord, but is 11–14 % too low with free transition, and its maximum lift is
   too high. Absolute L/D values from XFOIL are therefore optimistic; see
@@ -164,8 +170,10 @@ MATLAB/
                   optimize_xfoil_naca.m, optimize_naca_ga_nlp.m (report method), run_parsec_ga.m
   Morphing/       morph_airfoil.m (report morph), morph_to_design.m (morph to any .dat, with L/D per step)
   Validation/     validate_xfoil.m: XFOIL against NACA 0012 wind-tunnel data
-  Paper/          run_paper_batch.m (the 37 runs), collect_paper_results.m, benchmark and sensitivity
-  CFD/            C-grid generator, Fluent mesh export and journals (work in progress)
+  Paper/          run_paper_batch.m (the 37 runs), collect_paper_results.m, benchmark and sensitivity,
+                  run_population_study.m (the same optimisation for 30 airfoils)
+  CFD/            C-grid generator, Fluent journals and batch runner, verification on NASA's
+                  NACA 0012 case, design study, post-processing
   airfoils/       seed airfoils as .dat files (Clark Y)
   run_project.m   runs everything in order
   make_report_figures.m
@@ -176,9 +184,17 @@ results/
   morphing/       morphing envelope and nose/trailing-edge morphing
   validation/     XFOIL against wind-tunnel data (experimental data, polars, comparison)
   paper/          smooth-shape results with three random seeds (basis of the planned paper)
+  cfd/            Fluent: verification on NASA's NACA 0012 case, time-step study, design study
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method
+docs/
+  methods.md      the methods, with every setting as it is in the code
+  literature.md   references, documented search, audit of reporting practice, research gaps
+  literature/     search and audit scripts and their tables
+  paper_outline.md  working outline of the planned paper
+tools/
+  check_numbers.py  checks numbers in the documents against the result files (numbers.csv)
 LICENSE           MIT licence
 THIRD_PARTY_NOTICES.md   code and data from other sources and their terms
 ```
