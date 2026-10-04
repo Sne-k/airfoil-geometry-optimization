@@ -9,8 +9,9 @@ given.
 
 - All airfoils have unit chord, the leading edge at (0, 0) and the trailing edge at (1, 0).
 - Design condition: Reynolds number Re = 10⁶, Mach number 0, free transition with Ncrit = 9.
-- Efficiency measures: peak CL/CD (`'LDmax'`), peak CL^1.5/CD (endurance, `'endurance'`), and CL/CD at
-  one or more design lift coefficients, with weights (`'LDatCL'`).
+- Efficiency measures: peak CL/CD (`'LDmax'`), peak CL^1.5/CD (endurance, `'endurance'`), CL/CD at
+  one or more design lift coefficients, with weights (`'LDatCL'`), and CL/CD at one or more fixed angles
+  of attack (`'LDatAlpha'`).
 
 ## 2. Geometry
 
@@ -74,13 +75,21 @@ results depend on machine speed.
 - CL,max with its angle, and CD,min.
 - CM at α = 0, interpolated when α = 0 did not converge.
 - CL/CD at a design CL, at the first crossing of that CL on the polar, linearly interpolated; for
-  several design CL, the weighted mean.
+  several design CL, the weighted mean or, with `'Aggregate', 'worst'`, the lowest.
+- CL/CD at a fixed angle of attack, which must be one of the angles of the sweep. Like a peak, the value
+  counts only if a neighbouring angle reaches at least 80 % of it. If XFOIL did not converge at the
+  angle itself but at both neighbouring angles, and those agree within 30 %, their mean is used.
 
 ## 4. Optimisation problem (`Optimization/optimize_airfoil.m`, `airfoilObjective.m`)
 
 **Objective.** Maximise the chosen efficiency measure of the design, taken as the lower of two XFOIL
 analyses with 160 and 200 panel nodes. The second analysis is skipped when the first already scores
 below the fitted seed; such a design cannot become the result.
+
+**Several transition conditions** (`'Ncrit'` with more than one value). The design is analysed at
+every Ncrit, each with both panellings, and the values are combined by their mean or, with
+`'Aggregate', 'worst'`, by the lowest. The search then takes that many times longer. The polars in the
+report of a run are at Ncrit = 9 if it is among the values.
 
 **Constraints.**
 
@@ -161,6 +170,22 @@ Summary:
   the same task, and every design is re-analysed with one protocol.
 - **Optimiser comparison.** GA, particle swarm and Bayesian optimisation, global stage only, equal
   budget of 640 evaluations, three seeds each.
+
+- **Population study** (`Paper/run_population_study.m`, `Paper/collect_population_results.m`). The same
+  optimisation is run for 30 seed airfoils: 18 NACA 4- and 5-digit sections (0009, 0012, 0015, 1408,
+  1412, 2408, 2412, 2415, 2418, 4409, 4412, 4415, 4418, 6409, 6412, 23012, 23015, 23018), Clark Y, and
+  11 airfoils of other families from the UIUC Airfoil Coordinates Database (E387, S1223, SD7062,
+  SG6043, FX 63-137, NLF(1)-0416, RG-15, E423, MH 32, AH 79-100 B, GOE 398).
+  - Formulations, all with the default limits and seed 1: peak CL/CD; CL/CD at α = 2°; CL/CD at the
+    lift coefficient at which the seed has its peak CL/CD, rounded to 0.05; and peak CL/CD without
+    curvature limits. The peak formulation is repeated with seeds 2 and 3. A lift coefficient common to
+    all airfoils was not used: five of the highly cambered seeds do not reach CL = 0.5 within the angle
+    range of the search.
+  - NACA 2412 is also optimised for the mean of the peak CL/CD at Ncrit = 5 and 9 (seeds 1 to 3) and for
+    the lower of the two (seed 1).
+  - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
+    Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
+    against the seed at the same condition.
 
 ## 7. Morphing analyses (`Morphing/`)
 
