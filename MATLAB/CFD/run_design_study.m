@@ -36,11 +36,11 @@ function run_design_study(outDir, pilot)
 %   The Transition SST runs do not settle. The laminar shear layer of the
 %   separation bubble rolls up into a train of small separation cells, and
 %   this train drifts slowly during the iterations: for NACA 2412 at 4 deg
-%   the drag cycles between 0.0056 and 0.0067 with a period of about 2400
-%   iterations (results/cfd/README.md). A smaller relaxation factor or
-%   first-order upwinding for the two transition equations does not remove
-%   the cycle. The runs are therefore long enough for about two cycles, the
-%   wall data are written every 200 iterations over the last 2400, and
+%   the drag cycles between 0.0056 and 0.0067 with a period of about 2500
+%   iterations (results/cfd/README.md). The other solver settings of
+%   transition_tests.m do not remove the cycle. The runs are therefore long
+%   enough to hold a whole cycle after the start-up, the wall data are
+%   written every 200 iterations over the last 2400, and
 %   collect_cfd_results.m takes means over whole cycles and gives the range.
 %
 %   Order of the runs: the start-up check, the SST runs, the Transition SST
