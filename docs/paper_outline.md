@@ -86,7 +86,7 @@ the Transition SST runs do not all settle).
 | Item | Content | Source | State |
 |---|---|---|---|
 | Fig. 1 | Original and optimised NACA 2412 shapes, with curvature | `results/paper` | available |
-| Fig. 2 | The decomposition of the NACA 2412 gain (bar chart) | to make from `results/paper`, `results/cfd/designs/xfoil.csv` | to do |
+| Fig. 2 | The decomposition of the NACA 2412 gain (bar chart) | `results/paper/gain_decomposition.png` (`MATLAB/Paper/gain_decomposition.m`) | available; the two RANS bars follow with the design study |
 | Fig. 3 | Population: gain by condition for each formulation | `results/population/gains_by_condition.png` | after the batch |
 | Fig. 4 | Population: gain by reporting angle | `results/population/gain_by_angle.png` | after the batch |
 | Fig. 5 | Fluent verification: forces, pressure and skin friction | `results/cfd/verification` | available |
