@@ -156,7 +156,8 @@ the boundary layers tripped at 5 % chord ([designs/comparison.csv](designs/compa
 
 ### Transition SST
 
-Six of 49 runs are done, the six airfoils at 4°; the others are in progress.
+The six airfoils at 4° are discussed here. The other angles are still running; the files in `designs/`
+hold the runs that are finished.
 
 **The runs do not settle.** Lift and drag cycle, for NACA 2412 with a period of 2550 iterations
 ([designs/history.csv](designs/history.csv), [designs/cycle_naca2412_a4.csv](designs/cycle_naca2412_a4.csv)):
