@@ -8,9 +8,13 @@ function [T, H] = run_fluent_cases(meshFile, alphas, varargin)
 %   read, the run time, the transcript file, the mean and the range
 %   (maximum minus minimum) of CL and CD over the last second-order reports
 %   (a convergence measure: a converged steady solution has a range near
-%   zero), and the scaled residuals at the last iteration (NaN for
-%   equations that the model does not have). The table is also written next
-%   to the mesh (<Tag><mesh name>_forces.csv).
+%   zero), the scaled residuals at the last iteration (NaN for equations
+%   that the model does not have), and the number of force reports that the
+%   journal plans (blocks_planned). A session that ends with fewer reports
+%   than planned, for example because Fluent ran out of memory, is run once
+%   more; if it is still incomplete, a message says so and the row keeps the
+%   smaller number of reports. The table is also written next to the mesh
+%   (<Tag><mesh name>_forces.csv).
 %
 %   [T, H] = RUN_FLUENT_CASES(...) also returns the history H with one row
 %   per force report: alpha, iteration (the last iteration before the
@@ -82,7 +86,8 @@ for k = 1:numel(sessions)
         t0 = tic;
         system(cmd);
         [cd, cl, it] = readForces(transcript);
-        if isempty(cd)                    % e.g. the licence of the previous session was not free yet
+        if numel(cd) < height(plan)       % the licence was not free yet, or the session broke off
+            fprintf('%s: %d of %d force reports; the session is run once more\n', tag, numel(cd), height(plan));
             pause(120);
             system(cmd);
             [cd, cl, it] = readForces(transcript);
@@ -113,6 +118,10 @@ for k = 1:numel(sessions)
         if nProbes > 0 && m > 0
             probe = [ha.Tu_probe(end, :); ha.visc_ratio_probe(end, :); ha.speed_probe(end, :)];
         end
+        planned = sum(plan.alpha == a(i));
+        if m < planned
+            fprintf('%s alpha %g: INCOMPLETE, %d of %d force reports\n', tag, a(i), m, planned);
+        end
         if m == 0
             row = {a(i), NaN, NaN, NaN, NaN, 0, secs, [tag '.out'], NaN, NaN, NaN, NaN, 0};
         else
@@ -130,14 +139,14 @@ for k = 1:numel(sessions)
             fprintf('%s alpha %g: CL %.4f, CD %.5f; last %d reports: CL range %.1e, CD range %.1e (%d reports, %.0f s)\n', ...
                 tag, a(i), ha.CL(end), ha.CD(end), height(tail), row{11}, row{12}, m, secs);
         end
-        row = [row, num2cell(res)]; %#ok<AGROW>
+        row = [row, num2cell(res), {planned}]; %#ok<AGROW>
         if nProbes > 0, row = [row, {probe(1, :), probe(2, :), probe(3, :)}]; end %#ok<AGROW>
         rows(end+1, :) = row; %#ok<AGROW>
     end
     if n == 0, fprintf('%s: no force reports in the transcript (%.0f s)\n', tag, secs); end
 end
 vars = [{'alpha', 'CL', 'CD', 'dCL_last_block', 'dCD_last_block', 'blocks', 'seconds', 'transcript', ...
-    'CL_mean', 'CD_mean', 'CL_range', 'CD_range', 'tail'}, strcat('res_', resNames)];
+    'CL_mean', 'CD_mean', 'CL_range', 'CD_range', 'tail'}, strcat('res_', resNames), {'blocks_planned'}];
 if nProbes > 0, vars = [vars, {'Tu_probe', 'visc_ratio_probe', 'speed_probe'}]; end
 T = cell2table(rows, 'VariableNames', vars);
 H = vertcat(hist{:});

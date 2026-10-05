@@ -351,6 +351,14 @@ for i = 1:height(T)
     file = fullfile(in, T.transcript{i});
     if ~isfile(file), continue; end
     [cd, cl, it, parts] = fluentForces(file);
+    journal = strrep(file, '.out', '.jou');
+    if isfile(journal)                                 % a session that broke off is left out
+        planned = numel(regexp(fileread(journal), '(?m)^/solve/iterate '));
+        if numel(cd) < planned
+            fprintf('[INCOMPLETE] %s: %d of %d force reports; left out\n', T.transcript{i}, numel(cd), planned);
+            continue;
+        end
+    end
     h = H(strcmp(H.transcript, T.transcript{i}), :);
     n = min(height(h), numel(cd));
     if n < 3, continue; end
@@ -628,7 +636,8 @@ end
 methodLabel = struct('transition', 'Fluent, Transition SST', 'xfoil_free', 'XFOIL, free transition', ...
     'sst', 'Fluent, SST (fully turbulent)', 'xfoil_tripped', 'XFOIL, tripped at 5 % chord');
 f = figure('Color', 'w', 'Position', [80 80 900 470], 'Visible', 'off');
-bar(V);  box on;  grid on;
+bar([V; nan(1, size(V, 2))]);  box on;  grid on;      % the extra row keeps one group per airfoil for a single airfoil
+xlim([0.5, numel(order) + 0.5]);
 set(gca, 'XTick', 1:numel(order), 'XTickLabel', cellfun(@(d) label.(d), order, 'UniformOutput', false));
 ylabel('best C_L / C_D over the angles run');
 legend(cellfun(@(s) methodLabel.(s), methods, 'UniformOutput', false), 'Location', 'northoutside', 'Orientation', 'horizontal');
