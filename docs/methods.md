@@ -247,8 +247,11 @@ Results: [results/cfd](../results/cfd/README.md).
 - **Surface data.** Every run writes the pressure coefficient and the wall shear stress on the airfoil
   at its last iteration; the Transition SST runs of the design study also every 200 iterations over
   their last 2400, and their surface data are the means over these snapshots. The transition location
-  is taken where the skin friction rises fastest, and the separation location where it first becomes
-  negative (`transitionFromCf.m`).
+  is the middle of the rise of the mean skin friction from its minimum to the turbulent level behind it
+  (a moving average over seven wall faces keeps short waves in a separated region from setting it), and
+  the separation location is where the mean skin friction first becomes negative (`transitionFromCf.m`).
+  A cycle whose period is a multiple of 200 iterations is sampled at few of its phases, so the mean
+  distribution of such a run is less smooth.
 - **Verification** (`verify_naca0012.m`). NASA Turbulence Modeling Resource, 2D NACA 0012 case: SST,
   M = 0.15, Re = 6 × 10⁶. Three geometrically similar meshes (refinement ratio √2; 50,292, 100,240 and
   200,376 cells) at 0°, 10° and 15°, and the medium resolution with the far field at 20 and 100 chords.
