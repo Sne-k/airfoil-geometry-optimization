@@ -30,7 +30,11 @@ function [pol, info] = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, r
 %   Karman-Tsien correction), Ncrit (default 9, the e^n transition
 %   criterion) and Xtr ([top bottom] forced transition x/c, default [1 1] =
 %   free transition). [pol, info] = XFOILPOLAR(...) also returns the header
-%   of XFOIL's polar file (info.header), which lists the settings XFOIL used.
+%   of XFOIL's polar file (info.header), which lists the settings XFOIL used,
+%   and info.timedOut, which is true if a sweep was stopped by the time
+%   limit (see runSweep below). Such a polar can lack angles that XFOIL would
+%   have converged on a machine that is not overloaded, so a caller that
+%   needs a complete polar should run it again.
 %
 %   XFOIL is not part of this repository. Download it from
 %   https://web.mit.edu/drela/Public/web/xfoil/ and put xfoil.exe in this
@@ -77,8 +81,10 @@ fclose(fid);
 
 a = alphaRange(1):alphaRange(3):alphaRange(2);
 [~, i0] = min(abs(a));
-[dUp, info.header] = sweepWithRestarts(work, exe, Re, a(i0:end), panels, 'up', restarts, flowCmd);
-d = [dUp; sweepWithRestarts(work, exe, Re, a(i0-1:-1:1), panels, 'down', restarts, flowCmd)];
+[dUp, info.header, outUp] = sweepWithRestarts(work, exe, Re, a(i0:end), panels, 'up', restarts, flowCmd);
+[dDown, ~, outDown] = sweepWithRestarts(work, exe, Re, a(i0-1:-1:1), panels, 'down', restarts, flowCmd);
+d = [dUp; dDown];
+info.timedOut = outUp || outDown;
 
 pol = struct('alpha', [], 'CL', [], 'CD', [], 'CM', [], 'xtrTop', [], 'xtrBot', []);
 if isempty(d), return; end
@@ -120,7 +126,7 @@ end
 d = d(keep, :);
 end
 
-function [d, header] = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts, flowCmd)
+function [d, header, timedOut] = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts, flowCmd)
 % Sweeps over angles. Once a solution diverges, XFOIL starts every
 % following angle from it and usually fails on all of them. If the sweep
 % stops converging before the last angle, it is restarted from the last
@@ -128,13 +134,14 @@ function [d, header] = sweepWithRestarts(work, exe, Re, angles, panels, tag, res
 % three times). The restart must first reproduce the last converged point
 % (CL/CD within 2 %); otherwise its results are discarded, because a fresh
 % start can land on a different, spurious solution.
-[d, header] = runSweep(work, exe, Re, angles, panels, [tag '1'], flowCmd);
+[d, header, timedOut] = runSweep(work, exe, Re, angles, panels, [tag '1'], flowCmd);
 if ~restarts || isempty(d) || numel(angles) < 2, return; end
 step = angles(2) - angles(1);
 for attempt = 2:4
     j = find(abs(angles - d(end, 1)) < 1e-6, 1);   % last converged angle
     if isempty(j) || j == numel(angles), break; end
-    r = runSweep(work, exe, Re, angles(j):step/2:angles(end), panels, sprintf('%s%d', tag, attempt), flowCmd);
+    [r, ~, out] = runSweep(work, exe, Re, angles(j):step/2:angles(end), panels, sprintf('%s%d', tag, attempt), flowCmd);
+    timedOut = timedOut || out;
     ld0 = d(end, 2) / d(end, 3);
     if isempty(r) || abs(r(1, 1) - d(end, 1)) > 1e-6 || abs(r(1, 2)/r(1, 3) - ld0) > 0.02*abs(ld0)
         break;
@@ -146,11 +153,12 @@ for attempt = 2:4
 end
 end
 
-function [d, header] = runSweep(work, exe, Re, angles, panels, tag, flowCmd)
-% One XFOIL run over the given angles; returns the rows of its polar file
-% and the header lines above them
+function [d, header, timedOut] = runSweep(work, exe, Re, angles, panels, tag, flowCmd)
+% One XFOIL run over the given angles; returns the rows of its polar file,
+% the header lines above them, and whether the time limit stopped the run
 d = zeros(0, 7);
 header = '';
+timedOut = false;
 if isempty(angles), return; end
 step = 1;
 if numel(angles) > 1, step = angles(2) - angles(1); end
@@ -176,7 +184,8 @@ if isfile(guard)
 else
     cmd = sprintf('"%s"', exe);
 end
-system(sprintf('cd /d "%s" && %s < cmd_%s.txt > log_%s.txt 2>&1', work, cmd, tag, tag));
+status = system(sprintf('cd /d "%s" && %s < cmd_%s.txt > log_%s.txt 2>&1', work, cmd, tag, tag));
+timedOut = isfile(guard) && status == 124;           % exit status of timeout.exe when it had to stop XFOIL
 
 polFile = fullfile(work, ['pol_' tag '.txt']);
 if ~isfile(polFile), return; end
