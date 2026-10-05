@@ -173,10 +173,11 @@ Six of 49 runs are done, the six airfoils at 4°; the others are in progress.
   separates at x/c = 0.89 to 0.91 and stays separated to the trailing edge.
 - **What is reported.** The forces are means over whole cycles, with the lowest and the highest value in
   the cycle, and the surface data are means over the 12 snapshots of a run. The mean skin friction of
-  the upper surface is close to zero from the separation to x/c = 0.57 and then rises steeply (0.585).
+  the upper surface is close to zero from the separation to x/c = 0.57 and then rises steeply; the
+  middle of the rise, taken as the transition location, is at 0.582.
 - **Against XFOIL** (free transition, Ncrit 9, same angle): CL 0.7249 against 0.7356, CD 0.00613 against
   0.00728, CL/CD 118.2 (108.6 to 128.2 within the cycle) against 101.0. XFOIL has transition on the upper
-  surface at x/c = 0.38, Fluent near 0.59: the transition model keeps the separated layer laminar for
+  surface at x/c = 0.38, Fluent at 0.58: the transition model keeps the separated layer laminar for
   much longer, and its drag is 15.7 % lower.
 - **Inflow.** The turbulence intensity one chord ahead of the airfoil is 0.0717 %, which corresponds to
   Ncrit = 8.95 by Mack's relation.
@@ -189,12 +190,12 @@ runs are queued behind the design study.
 
 | Airfoil | Period (iterations) | CL | CD | CL/CD, mean (lowest to highest) | XFOIL CL/CD | Transition, upper surface: Fluent / XFOIL |
 |---|---:|---:|---:|---:|---:|---:|
-| NACA 2412 | 2550 | 0.7249 | 0.00613 | 118.2 (108.6 to 128.2) | 101.0 | 0.59 / 0.38 |
-| optimised, smooth | 450 | 0.9026 | 0.00612 | 147.4 (130.5 to 166.7) | 135.7 | 0.73 / 0.50 |
-| optimised, no curvature limits | 400 | 0.8530 | 0.00649 | 131.4 (103.6 to 171.0) | 135.3 \* | 0.46 / 0.50 |
+| NACA 2412 | 2550 | 0.7249 | 0.00613 | 118.2 (108.6 to 128.2) | 101.0 | 0.58 / 0.38 |
+| optimised, smooth | 450 | 0.9026 | 0.00612 | 147.4 (130.5 to 166.7) | 135.7 | 0.75 / 0.50 |
+| optimised, no curvature limits | 400 | 0.8530 | 0.00649 | 131.4 (103.6 to 171.0) | 135.3 \* | 0.68 / 0.50 |
 | PARSEC design | 1250 | 1.0037 | 0.00649 | 154.6 (145.7 to 164.7) | 182.1 | 0.77 / 0.70 |
-| optimised for free and tripped flow (mean) | 2800 | 0.8454 | 0.00622 | 135.8 (125.1 to 148.5) | 125.6 | 0.43 / 0.45 |
-| optimised for the worse of free and tripped | 1050 | 0.7235 | 0.00646 | 112.0 (102.7 to 123.3) | 91.1 | 0.62 / 0.27 |
+| optimised for free and tripped flow (mean) | 2800 | 0.8454 | 0.00622 | 135.8 (125.1 to 148.5) | 125.6 | 0.71 / 0.45 |
+| optimised for the worse of free and tripped | 1050 | 0.7235 | 0.00646 | 112.0 (102.7 to 123.3) | 91.1 | 0.59 / 0.27 |
 
 \* XFOIL did not converge at 4° for this airfoil; the value is the mean of 3.5° and 4.5°.
 
@@ -205,3 +206,6 @@ runs are queued behind the design study.
   NACA 2412 the smooth design gains 24.7 % (XFOIL 34.3 %), the design without curvature limits 11.2 %
   (33.9 %), the PARSEC design 30.8 % (80.2 %) and the design optimised for free and tripped flow 15.0 %
   (24.3 %). One angle is not the polar: the best values need the other seven angles.
+- **The transition model places transition further aft than XFOIL on every airfoil,** by 0.07 to 0.32
+  chords on the upper surface. The location is the middle of the rise of the mean skin friction
+  (`MATLAB/CFD/transitionFromCf.m`).

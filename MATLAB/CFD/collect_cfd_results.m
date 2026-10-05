@@ -420,6 +420,7 @@ for i = 1:height(T)
         u = s(strcmp(s.surface, sides{side}), :);
         [loc(i, side), loc(i, side + 2)] = transitionFromCf(u.x, u.cf);
     end
+    if ~strcmp(T.model{i}, 'transition'), loc(i, 1:2) = NaN; end     % a transition location only with the transition model
     loc(i, 5) = numel(files);
     snap{i} = struct('iteration', its, 'x', s.x, 'surface', {s.surface}, 'cf', cf);
     s.model = repmat(T.model(i), height(s), 1);
