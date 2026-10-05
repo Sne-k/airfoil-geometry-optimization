@@ -6,7 +6,7 @@ The RANS runs check the XFOIL results with an independent method. This folder ha
 |---|---|---|
 | [timestep_study](timestep_study) | which solver settings give a steady solution | done |
 | [verification](verification) | the set-up against NASA's NACA 0012 case | done |
-| [designs](designs) | the NACA 2412 designs with Transition SST and SST | XFOIL side done; Fluent runs in progress |
+| [designs](designs) | the NACA 2412 designs with Transition SST and SST | XFOIL side done; SST done for four of the six airfoils; Transition SST in progress |
 
 All files are written by `MATLAB/CFD/collect_cfd_results.m` from the outputs of `timestep_study.m`,
 `verify_naca0012.m` and `run_design_study.m`. The Fluent transcripts are not published, because they
@@ -115,6 +115,42 @@ the earlier PARSEC design); and two designs optimised for free and tripped flow 
 - **The Mach number matters little:** at M = 0 the free-transition values of the first four are 104.6,
   141.6, 145.9 and 182.5.
 
-**Fluent.** The runs are in progress: the fully turbulent SST runs first, then Transition SST. The first
-run repeats the NASA case with the start-up of the design study and gives the same forces as the
+**Fluent, start-up check.** The first run repeats the NASA case with the start-up of the design study and
+gives the same forces as the
 verification (CL 1.0757, CD 0.01284).
+
+### Fully turbulent flow (SST)
+
+Done for the first four airfoils at 0° to 8° (20 runs, all steady); the two other airfoils and 10° are
+queued. CL/CD from Fluent, and in brackets from XFOIL with the boundary layers tripped at 5 % chord
+([designs/comparison.csv](designs/comparison.csv)):
+
+| Airfoil | 0° | 2° | 4° | 6° | 8° |
+|---|---:|---:|---:|---:|---:|
+| NACA 2412 | 18.8 (18.6) | 36.8 (36.9) | 51.4 (52.6) | 61.3 (64.7) | 65.8 (72.0) |
+| optimised, smooth | 32.2 (32.0) | 47.8 (47.7) | 59.2 (59.9) | 65.3 (67.2) | 65.5 (68.0) |
+| optimised, no curvature limits | 28.1 (28.0) | 44.8 (45.0) | 57.3 (58.5) | 64.4 (67.4) | 65.3 (69.7) |
+| PARSEC design | 35.2 (28.7) | 46.9 (39.2) | 53.7 (46.7) | 55.5 (51.4) | 53.5 (53.1) |
+
+![Fluent and XFOIL polars of the designs](designs/design_polars.png)
+
+- **Without laminar flow the optimised designs have no advantage.** The best CL/CD over these angles is
+  65.8 for NACA 2412, 65.5 and 65.3 for the two CST designs (0.4 % and 0.8 % lower) and 55.5 for the
+  PARSEC design (15.6 % lower) ([designs/peaks.csv](designs/peaks.csv)). XFOIL with tripped boundary
+  layers puts the three designs 5.6 %, 3.2 % and 26.2 % below the original at the same angles. Both
+  methods put the original first and the PARSEC design far behind; Fluent sees a smaller loss for the
+  CST designs.
+- **At a fixed small angle the designs look better even here.** At 4° they reach 53.7 to 59.2 against
+  51.4, because they carry more lift at the same angle. At the best angle the difference is gone.
+- **Fluent and tripped XFOIL agree closely at low lift.** For NACA 2412 and the two CST designs
+  Fluent's lift is 0.7 to 7.1 % higher than XFOIL's, and its drag is higher by 0.2 to 1.1 % at 0° and by
+  10.7 to 11.1 % at 8°. For the PARSEC design Fluent's lift is 10.8 to 23.9 % higher than XFOIL's.
+- **The peak is not reached at 8°** for the original, whose CL/CD still rises there; this is why the
+  runs at 10° were added.
+- **Mesh.** NACA 2412 at 4° on the refined mesh (200,376 cells) gives a drag that differs by 0.03 % from
+  the mesh of the design study ([designs/mesh_check.csv](designs/mesh_check.csv)).
+
+### Transition SST
+
+The runs are in progress. They do not settle; `MATLAB/CFD/README.md` describes why and how the forces
+are averaged.

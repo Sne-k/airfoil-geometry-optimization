@@ -370,6 +370,7 @@ F.Tu_1chord_percent = T.Tu_probe_1;                  % one chord upstream of the
 F.Tu_quarter_chord_percent = T.Tu_probe_2;
 F.viscosity_ratio_1chord = T.visc_ratio_probe_1;
 F.Ncrit_equivalent = -8.43 - 2.4 * log(T.Tu_probe_1 / 100);     % Mack's relation
+F.Ncrit_equivalent(~strcmp(F.model, 'transition')) = NaN;        % has a meaning for the transition model only
 F = [F, T(:, {'res_continuity', 'res_x_velocity', 'res_y_velocity', 'res_energy', 'res_k', 'res_omega', ...
     'res_intermit', 'res_retheta'})];
 
@@ -515,6 +516,7 @@ for m = 1:size(pairs, 1)
             end
         end
         for k = 1:numel(order)
+            if isnan(best(k, 1)), continue; end           % no runs of this airfoil with this model yet
             if strcmp(src{1}, 'cfd'), method = pairs{m, 1}; else, method = ['xfoil_' pairs{m, 2}]; end
             sel = strcmp(F.model, pairs{m, 1}) & strcmp(F.design, order{k});
             P(end+1, :) = {method, order{k}, sum(sel), best(k, 1), best(k, 2), best(k, 3), best(k, 4), best(k, 5), ...
@@ -585,13 +587,15 @@ col = lines(numel(order));
 f = figure('Color', 'w', 'Position', [60 60 1250 820], 'Visible', 'off');
 tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
 qty = {'CL', 'CD', 'LD'};  ylab = {'C_L', 'C_D', 'C_L / C_D'};
+amax = max([8; F.alpha]);                            % XFOIL lines over the angles of the CFD runs
 for m = 1:size(pairs, 1)
     for q = 1:3
         nexttile;  hold on;  box on;  grid on;
+        shown = false;
         for k = 1:numel(order)
             if hasX
                 x = sortrows(X(strcmp(X.condition, pairs{m, 2}) & strcmp(X.design, order{k}) & X.alpha >= -0.01 & ...
-                    X.alpha <= 8.01, :), 'alpha');
+                    X.alpha <= amax + 0.01, :), 'alpha');
                 xv = struct('CL', x.CL, 'CD', x.CD, 'LD', x.CL ./ x.CD);
                 plot(x.alpha, xv.(qty{q}), '-', 'Color', col(k, :), 'LineWidth', 1.1, 'HandleVisibility', 'off');
             end
@@ -600,12 +604,13 @@ for m = 1:size(pairs, 1)
             lo = c.([qty{q} '_min']);  hi = c.([qty{q} '_max']);
             errorbar(c.alpha, c.(qty{q}), c.(qty{q}) - lo, hi - c.(qty{q}), 'o', 'Color', col(k, :), ...
                 'MarkerFaceColor', col(k, :), 'MarkerSize', 5, 'CapSize', 3, 'DisplayName', label.(order{k}));
+            shown = true;
         end
-        xlabel('\alpha (deg)');  ylabel(ylab{q});
+        xlabel('\alpha (deg)');  ylabel(ylab{q});  xlim([0 amax]);
         if q == 1
             if m == 1, title('Transition SST (symbols) and XFOIL, free transition (lines)');
             else, title('SST, fully turbulent (symbols) and XFOIL, tripped (lines)'); end
-            legend('Location', 'northwest');
+            if shown, legend('Location', 'northwest'); end
         end
     end
 end
@@ -620,11 +625,13 @@ for j = 1:numel(methods)
         if ~isempty(v), V(k, j) = v; end
     end
 end
-f = figure('Color', 'w', 'Position', [80 80 760 430], 'Visible', 'off');
+methodLabel = struct('transition', 'Fluent, Transition SST', 'xfoil_free', 'XFOIL, free transition', ...
+    'sst', 'Fluent, SST (fully turbulent)', 'xfoil_tripped', 'XFOIL, tripped at 5 % chord');
+f = figure('Color', 'w', 'Position', [80 80 900 470], 'Visible', 'off');
 bar(V);  box on;  grid on;
-set(gca, 'XTickLabel', cellfun(@(d) label.(d), order, 'UniformOutput', false));
+set(gca, 'XTick', 1:numel(order), 'XTickLabel', cellfun(@(d) label.(d), order, 'UniformOutput', false));
 ylabel('best C_L / C_D over the angles run');
-legend(strrep(methods, '_', ' '), 'Location', 'northwest');
+legend(cellfun(@(s) methodLabel.(s), methods, 'UniformOutput', false), 'Location', 'northoutside', 'Orientation', 'horizontal');
 exportgraphics(f, fullfile(out, 'design_gains.png'), 'Resolution', 130);
 close(f);
 
