@@ -55,8 +55,9 @@ What the table shows:
    design space, about 7 % is what fully turbulent flow allows for NACA 2412; the larger gains are gains
    in laminar flow.
 
-Two of these designs (`robusttrip_s3`, `robusttripworst_s1`) have been added to the RANS design study
-(`MATLAB/CFD/designStudyAirfoils.m`); their Fluent runs are queued.
+Two of these designs (`robusttrip_s3`, `robusttripworst_s1`) are part of the RANS design study
+([results/cfd](../cfd/README.md)). In fully turbulent Fluent runs their best CL/CD is 3.3 % and 1.5 %
+above that of NACA 2412; the runs with the transition model are in progress.
 
 ## Files
 
