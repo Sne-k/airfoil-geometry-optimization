@@ -227,12 +227,15 @@ Results: [results/cfd](../results/cfd/README.md).
   value, the mean and the range, and the scaled residuals at the last iteration.
 - **Runs that cycle** (`cycleStatistics.m`). The Transition SST runs of the design study do not settle:
   the laminar shear layer of the separation bubble rolls up into a train of small separation cells that
-  drifts during the iterations, and the forces cycle with it. For such a run the period is taken as the
-  smallest lag at which the drag history repeats (the mean square difference between the history and
-  the history one lag earlier, divided by twice the variance, has its first local minimum below 0.1;
-  the first 600 second-order iterations are left out). The forces are the means over the last whole
-  periods, and the lowest and highest values in those periods are given with them. The solver settings
-  that were tried against the cycle are in `transition_tests.m`.
+  drifts during the iterations, and the forces cycle with it. For such a run the period is a lag at
+  which the drag history repeats. The measure is the mean square difference between the history and
+  the history one lag earlier, divided by twice the variance; the first 600 second-order iterations
+  are left out. The candidates are the lags where the measure has a local minimum below 0.2, and the
+  period is the shortest candidate whose value is within 0.05 of the lowest one. The forces are the
+  means over the last whole periods, and the lowest and highest values in those periods are given with
+  them. These means differ little from the means over all second-order iterations after the first 600
+  (`results/cfd/README.md` gives the numbers). The solver settings that were tried against the cycle
+  are in `transition_tests.m`.
 - **Models.** k-ω SST (fully turbulent) with the free-stream values of the NASA case (0.052 %, viscosity
   ratio 0.009), and Transition SST (γ–Re_θ; Langtry & Menter 2009).
 - **Transition SST inflow.** XFOIL's Ncrit = 9 corresponds to Tu ≈ 0.07 % by Mack's relation
