@@ -21,22 +21,30 @@ function s = cycleStatistics(iteration, cl, cd, varargin)
 %     CL_min, CL_max, CD_min, CD_max, LD_min, LD_max
 %                lowest and highest value in the averaging window (LD: of
 %                the ratio CL/CD of the single reports)
+%     CL_all, CD_all  means over all reports after the first 'Skip'
+%                iterations (a check: for a run that cycles they should be
+%                close to CL and CD)
 %     use        logical vector: the reports in the averaging window
 %   The averaging window is the last 'Window' iterations for a steady run
 %   and for a run without a period, and the last whole periods for a run
 %   that cycles.
 %
-%   The period is the smallest lag at which the drag history repeats: the
-%   first lag (of at least 'MinPeriod' iterations) where the mismatch has a
-%   local minimum below 'Match'. The first 'Skip' iterations of the stage
-%   are left out of this search and of the periods that are averaged, and a
-%   lag is only tried if at least 16 reports remain to compare.
+%   The period is a lag at which the drag history repeats. The candidates
+%   are the lags (of at least 'MinPeriod' iterations) where the mismatch
+%   has a local minimum below 'Match'; the period is the shortest of them
+%   whose mismatch is within 'Slack' of the lowest one. A cycle whose length
+%   is not a multiple of the report spacing repeats well only after several
+%   cycles, and this rule then takes that longer lag. The first 'Skip'
+%   iterations of the stage are left out of the search and of the periods
+%   that are averaged, and a lag is only tried if at least 16 reports remain
+%   to compare.
 %
 %   Options (name, value), defaults in brackets:
 %     'Window'     iterations for the steadiness test and the fallback (1000)
 %     'Skip'       iterations at the start of the stage to leave out   (600)
 %     'MinPeriod'  shortest period that is looked for, in iterations   (400)
-%     'Match'      largest mismatch accepted for a period              (0.1)
+%     'Match'      largest mismatch accepted for a period              (0.2)
+%     'Slack'      see above                                          (0.05)
 %     'Tol'        [CL CD] ranges below which a run is steady  ([1e-4 1e-5])
 
 ip = inputParser;
@@ -44,7 +52,8 @@ ip.PartialMatching = false;
 ip.addParameter('Window', 1000);
 ip.addParameter('Skip', 600);
 ip.addParameter('MinPeriod', 400);
-ip.addParameter('Match', 0.1);
+ip.addParameter('Match', 0.2);
+ip.addParameter('Slack', 0.05);
 ip.addParameter('Tol', [1e-4 1e-5]);
 ip.parse(varargin{:});
 o = ip.Results;
@@ -56,8 +65,11 @@ if isnan(step) || step <= 0, step = 1; end
 use = iteration > iteration(end) - o.Window;
 s.steady = (max(cl(use)) - min(cl(use))) <= o.Tol(1) && (max(cd(use)) - min(cd(use))) <= o.Tol(2);
 s.period = NaN;  s.mismatch = NaN;  s.cycles = 0;
+k0 = find(iteration >= iteration(1) + o.Skip, 1);
+if isempty(k0), k0 = 1; end
+s.CL_all = mean(cl(k0:end));
+s.CD_all = mean(cd(k0:end));
 if ~s.steady
-    k0 = find(iteration >= iteration(1) + o.Skip, 1);
     x = cd(k0:end);
     m = numel(x);
     lagMin = max(2, ceil(o.MinPeriod / step));
@@ -66,15 +78,15 @@ if ~s.steady
     if lagMax > lagMin && v > 0
         lags = lagMin-1:min(lagMax+1, m-1);
         d = arrayfun(@(L) mean((x(1+L:m) - x(1:m-L)).^2) / (2 * v), lags);
-        for j = 2:numel(d)-1
-            if d(j) < o.Match && d(j) <= d(j-1) && d(j) <= d(j+1)
-                s.period = lags(j) * step;
-                s.mismatch = d(j);
-                s.cycles = floor(m / lags(j));
-                use = false(n, 1);
-                use(n - s.cycles * lags(j) + 1:n) = true;
-                break;
-            end
+        j = 2:numel(d)-1;
+        j = j(d(j) < o.Match & d(j) <= d(j-1) & d(j) <= d(j+1));     % local minima that are low enough
+        if ~isempty(j)
+            j = j(find(d(j) <= min(d(j)) + o.Slack, 1));             % the shortest of the best ones
+            s.period = lags(j) * step;
+            s.mismatch = d(j);
+            s.cycles = floor(m / lags(j));
+            use = false(n, 1);
+            use(n - s.cycles * lags(j) + 1:n) = true;
         end
     end
 end

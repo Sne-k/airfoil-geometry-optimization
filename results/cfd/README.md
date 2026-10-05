@@ -156,9 +156,9 @@ the boundary layers tripped at 5 % chord ([designs/comparison.csv](designs/compa
 
 ### Transition SST
 
-The first of 49 runs is done (NACA 2412 at 4°); the others are in progress.
+Six of 49 runs are done, the six airfoils at 4°; the others are in progress.
 
-**The runs do not settle.** Lift and drag cycle, here with a period of 2550 iterations
+**The runs do not settle.** Lift and drag cycle, for NACA 2412 with a period of 2550 iterations
 ([designs/history.csv](designs/history.csv), [designs/cycle_naca2412_a4.csv](designs/cycle_naca2412_a4.csv)):
 
 ![Force cycle and wall shear of a Transition SST run](designs/transition_cycle.png)
@@ -183,3 +183,25 @@ The first of 49 runs is done (NACA 2412 at 4°); the others are in progress.
 
 The solver settings that were tried against the cycle are in `MATLAB/CFD/transition_tests.m`; their
 runs are queued behind the design study.
+
+**The six airfoils at 4°** (means over whole cycles; [designs/forces.csv](designs/forces.csv),
+[designs/comparison.csv](designs/comparison.csv)):
+
+| Airfoil | Period (iterations) | CL | CD | CL/CD, mean (lowest to highest) | XFOIL CL/CD | Transition, upper surface: Fluent / XFOIL |
+|---|---:|---:|---:|---:|---:|---:|
+| NACA 2412 | 2550 | 0.7249 | 0.00613 | 118.2 (108.6 to 128.2) | 101.0 | 0.59 / 0.38 |
+| optimised, smooth | 450 | 0.9026 | 0.00612 | 147.4 (130.5 to 166.7) | 135.7 | 0.73 / 0.50 |
+| optimised, no curvature limits | 400 | 0.8530 | 0.00649 | 131.4 (103.6 to 171.0) | 135.3 \* | 0.46 / 0.50 |
+| PARSEC design | 1250 | 1.0037 | 0.00649 | 154.6 (145.7 to 164.7) | 182.1 | 0.77 / 0.70 |
+| optimised for free and tripped flow (mean) | 2800 | 0.8454 | 0.00622 | 135.8 (125.1 to 148.5) | 125.6 | 0.43 / 0.45 |
+| optimised for the worse of free and tripped | 1050 | 0.7235 | 0.00646 | 112.0 (102.7 to 123.3) | 91.1 | 0.62 / 0.27 |
+
+\* XFOIL did not converge at 4° for this airfoil; the value is the mean of 3.5° and 4.5°.
+
+- **All six runs cycle,** with periods of 400 to 2800 iterations. The design without curvature limits
+  swings most. The mean over whole cycles differs by at most 0.73 % in drag from the mean over all
+  second-order iterations after the first 600, so the choice of the window matters little.
+- **At this angle the transition model confirms a gain of the designs, smaller than XFOIL's.** Against
+  NACA 2412 the smooth design gains 24.7 % (XFOIL 34.3 %), the design without curvature limits 11.2 %
+  (33.9 %), the PARSEC design 30.8 % (80.2 %) and the design optimised for free and tripped flow 15.0 %
+  (24.3 %). One angle is not the polar: the best values need the other seven angles.

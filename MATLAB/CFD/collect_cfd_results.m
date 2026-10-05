@@ -344,7 +344,7 @@ M = readtable(fullfile(in, 'meshes.csv'));
 window = struct('transition', 2400, 'sst', 1000, 'check', 500);
 names = {'iterations', 'steady', 'period_iterations', 'period_mismatch', 'cycles_averaged', 'window_iterations', ...
     'window_first_iteration', 'CL', 'CD', 'LD', 'CL_min', 'CL_max', 'CD_min', 'CD_max', 'LD_min', 'LD_max', ...
-    'CD_pressure', 'CD_viscous'};
+    'CD_pressure', 'CD_viscous', 'CD_all_after_startup'};
 stat = nan(height(T), numel(names));
 Hp = cell(height(T), 1);                               % histories with the pressure and viscous parts
 for i = 1:height(T)
@@ -370,7 +370,8 @@ for i = 1:height(T)
     s = cycleStatistics(h.iteration(k), h.CL(k), h.CD(k), 'Window', window.(T.model{i}), 'Tol', [tol.CL tol.CD]);
     p = h(k, :);
     stat(i, :) = [max(h.iteration), s.steady, s.period, s.mismatch, s.cycles, s.window, s.first, s.CL, s.CD, s.LD, ...
-        s.CL_min, s.CL_max, s.CD_min, s.CD_max, s.LD_min, s.LD_max, mean(p.CD_pressure(s.use)), mean(p.CD_viscous(s.use))];
+        s.CL_min, s.CL_max, s.CD_min, s.CD_max, s.LD_min, s.LD_max, mean(p.CD_pressure(s.use)), mean(p.CD_viscous(s.use)), ...
+        s.CD_all];
 end
 F = [T(:, {'model', 'design', 'alpha'}), array2table(stat, 'VariableNames', names)];
 F.steady = F.steady == 1;
@@ -478,26 +479,28 @@ D = designStudyAirfoils();
 D = D(ismember(D.name, F.design), :);                % the airfoils that have been run, NACA 2412 first
 order = D.name';
 label = cell2struct(D.label, D.name, 1);
-pairs ={'transition', 'free'; 'sst', 'tripped'};    % CFD model and the XFOIL condition it is compared with
+pairs = {'transition', 'free'; 'sst', 'tripped'};    % CFD model and the XFOIL condition it is compared with
 hasX = isfile(fullfile(out, 'xfoil.csv'));
 if hasX, X = readtable(fullfile(out, 'xfoil.csv')); end
 
-% CFD against XFOIL at the same angles
+% CFD against XFOIL at the same angles. Where XFOIL did not converge at an angle, its values are the
+% means of the two neighbouring angles (0.5 deg away), and the row says so.
 if hasX
-    C = cell(0, 20);
+    C = cell(0, 21);
     for i = 1:height(F)
         cond = pairs{strcmp(pairs(:, 1), F.model{i}), 2};
-        x = X(strcmp(X.condition, cond) & strcmp(X.design, F.design{i}) & abs(X.alpha - F.alpha(i)) < 1e-9, :);
-        if isempty(x) || isnan(x.CL) || isnan(F.CD(i)), continue; end
+        x = xfoilAt(X, cond, F.design{i}, F.alpha(i));
+        if isempty(x) || isnan(F.CD(i)), continue; end
         C(end+1, :) = {F.model{i}, F.design{i}, F.alpha(i), F.steady(i), F.CL(i), F.CD(i), F.LD(i), F.LD_min(i), F.LD_max(i), ...
             x.CL, x.CD, x.CL / x.CD, 100 * (F.CL(i) - x.CL) / x.CL, 100 * (F.CD(i) - x.CD) / x.CD, ...
             100 * (F.LD(i) - x.CL / x.CD) / (x.CL / x.CD), F.xtr_upper(i), x.xtrTop, F.xtr_lower(i), x.xtrBot, ...
-            F.xsep_upper(i)}; %#ok<AGROW>
+            F.xsep_upper(i), x.interpolated}; %#ok<AGROW>
     end
     if ~isempty(C)
         C = cell2table(C, 'VariableNames', {'model', 'design', 'alpha', 'steady', 'CL_cfd', 'CD_cfd', 'LD_cfd', 'LD_cfd_min', ...
             'LD_cfd_max', 'CL_xfoil', 'CD_xfoil', 'LD_xfoil', 'CL_difference_percent', 'CD_difference_percent', ...
-            'LD_difference_percent', 'xtr_upper_cfd', 'xtr_upper_xfoil', 'xtr_lower_cfd', 'xtr_lower_xfoil', 'xsep_upper_cfd'});
+            'LD_difference_percent', 'xtr_upper_cfd', 'xtr_upper_xfoil', 'xtr_lower_cfd', 'xtr_lower_xfoil', 'xsep_upper_cfd', ...
+            'xfoil_interpolated'});
         writetable(C, fullfile(out, 'comparison.csv'));
     end
 end
@@ -516,9 +519,13 @@ for m = 1:size(pairs, 1)
                 [v, j] = max(f.LD);
                 best(k, :) = [v, f.alpha(j), f.CL(j), f.LD_min(j), f.LD_max(j)];
             else                                          % XFOIL at the angles of the CFD runs
-                x = X(strcmp(X.condition, pairs{m, 2}) & strcmp(X.design, order{k}) & ...
-                    ismember(round(X.alpha, 6), round(f.alpha, 6)), :);
+                x = cell(0, 1);
+                for a = f.alpha'
+                    xa = xfoilAt(X, pairs{m, 2}, order{k}, a);
+                    if ~isempty(xa), x{end+1, 1} = xa; end %#ok<AGROW>
+                end
                 if isempty(x), continue; end
+                x = vertcat(x{:});
                 [v, j] = max(x.CL ./ x.CD);
                 best(k, :) = [v, x.alpha(j), x.CL(j), NaN, NaN];
             end
@@ -740,6 +747,28 @@ close(f);
 end
 
 %% ------------------------------------------------------------------ helpers
+function x = xfoilAt(X, condition, design, alpha)
+% XFOIL values of an airfoil at one angle (one table row: alpha, CL, CD, xtrTop, xtrBot, interpolated);
+% the mean of the two neighbouring angles, 0.5 deg away, if XFOIL has no value at the angle itself;
+% empty if it has neither
+vars = {'alpha', 'CL', 'CD', 'xtrTop', 'xtrBot'};
+x = X(strcmp(X.condition, condition) & strcmp(X.design, design) & ~isnan(X.CL), vars);
+k = find(abs(x.alpha - alpha) < 1e-9, 1);
+if ~isempty(k)
+    x = x(k, :);
+    x.interpolated = false;
+    return;
+end
+lo = find(abs(x.alpha - (alpha - 0.5)) < 1e-9, 1);
+hi = find(abs(x.alpha - (alpha + 0.5)) < 1e-9, 1);
+if isempty(lo) || isempty(hi)
+    x = x([], :);
+    return;
+end
+x = array2table((x{lo, :} + x{hi, :}) / 2, 'VariableNames', vars);
+x.interpolated = true;
+end
+
 function plainTicks(ax, fmt)
 % Tick labels of the y axis as plain decimal numbers (no common power of ten)
 ax.YAxis.Exponent = 0;
