@@ -121,36 +121,65 @@ verification (CL 1.0757, CD 0.01284).
 
 ### Fully turbulent flow (SST)
 
-Done for the first four airfoils at 0° to 8° (20 runs, all steady); the two other airfoils and 10° are
-queued. CL/CD from Fluent, and in brackets from XFOIL with the boundary layers tripped at 5 % chord
-([designs/comparison.csv](designs/comparison.csv)):
+All six airfoils at 0° to 10° (36 runs, all steady). CL/CD from Fluent, and in brackets from XFOIL with
+the boundary layers tripped at 5 % chord ([designs/comparison.csv](designs/comparison.csv)):
 
-| Airfoil | 0° | 2° | 4° | 6° | 8° |
-|---|---:|---:|---:|---:|---:|
-| NACA 2412 | 18.8 (18.6) | 36.8 (36.9) | 51.4 (52.6) | 61.3 (64.7) | 65.8 (72.0) |
-| optimised, smooth | 32.2 (32.0) | 47.8 (47.7) | 59.2 (59.9) | 65.3 (67.2) | 65.5 (68.0) |
-| optimised, no curvature limits | 28.1 (28.0) | 44.8 (45.0) | 57.3 (58.5) | 64.4 (67.4) | 65.3 (69.7) |
-| PARSEC design | 35.2 (28.7) | 46.9 (39.2) | 53.7 (46.7) | 55.5 (51.4) | 53.5 (53.1) |
+| Airfoil | 0° | 2° | 4° | 6° | 8° | 10° |
+|---|---:|---:|---:|---:|---:|---:|
+| NACA 2412 | 18.8 (18.6) | 36.8 (36.9) | 51.4 (52.6) | 61.3 (64.7) | 65.8 (72.0) | 64.8 (68.5) |
+| optimised, smooth | 32.2 (32.0) | 47.8 (47.7) | 59.2 (59.9) | 65.3 (67.2) | 65.5 (68.0) | 59.1 (58.9) |
+| optimised, no curvature limits | 28.1 (28.0) | 44.8 (45.0) | 57.3 (58.5) | 64.4 (67.4) | 65.3 (69.7) | 58.5 (57.1) |
+| PARSEC design | 35.2 (28.7) | 46.9 (39.2) | 53.7 (46.7) | 55.5 (51.4) | 53.5 (53.1) | 49.0 (52.3) |
+| optimised for free and tripped flow (mean) | 29.2 (29.4) | 46.0 (46.6) | 58.7 (60.4) | 66.3 (70.1) | 67.9 (74.5) | 63.1 (65.4) |
+| optimised for the worse of free and tripped | 19.3 (19.1) | 37.3 (37.5) | 51.9 (53.3) | 61.9 (65.5) | 66.7 (73.7) | 66.4 (77.2) |
 
 ![Fluent and XFOIL polars of the designs](designs/design_polars.png)
 
-- **Without laminar flow the optimised designs have no advantage.** The best CL/CD over these angles is
-  65.8 for NACA 2412, 65.5 and 65.3 for the two CST designs (0.4 % and 0.8 % lower) and 55.5 for the
-  PARSEC design (15.6 % lower) ([designs/peaks.csv](designs/peaks.csv)). XFOIL with tripped boundary
-  layers puts the three designs 5.6 %, 3.2 % and 26.2 % below the original at the same angles. Both
-  methods put the original first and the PARSEC design far behind; Fluent sees a smaller loss for the
-  CST designs.
-- **At a fixed small angle the designs look better even here.** At 4° they reach 53.7 to 59.2 against
-  51.4, because they carry more lift at the same angle. At the best angle the difference is gone.
-- **Fluent and tripped XFOIL agree closely at low lift.** For NACA 2412 and the two CST designs
-  Fluent's lift is 0.7 to 7.1 % higher than XFOIL's, and its drag is higher by 0.2 to 1.1 % at 0° and by
-  10.7 to 11.1 % at 8°. For the PARSEC design Fluent's lift is 10.8 to 23.9 % higher than XFOIL's.
-- **The peak is not reached at 8°** for the original, whose CL/CD still rises there; this is why the
-  runs at 10° were added.
+- **Without laminar flow the designs optimised for free transition alone have no advantage.** The best
+  CL/CD over these angles is 65.8 for NACA 2412, 65.5 and 65.3 for the two CST designs (0.4 % and 0.8 %
+  lower) and 55.5 for the PARSEC design (15.6 % lower) ([designs/peaks.csv](designs/peaks.csv)). XFOIL
+  with tripped boundary layers puts these three designs 5.6 %, 3.2 % and 26.2 % below the original at
+  the same angles. Both methods put the PARSEC design far behind; Fluent sees a smaller loss for the CST
+  designs.
+- **The design optimised for free and tripped flow together is better than the original here as well:**
+  67.9, which is 3.3 % higher; XFOIL had given 3.5 %. The design optimised for the worse of the two
+  conditions reaches 66.7 (1.5 % higher; XFOIL: 7.4 %).
+- **At a fixed small angle the designs look better even here.** At 4° the five designs reach 51.9 to
+  59.2 against 51.4, mostly because they carry more lift at the same angle.
+- **Fluent and tripped XFOIL agree closely at low lift.** Leaving the PARSEC design aside, Fluent's drag
+  is higher than XFOIL's by 0.2 to 1.1 % at 0°, by 9.9 to 11.3 % at 8° and by 6.3 to 16.0 % at 10°, and
+  its lift differs by −0.4 to +9.7 %. For the PARSEC design Fluent's lift is 8.1 to 23.9 % higher.
+- **The peak lies inside the range of the runs:** every airfoil has its best value at 6° or 8° and a
+  lower one at 10°.
 - **Mesh.** NACA 2412 at 4° on the refined mesh (200,376 cells) gives a drag that differs by 0.03 % from
   the mesh of the design study ([designs/mesh_check.csv](designs/mesh_check.csv)).
 
 ### Transition SST
 
-The runs are in progress. They do not settle; `MATLAB/CFD/README.md` describes why and how the forces
-are averaged.
+The first of 49 runs is done (NACA 2412 at 4°); the others are in progress.
+
+**The runs do not settle.** Lift and drag cycle, here with a period of 2550 iterations
+([designs/history.csv](designs/history.csv), [designs/cycle_naca2412_a4.csv](designs/cycle_naca2412_a4.csv)):
+
+![Force cycle and wall shear of a Transition SST run](designs/transition_cycle.png)
+
+- **What cycles.** The drag moves between 0.00561 and 0.00673 and the lift between 0.7179 and 0.7335.
+  The friction part of the drag stays at 0.0035; the whole change is in the pressure part (0.0021 to
+  0.0031 in the wall snapshots).
+- **Why.** The laminar boundary layer of the upper surface separates near one third of the chord. In
+  every snapshot the separated region is not one bubble but a train of small separation cells, with
+  reversed flow starting between x/c = 0.32 and 0.35 and ending between 0.51 and 0.54. The train drifts
+  from one iteration to the next, and the forces follow it. On the lower surface the laminar layer
+  separates at x/c = 0.89 to 0.91 and stays separated to the trailing edge.
+- **What is reported.** The forces are means over whole cycles, with the lowest and the highest value in
+  the cycle, and the surface data are means over the 12 snapshots of a run. The mean skin friction of
+  the upper surface is close to zero from the separation to x/c = 0.57 and then rises steeply (0.585).
+- **Against XFOIL** (free transition, Ncrit 9, same angle): CL 0.7249 against 0.7356, CD 0.00613 against
+  0.00728, CL/CD 118.2 (108.6 to 128.2 within the cycle) against 101.0. XFOIL has transition on the upper
+  surface at x/c = 0.38, Fluent near 0.59: the transition model keeps the separated layer laminar for
+  much longer, and its drag is 15.7 % lower.
+- **Inflow.** The turbulence intensity one chord ahead of the airfoil is 0.0717 %, which corresponds to
+  Ncrit = 8.95 by Mack's relation.
+
+The solver settings that were tried against the cycle are in `MATLAB/CFD/transition_tests.m`; their
+runs are queued behind the design study.

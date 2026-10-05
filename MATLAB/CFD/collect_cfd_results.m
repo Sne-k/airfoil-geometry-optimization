@@ -618,7 +618,7 @@ for m = 1:size(pairs, 1)
         if q == 1
             if m == 1, title('Transition SST (symbols) and XFOIL, free transition (lines)');
             else, title('SST, fully turbulent (symbols) and XFOIL, tripped (lines)'); end
-            if shown, legend('Location', 'northwest'); end
+            if shown, legend('Location', 'southeast'); end
         end
     end
 end
