@@ -112,7 +112,11 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   30 airfoils, is still running.
 - **CFD.** The Fluent set-up is verified on NASA's NACA 0012 case: lift within 1.2 % and drag within
   6.4 % of each of NASA's three reference codes, skin friction within 1.2 % of CFL3D
-  ([results/cfd](results/cfd/README.md)). The RANS runs of the NACA 2412 designs are in progress.
+  ([results/cfd](results/cfd/README.md)).
+- **Fully turbulent RANS agrees with the tripped XFOIL result.** Without laminar flow the three designs
+  optimised for free transition alone are 0.4 to 15.6 % below NACA 2412 in best CL/CD, and the design
+  optimised for free and tripped flow together is 3.3 % above it. The runs with the transition model
+  are in progress.
 - **Validation.** Against NACA 0012 wind-tunnel data (Ladson 1988), XFOIL's drag agrees within 3 % when
   transition is fixed at 5 % chord, but is 11–14 % too low with free transition, and its maximum lift is
   too high. Absolute L/D values from XFOIL are therefore optimistic; see

@@ -6,7 +6,7 @@ The RANS runs check the XFOIL results with an independent method. This folder ha
 |---|---|---|
 | [timestep_study](timestep_study) | which solver settings give a steady solution | done |
 | [verification](verification) | the set-up against NASA's NACA 0012 case | done |
-| [designs](designs) | the NACA 2412 designs with Transition SST and SST | XFOIL side done; SST done for four of the six airfoils; Transition SST in progress |
+| [designs](designs) | the NACA 2412 designs with Transition SST and SST | XFOIL side and SST done; Transition SST in progress |
 
 All files are written by `MATLAB/CFD/collect_cfd_results.m` from the outputs of `timestep_study.m`,
 `verify_naca0012.m` and `run_design_study.m`. The Fluent transcripts are not published, because they
