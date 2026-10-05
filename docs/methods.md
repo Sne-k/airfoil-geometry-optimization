@@ -188,6 +188,12 @@ Summary:
   - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
     against the seed at the same condition.
+  - A polar of this analysis gives values only if at least 12 angles converged, on both sides of 0° or
+    at it (the rule of the optimiser). The XFOIL wrapper stops a sweep at a time limit. Normally that
+    cuts only angles beyond stall, which do not converge; on an overloaded machine it once cut a sweep
+    short and left a polar that gave a wrong peak. A polar whose sweep was stopped is therefore computed
+    again and accepted only when the same angles converge twice in a row; otherwise the table has no
+    value for it (`collect_population_results.m`).
 
 ## 7. Morphing analyses (`Morphing/`)
 
