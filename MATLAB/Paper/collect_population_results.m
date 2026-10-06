@@ -1,4 +1,4 @@
-function collect_population_results(runDir, outDir, airfoilDir)
+function collect_population_results(runDir, outDir, airfoilDir, workers, only)
 %COLLECT_POPULATION_RESULTS  Tables of the population study (run_population_study.m).
 %   COLLECT_POPULATION_RESULTS reads every finished run in runDir (default
 %   MATLAB/output/population), analyses each original airfoil and each
@@ -9,14 +9,16 @@ function collect_population_results(runDir, outDir, airfoilDir)
 %     conditions.csv  one row per run and condition: peak CL/CD, CL/CD at
 %                     2 deg and CL/CD at the design lift coefficient of the
 %                     airfoil, for the original and the design, and the
-%                     gains. Conditions (Re 1e6 and Ncrit 9 unless stated):
+%                     gains; the number of converged angles of both polars.
+%                     Conditions (Re 1e6 and Ncrit 9 unless stated):
 %                     design, Ncrit 5, Ncrit 7, Ncrit 11, Re 0.5e6, Re 2e6,
 %                     tripped (transition fixed at x/c = 0.05 on both
 %                     surfaces)
 %     summary.csv     statistics over the airfoils for every formulation
 %                     and condition: median, quartiles, minimum, maximum of
-%                     the gain in peak CL/CD, and the number of designs that
-%                     are worse than their original
+%                     the gain in peak CL/CD, the number of designs that are
+%                     worse than their original, and the number of airfoils
+%                     without a value
 %     gain_by_angle.csv  gain in CL/CD of the peak-optimised designs at
 %                     every angle of attack (design condition): the size of
 %                     a gain depends on the angle at which it is reported
@@ -27,6 +29,22 @@ function collect_population_results(runDir, outDir, airfoilDir)
 %   0.5 deg steps. A gain is taken against the original airfoil at the same
 %   condition. airfoilDir holds the UIUC coordinate files (default
 %   MATLAB/airfoils/uiuc).
+%
+%   A polar gives values only if it is usable by the rule of the optimiser:
+%   at least 12 converged angles, on both sides of 0 deg or at it. The
+%   polars must also not depend on the load of the machine. xfoilPolar stops
+%   a sweep at a time limit; normally that only cuts a tail of angles beyond
+%   stall that do not converge, but on an overloaded machine it can cut
+%   angles that would have converged. A polar whose sweep was stopped is
+%   therefore computed again and accepted when the same angles converge
+%   twice in a row (up to four runs); otherwise the row is marked
+%   (no_stable_polar) and has no values.
+%
+%   COLLECT_POPULATION_RESULTS(runDir, outDir, airfoilDir, workers) sets the
+%   number of parallel workers for the XFOIL analyses (default 4; 0 runs
+%   them one after the other). COLLECT_POPULATION_RESULTS(..., workers,
+%   only) takes only the runs whose name matches the regular expression
+%   only, for example '^NACA_2412_' (a check on part of a batch).
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
@@ -34,6 +52,8 @@ addpath(fullfile(root, 'Aerodynamics'), fullfile(root, 'Optimization'), fullfile
 if nargin < 1 || isempty(runDir), runDir = fullfile(root, 'output', 'population'); end
 if nargin < 2 || isempty(outDir), outDir = fullfile(root, '..', 'results', 'population'); end
 if nargin < 3 || isempty(airfoilDir), airfoilDir = fullfile(root, 'airfoils', 'uiuc'); end
+if nargin < 4 || isempty(workers), workers = 4; end
+if nargin < 5, only = ''; end
 if ~exist(fullfile(outDir, 'airfoils'), 'dir'), mkdir(fullfile(outDir, 'airfoils')); end
 exe = getenv('XFOIL_EXE');
 if isempty(exe), exe = fullfile(root, 'Aerodynamics', 'xfoil.exe'); end
@@ -46,6 +66,7 @@ B = table();
 if isfile(fullfile(runDir, 'baselines.csv')), B = readtable(fullfile(runDir, 'baselines.csv'), 'TextType', 'char'); end
 for k = 1:numel(d)
     [~, tag] = fileparts(d(k).folder);
+    if ~isempty(only) && isempty(regexp(tag, only, 'once')), continue; end
     tok = regexp(tag, '^(.*)_(robustmean|robustworst|robusttripworst|robusttrip|peak|alpha2|cldes|cl05|nocurv)_s(\d+)$', 'tokens', 'once');
     if isempty(tok) || ~isfile(fullfile(d(k).folder, 'run_info.json')), continue; end
     S = load(fullfile(d(k).folder, 'result.mat'));
@@ -91,12 +112,15 @@ cond = {'design', 1e6, struct()
 nG = numel(G);  nC = size(cond, 1);
 jobs = [repelem((1:nG)', nC), repmat((1:nC)', nG, 1)];
 P = cell(size(jobs, 1), 1);
-parfor j = 1:size(jobs, 1)
+cut = false(size(jobs, 1), 1);                       % no polar that is independent of the machine load
+if workers > 0 && isempty(gcp('nocreate')), parpool('Processes', workers); end
+parfor (j = 1:size(jobs, 1), workers)
     g = G(jobs(j, 1));
     if iscell(g.x), xu = g.x{1};  xl = g.x{2}; else, xu = g.x;  xl = g.x; end
-    P{j} = xfoilPolar(xu, g.yu, xl, g.yl, cond{jobs(j, 2), 2}, [-2 18 0.5], exe, [], true, cond{jobs(j, 2), 3});
+    [P{j}, cut(j)] = stablePolar(xu, g.yu, xl, g.yl, cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3});
 end
-pol = @(tag, c) P{find(strcmp({G(jobs(:, 1)).tag}', tag) & jobs(:, 2) == c, 1)};
+index = @(tag, c) find(strcmp({G(jobs(:, 1)).tag}', tag) & jobs(:, 2) == c, 1);
+pol = @(tag, c) P{index(tag, c)};
 
 %% Metrics per run and condition
 C = cell(0, 1);
@@ -107,11 +131,14 @@ for k = 1:height(R)
         pd = pol(R.tag{k}, c);
         v = [metrics(po, R.design_CL(k)); metrics(pd, R.design_CL(k))];
         g = 100 * (v(2, 1:3) ./ v(1, 1:3) - 1);
+        late = cut(index(['original:' R.airfoil{k}], c)) || cut(index(R.tag{k}, c));
         C{end+1, 1} = table(R.tag(k), R.airfoil(k), R.formulation(k), R.seed(k), cond(c, 1), v(1, 1), v(2, 1), g(1), ...
-            v(1, 2), v(2, 2), g(2), v(1, 3), v(2, 3), g(3), v(1, 4), v(2, 4), v(1, 5), v(2, 5), 'VariableNames', ...
+            v(1, 2), v(2, 2), g(2), v(1, 3), v(2, 3), g(3), v(1, 4), v(2, 4), v(1, 5), v(2, 5), numel(po.alpha), ...
+            numel(pd.alpha), late, 'VariableNames', ...
             {'tag', 'airfoil', 'formulation', 'seed', 'condition', 'LDmax_original', 'LDmax', 'LDmax_gain_percent', ...
             'LD_2deg_original', 'LD_2deg', 'LD_2deg_gain_percent', 'LD_designCL_original', 'LD_designCL', ...
-            'LD_designCL_gain_percent', 'alpha_LDmax_original', 'alpha_LDmax', 'CLmax_original', 'CLmax'}); %#ok<AGROW>
+            'LD_designCL_gain_percent', 'alpha_LDmax_original', 'alpha_LDmax', 'CLmax_original', 'CLmax', ...
+            'angles_original', 'angles', 'no_stable_polar'}); %#ok<AGROW>
     end
     if strcmp(R.formulation{k}, 'peak') && R.seed(k) == 1
         po = pol(['original:' R.airfoil{k}], 1);
@@ -134,11 +161,12 @@ S = cell(0, 1);
 for f = 1:numel(forms)
     for c = 1:nC
         g = C.LDmax_gain_percent(strcmp(C.formulation, forms{f}) & C.seed == 1 & strcmp(C.condition, cond{c, 1}));
+        missing = sum(isnan(g));
         g = g(~isnan(g));
         if isempty(g), continue; end
         S{end+1, 1} = table(forms(f), cond(c, 1), numel(g), median(g), quantile(g, 0.25), quantile(g, 0.75), min(g), max(g), ...
-            sum(g < 0), 'VariableNames', {'formulation', 'condition', 'airfoils', 'median_gain_percent', 'q25', 'q75', ...
-            'min', 'max', 'designs_worse_than_original'}); %#ok<AGROW>
+            sum(g < 0), missing, 'VariableNames', {'formulation', 'condition', 'airfoils', 'median_gain_percent', 'q25', ...
+            'q75', 'min', 'max', 'designs_worse_than_original', 'airfoils_without_value'}); %#ok<AGROW>
     end
 end
 S = vertcat(S{:});
@@ -191,10 +219,25 @@ end
 fprintf('%d runs, %d airfoils, %d XFOIL polars\n', height(R), numel(names), numel(P));
 end
 
+function [p, unstable] = stablePolar(xu, yu, xl, yl, Re, exe, flow)
+% XFOIL polar that does not depend on the load of the machine (see the header)
+unstable = false;
+[p, info] = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe, [], true, flow);
+if ~info.timedOut, return; end
+for attempt = 2:4
+    [q, info] = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe, [], true, flow);
+    same = isequal(q.alpha, p.alpha);
+    p = q;
+    if ~info.timedOut || same, return; end
+end
+unstable = true;
+p = struct('alpha', [], 'CL', [], 'CD', [], 'CM', [], 'xtrTop', [], 'xtrBot', []);
+end
+
 function v = metrics(p, designCL)
 % [peak CL/CD, CL/CD at 2 deg, CL/CD at the design CL, angle of the peak, CL max]; NaN where XFOIL gave no value
 v = nan(1, 5);
-if isempty(p.alpha), return; end
+if numel(p.alpha) < 12 || p.alpha(1) > 0 || p.alpha(end) < 0, return; end    % no usable polar
 m = efficiencyMetrics(p);
 v([1 4 5]) = [m.LDmax, m.alphaLD, m.CLmax];
 e = efficiencyValue(p, 'LDatAlpha', 2);

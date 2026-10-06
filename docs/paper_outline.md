@@ -1,6 +1,6 @@
 # Paper outline (working document)
 
-State: 4 October 2026. This outline says what the paper would claim, which result supports each claim,
+State: 5 October 2026. This outline says what the paper would claim, which result supports each claim,
 and what is still missing. Nothing here is final; the team decides the scope, the title, the authors and
 the journal.
 
@@ -16,17 +16,17 @@ Many studies optimise an airfoil with XFOIL in the loop and report a gain in lif
 at one angle of attack, from one run, with free transition at Ncrit = 9. The paper asks how much of
 such a gain is a property of the airfoil, and answers it in three steps: one design problem taken
 apart (NACA 2412), the same analysis over a population of 30 airfoils, and a check with RANS. It then
-shows a formulation whose gain survives a change of the transition condition, and proposes a short
-reporting checklist.
+shows a formulation whose gain survives the loss of laminar flow, and proposes a short reporting
+checklist.
 
 ## Contributions
 
 | # | Contribution | Evidence | State |
 |---|---|---|---|
 | 1 | One reported gain taken apart into metric, numerical artefacts, shape artefacts and transition assumption | NACA 2412: `results/paper`, `results/README.md`, `results/cfd/designs/xfoil.csv` | available |
-| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (184 runs) |
-| 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | set-up verified; design study queued |
-| 4 | A formulation that keeps its gain: optimise over several Ncrit values | first four runs of the population batch | running |
+| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (188 runs, 11 done) |
+| 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | set-up verified; design study running (six airfoils) |
+| 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412) | XFOIL part done; RANS check queued |
 | 5 | Audit of how such results are reported, and a checklist | `docs/literature.md`, sections 8–13 | first version done |
 | 6 | Open, checked tools: optimiser with curvature limits, verified Fluent set-up, provenance of every number | repository, `tools/check_numbers.py` | available |
 
@@ -48,8 +48,8 @@ the question, the approach and the contributions.
 - Geometry and CST parameterisation.
 - XFOIL analysis: two panellings, restarts, drag floor, supported maxima.
 - Optimisation: GA followed by fmincon; limits on thickness, pitching moment and curvature.
-- Formulations: peak CL/CD, CL/CD at a fixed angle, CL/CD at a fixed lift coefficient, and the mean over
-  Ncrit = 5 and 9.
+- Formulations: peak CL/CD, CL/CD at a fixed angle, CL/CD at a fixed lift coefficient, the mean or the
+  lower value over Ncrit = 5 and 9, and the mean or the lower value over free and tripped flow.
 - Population: 30 airfoils (18 NACA, Clark Y, 11 of other families).
 - Off-design analysis: Ncrit 5, 7, 11; Re 0.5 and 2 million; tripped boundary layers.
 - RANS: mesh generator, Fluent set-up, free-stream turbulence matched to Ncrit.
@@ -65,8 +65,13 @@ the question, the approach and the contributions.
 - 5.2 The population: distribution of the gains by formulation; what survives at Ncrit 5 and with
   tripped flow; spread over seeds; effect of the curvature limits; gain as a function of the angle at
   which it is reported.
-- 5.3 The robust formulation: what it costs at the design point and what it keeps off it.
-- 5.4 RANS: do the designs keep their ranking and their gain; transition locations against XFOIL.
+- 5.3 The robust formulations. First result (NACA 2412): the single-point design keeps its gain between
+  Ncrit 5 and 11 and loses it only when tripped; the mean of free and tripped flow as objective keeps
+  25 to 32 % with free transition and loses nothing when tripped; the worst case of the two gives up the
+  laminar gain for about 7 % in tripped flow.
+- 5.4 RANS: do the designs keep their ranking and their gain; transition locations against XFOIL; the
+  behaviour of the Transition SST runs (force cycle from drifting separation cells in the laminar
+  bubble, means over whole cycles).
 - 5.5 Optimiser comparison at equal budget (GA, particle swarm, Bayesian optimisation) and the
   benchmark against Xoptfoil2.
 
@@ -81,13 +86,14 @@ the Transition SST runs do not all settle).
 | Item | Content | Source | State |
 |---|---|---|---|
 | Fig. 1 | Original and optimised NACA 2412 shapes, with curvature | `results/paper` | available |
-| Fig. 2 | The decomposition of the NACA 2412 gain (bar chart) | to make from `results/paper`, `results/cfd/designs/xfoil.csv` | to do |
+| Fig. 2 | The decomposition of the NACA 2412 gain (bar chart) | `results/paper/gain_decomposition.png` (`MATLAB/Paper/gain_decomposition.m`) | available; the two RANS bars follow with the design study |
 | Fig. 3 | Population: gain by condition for each formulation | `results/population/gains_by_condition.png` | after the batch |
 | Fig. 4 | Population: gain by reporting angle | `results/population/gain_by_angle.png` | after the batch |
-| Fig. 5 | Fluent verification: forces, pressure and skin friction | `results/cfd/verification` | running |
-| Fig. 6 | RANS and XFOIL polars of the four designs | `results/cfd/designs/design_polars.png` | queued |
+| Fig. 5 | Fluent verification: forces, pressure and skin friction | `results/cfd/verification` | available |
+| Fig. 6 | RANS and XFOIL polars of the six airfoils | `results/cfd/designs/design_polars.png` | running |
+| Fig. 7 | The force cycle of a Transition SST run and the mean skin friction | `results/cfd/designs/transition_cycle.png` | running |
 | Tab. 1 | Audit of reporting practice | `docs/literature/screening_summary.csv` | available |
-| Tab. 2 | Mesh convergence and domain size | `results/cfd/verification` | running |
+| Tab. 2 | Mesh convergence and domain size | `results/cfd/verification` | available |
 | Tab. 3 | Seeds: spread of the result | `results/paper/cases.csv`, `results/population/seeds.csv` | partly |
 
 ## Open decisions (for the team)

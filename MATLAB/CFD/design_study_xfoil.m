@@ -1,6 +1,7 @@
 function T = design_study_xfoil(outDir)
 %DESIGN_STUDY_XFOIL  XFOIL polars of the airfoils of the CFD design study.
-%   T = DESIGN_STUDY_XFOIL analyses the four airfoils of run_design_study.m
+%   T = DESIGN_STUDY_XFOIL analyses the airfoils of run_design_study.m
+%   (designStudyAirfoils.m)
 %   with XFOIL at Re = 1e6 (160 panel nodes, alpha from -2 to 12 deg in
 %   0.5 deg steps) under three conditions:
 %     free      free transition, Ncrit = 9, M = 0.15 (compared with
@@ -21,11 +22,9 @@ if ~exist(outDir, 'dir'), mkdir(outDir); end
 exe = getenv('XFOIL_EXE');
 if isempty(exe), exe = fullfile(root, 'Aerodynamics', 'xfoil.exe'); end
 
-designs = {'naca2412', 'NACA 2412'
-           'smooth_s1', fullfile(repo, 'results', 'paper', 'runs', 'NACA_2412_s1', 'NACA_2412_optimized.dat')
-           'wavy_s1', fullfile(repo, 'results', 'paper', 'runs', 'NACA_2412_nocurv_s1', 'NACA_2412_optimized.dat')
-           'parsec_t12', fullfile(repo, 'results', 'xfoil', 'NACA2412_parsec_t12_optimized.dat')};
-conditions = {'free', struct('Mach', 0.15)
+D = designStudyAirfoils();
+designs = [D.name, D.source];
+conditions ={'free', struct('Mach', 0.15)
               'tripped', struct('Mach', 0.15, 'Xtr', [0.05 0.05])
               'free_M0', struct()};
 T = cell(0, 1);

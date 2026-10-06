@@ -1,0 +1,8 @@
+step,description,gain_percent,gain_low_percent,gain_high_percent,source
+1,"as reported: CL/CD at 0 deg, report airfoil (8 % thick), XFLR5",142.592592592593,NaN,NaN,"results/paper/report_values.csv"
+2,"the same metric with the XFOIL analysis used here",187.381936530624,NaN,NaN,"results/xfoil/polar_report_airfoil.csv, polar_NACA2412.csv"
+3,"same airfoil, peak CL/CD against peak CL/CD",71.0124504505396,NaN,NaN,"results/xfoil/approach_comparison.csv"
+4,"thickness and pitching moment kept, no curvature limits (3 seeds)",38.4501166646773,36.5227131300561,39.6620708096855,"results/paper/cases.csv"
+5,"smooth shape: with curvature limits (3 seeds)",33.209144742698,31.6454973332073,35.4909965237173,"results/paper/cases.csv"
+6,"smooth design at other Ncrit (5 to 11) and Re (0.5 to 2 million)",39.3964587682623,25.8612396953322,49.5186927660372,"results/paper/sensitivity.csv"
+7,"smooth design, boundary layers tripped at 5 % chord",-5.85113495804498,NaN,NaN,"results/cfd/designs/xfoil.csv"
