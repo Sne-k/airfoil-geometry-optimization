@@ -51,6 +51,10 @@ function plan = fluentJournal(file, meshFile, alpha, varargin)
 %                   airfoil, written after the last block; with several
 %                   angles the files are <name>_1.prof, <name>_2.prof, ...
 %                   (fluentSurface reads them)                         ('')
+%     'SurfaceEvery'  [every span]: further profile files
+%                   <name>_it<iteration>.prof every 'every' iterations
+%                   during the last 'span' iterations of an angle, for
+%                   averages over a solution that does not settle       ([])
 %
 %   The default free-stream turbulence is that of the NASA Turbulence
 %   Modeling Resource NACA 0012 case. The command sequences were checked
@@ -74,6 +78,7 @@ ip.addParameter('TransitionOrder', 2);
 ip.addParameter('TransitionRelax', []);
 ip.addParameter('Probes', []);
 ip.addParameter('Surface', '');
+ip.addParameter('SurfaceEvery', []);
 ip.parse(varargin{:});
 o = ip.Results;
 alpha = alpha(:).';
@@ -137,17 +142,20 @@ it = o.FirstOrder;
 rows = [alpha(1), it, 1];
 for i = 1:numel(alpha)
     if i > 1, farfield(w, o, T0, alpha(i), transition); end
+    if isscalar(alpha), name = o.Surface; else, name = sprintf('%s_%d', o.Surface, i); end
     for b = 1:o.Blocks
         w('/solve/iterate %d', o.BlockSize);
         forces(w, alpha(i));
         probes(w, o, i);
         it = it + o.BlockSize;
         rows(end+1, :) = [alpha(i), it, 2]; %#ok<AGROW>
+        left = (o.Blocks - b) * o.BlockSize;            % iterations still to run at this angle
+        if ~isempty(o.Surface) && ~isempty(o.SurfaceEvery) && left > 0 && left < o.SurfaceEvery(2) ...
+                && mod(left, o.SurfaceEvery(1)) == 0
+            surface(w, sprintf('%s_it%d', name, it));
+        end
     end
-    if ~isempty(o.Surface)
-        if isscalar(alpha), name = o.Surface; else, name = sprintf('%s_%d', o.Surface, i); end
-        w('/file/write-profile %s.prof airfoil () pressure-coefficient x-wall-shear y-wall-shear ()', name);
-    end
+    if ~isempty(o.Surface), surface(w, name); end
 end
 w('/exit yes');
 plan = array2table(rows, 'VariableNames', {'alpha', 'iteration', 'order'});
@@ -189,6 +197,11 @@ names = sprintf(names, 1:numel(o.Probes));
 for field = {'turb-intensity', 'viscosity-ratio', 'velocity-magnitude'}
     w('/report/surface-integrals/vertex-avg %s() %s no', names, field{1});
 end
+end
+
+function surface(w, name)
+% Pressure coefficient and wall shear stress on the airfoil
+w('/file/write-profile %s.prof airfoil () pressure-coefficient x-wall-shear y-wall-shear ()', name);
 end
 
 function forces(w, alpha)

@@ -7,8 +7,8 @@ lead to, and a draft reporting checklist.
 
 **How the references were checked.**
 - The bibliographic data (authors, year, title, journal, volume, pages, DOI) of every entry with a DOI
-  were looked up on Crossref, on 1 October 2026 or, for the entries added later, on 4 October 2026 with
-  `docs/literature/check_crossref.py` (result: `docs/literature/crossref_check.csv`).
+  were looked up on Crossref, on 1 October 2026 or, for the entries added later, on 4 and 5 October
+  2026 with `docs/literature/check_crossref.py` (result: `docs/literature/crossref_check.csv`).
 - Reports and books were checked on the NASA Technical Reports Server or the publisher's page.
 - The column "content" says how well the statement about the work is supported: **read** (the full
   text was read for this project), **abstract** (only the abstract or the publisher's summary), or
@@ -24,9 +24,13 @@ lead to, and a draft reporting checklist.
 | van Ingen, J. (2008). The eN method for transition prediction. Historical review of work at TU Delft. 38th Fluid Dynamics Conference, AIAA paper 2008-3830. doi:10.2514/6.2008-3830 | history of the e^N method | to check |
 | Menter, F. R. (1994). Two-equation eddy-viscosity turbulence models for engineering applications. *AIAA Journal* 32(8), 1598–1605. doi:10.2514/3.12149 | k-ω SST model (CFD) | abstract |
 | Langtry, R. B. & Menter, F. R. (2009). Correlation-based transition modeling for unstructured parallelized computational fluid dynamics codes. *AIAA Journal* 47(12), 2894–2906. doi:10.2514/1.42362 | γ–Re_θ transition model (CFD) | abstract |
+| Eça, L., Lopes, R., Toxopeus, S. L., Kerkvliet, M., Bettle, M., Rubino, G., Visonneau, M., Venkatachari, B. S., Hildebrand, N., Choudhari, M. M., Rumsey, C. L., Miozzi, M., Broglia, R., Durante, D., Costantini, M. & Poirier, J. C. (2022). Assessment of numerical and modeling errors of RANS-based transition models for low-Reynolds number 2-D flows. 34th Symposium on Naval Hydrodynamics, Washington, DC (NASA Technical Reports Server, document 20220002151) | NATO AVT-313 workshops: the γ–Re_θ and γ models in six flow solvers on common grids (flat plate, Eppler 387 at Re = 3 × 10⁵, NACA 0015 at Re = 1.8 × 10⁵). Reducing the iterative error is named as one of the challenges; in the separation bubble the grid convergence is noisy or not monotonic for some solvers; the solvers disagree more with γ–Re_θ than with γ. On the Eppler 387 at 1° the γ–Re_θ model gives the largest separation bubble and the largest difference from the experiment; at 7° the experiment and LES show no bubble while RANS shows one at mid-chord, which the authors attribute to the very low turbulence intensity at the leading edge in the RANS runs | read (the sections on iterative convergence and on the Eppler 387, and the conclusions) |
+| Eça, L., Lopes, R., Kerkvliet, M. & Toxopeus, S. L. (2022). On the simulation of low Reynolds number flows using the RANS equations with eddy-viscosity and transition models. AIAA SciTech 2022 Forum. doi:10.2514/6.2022-2569 | dependence of the predicted transition location on the domain size and on the inlet turbulence quantities; effect of a large inlet eddy viscosity on the laminar part of the flow; NLF(1)-0416 airfoil | abstract |
+| Counsil, J. N. N. & Goni Boulama, K. (2012). Validating the URANS shear stress transport γ–Re_θ model for low-Reynolds-number external aerodynamics. *International Journal for Numerical Methods in Fluids* 69(8), 1411–1432. doi:10.1002/fld.2651 | the same transition model run time-accurately (ANSYS CFX) for NACA 0012 at Re = 5 × 10⁴ to 2.5 × 10⁵, with time-averaged results, a comparison with an e^N panel method and sensitivity to grid, time step and free-stream turbulence | abstract |
+| Avirović, M., Brunelli, C., Marinus, B. G., Degroote, J. & van Beeck, J. (2026). Laminar–turbulent transition on a DU89-134/14 airfoil at low Reynolds number. *AIAA Journal* 64(8), 4456–4475. doi:10.2514/1.J065322 | force measurements and flow visualisation compared with XFOIL and Transition SST at Re = 2.5 × 10⁵ and 5 × 10⁵; both prediction methods show discrepancies in forces and in local flow features of the separation bubble | abstract |
 | Spalart, P. R. & Rumsey, C. L. (2007). Effective inflow conditions for turbulence models in aerodynamic calculations. *AIAA Journal* 45(10), 2544–2553. doi:10.2514/1.29373 | decay of free-stream turbulence between the inflow boundary and the body | abstract |
 | Thomas, J. L. & Salas, M. D. (1986). Far-field boundary conditions for transonic lifting solutions to the Euler equations. *AIAA Journal* 24(7), 1074–1080. doi:10.2514/3.9394 | point-vortex correction of the far-field boundary; named by the NASA TMR as the alternative to a 500-chord domain | abstract |
-| Celik, I. B., Ghia, U., Roache, P. J., Freitas, C. J., Coleman, H. & Raad, P. E. (2008). Procedure for estimation and reporting of uncertainty due to discretization in CFD applications. *Journal of Fluids Engineering* 130(7), 078001. doi:10.1115/1.2960953 | grid convergence index, used for the CFD mesh study | to check (formulas used from memory of the paper; Crossref lists no authors, so the author list must be confirmed on the article) |
+| Celik, I. B., Ghia, U., Roache, P. J., Freitas, C. J., Coleman, H. & Raad, P. E. (2008). Procedure for estimation and reporting of uncertainty due to discretization in CFD applications. *Journal of Fluids Engineering* 130(7), 078001. doi:10.1115/1.2960953 | grid convergence index, used for the CFD mesh study | read (the procedure as hosted by ASME with the journal's editorial policy statement on numerical accuracy; its equations 1 to 7 were compared with `gridConvergence.m`, and its advice of a refinement factor above 1.3 is met by √2). That copy names Celik, Ghia, Roache and Freitas as authors; the journal article is usually cited with Coleman and Raad as well, and Crossref lists no authors, so the author list is still **to check** on the article page |
 | Roache, P. J. (1994). Perspective: a method for uniform reporting of grid refinement studies. *Journal of Fluids Engineering* 116(3), 405–413. doi:10.1115/1.2910291 | origin of the grid convergence index | abstract |
 | Morgado, J., Vizinho, R., Silvestre, M. A. R. & Páscoa, J. C. (2016). XFOIL vs CFD performance predictions for high lift low Reynolds number airfoils. *Aerospace Science and Technology* 52, 207–214. doi:10.1016/j.ast.2016.02.031 | XFOIL compared with RANS for high-lift low-Re airfoils | abstract |
 | Adler, E. J., Christison Gray, A. & Martins, J. R. R. A. (2022). To CFD or not to CFD? Comparing RANS and viscous panel methods for airfoil shape optimization. 33rd ICAS Congress, paper ICAS2022_0905 | optimal shapes depend on the analysis tool; modelling transition gives significantly lower-drag designs; "few, if any" earlier studies compared this | abstract |
@@ -234,7 +238,11 @@ Web of Science must still be checked.
    - **With tripped boundary layers, XFOIL rates all three optimised NACA 2412 designs below the
      original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).
    - Physical drag filters removed spurious XFOIL optima such as L/D 836 and 984.
-   - CFD: verification done for SST; the design study is running.
+   - The steps are collected in one table and figure (`results/paper/gain_decomposition.csv`).
+   - CFD: verification done for SST; the design study is running. Its Transition SST runs cycle
+     instead of settling, which is itself a point for the comparison: Eça et al. (2022) name the
+     iterative error as a difficulty of these models and find that γ–Re_θ gives the largest separation
+     bubble on the Eppler 387.
 2. **Metric choice.** In the audit, 9 of the 14 in-scope works whose objective could be classified pose
    it at fixed angles of attack. At a fixed angle a cambered design gains mostly because it carries
    more lift.
@@ -255,17 +263,22 @@ Web of Science must still be checked.
      intermediate lift.
    - Its advantage can vanish off-design: +43 % at the design point, about +1 % at Ncrit = 5 or
      Re = 2 × 10⁶.
+   - For NACA 2412 the single-point design for peak CL/CD keeps its gain between Ncrit 5 and 11 and
+     loses it only with tripped boundary layers. A design optimised for the mean of free and tripped
+     flow keeps 25 to 32 % with free transition and is 2 to 4 % better than the original when tripped
+     (`results/population/README.md`). The population study will show how general this is.
 
 ## 12. Tasks that follow from the gaps
 
-| Task | Fills gap | State on 4 October 2026 |
+| Task | Fills gap | State on 5 October 2026 |
 |---|---|---|
-| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 184 runs started (`MATLAB/Paper/run_population_study.m`) |
-| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | to write (`collect_population_results.m`) |
-| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | to write (same script) |
-| Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | four runs for NACA 2412 are at the start of the population batch |
-| Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | four runs for NACA 2412 added to the population batch |
-| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | verification done; design study queued |
+| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 188 runs running (`MATLAB/Paper/run_population_study.m`); 11 done |
+| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | written (`collect_population_results.m`); applied to the finished runs in `results/population` |
+| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | written (same script); waits for the batch |
+| Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | done for NACA 2412 (four runs): the single-point design was not sensitive to Ncrit in the first place (`results/population/README.md`) |
+| Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped |
+| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | verification done; design study running, extended by two of the robust designs |
+| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | cause found (drifting separation cells in the laminar bubble); runs and tests queued (`MATLAB/CFD/transition_tests.m`) |
 | Reporting checklist | 2, 3 | draft in section 13 |
 | Optimise with RANS in the loop to see how the optimum itself moves | 1 | not feasible on the laptop; name as future work |
 | Wind-tunnel test of a design | 1 | outside this project; name as a limitation |

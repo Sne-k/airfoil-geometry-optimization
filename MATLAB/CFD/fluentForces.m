@@ -1,4 +1,4 @@
-function [cd, cl, iter] = fluentForces(transcript)
+function [cd, cl, iter, parts] = fluentForces(transcript)
 %FLUENTFORCES  Drag and lift coefficients from a Fluent transcript.
 %   [cd, cl] = FLUENTFORCES(transcript) reads the wall-forces reports that
 %   the journal from fluentJournal prints after every iteration block (drag
@@ -9,14 +9,24 @@ function [cd, cl, iter] = fluentForces(transcript)
 %   the last iteration before each report (0 if there is none). It can be
 %   smaller than planned: Fluent ends a block early when all residuals are
 %   below the convergence criteria.
+%
+%   [cd, cl, iter, parts] = FLUENTFORCES(transcript) also returns the
+%   pressure and the viscous part of both coefficients, as a table with the
+%   columns CD_pressure, CD_viscous, CL_pressure and CL_viscous.
 
 txt = fileread(transcript);
 [tok, pos] = regexp(txt, 'Forces - Direction Vector[^\n]*\n(?:[^\n]*\n)*?\s*Net\s+([^\n]*)', 'tokens', 'start');
-v = cellfun(@(t) lastNumber(t{1}), tok);
-cd = v(1:2:end).';
-cl = v(2:2:end).';
-n = min(numel(cd), numel(cl));
-cd = cd(1:n);  cl = cl(1:n);
+v = nan(numel(tok), 3);                  % coefficients: pressure, viscous, total
+for k = 1:numel(tok)
+    nums = str2double(regexp(tok{k}{1}, '[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?', 'match'));
+    m = min(3, numel(nums));
+    v(k, end-m+1:end) = nums(end-m+1:end);
+end
+n = floor(size(v, 1) / 2);
+d = v(1:2:2*n, :);
+l = v(2:2:2*n, :);
+cd = d(:, 3);
+cl = l(:, 3);
 if nargout > 2
     [itTok, itPos] = regexp(txt, '(?m)^\s*(\d+)\s+\d\.\d+e[-+]\d+\s', 'tokens', 'start');
     itNum = cellfun(@(t) str2double(t{1}), itTok);
@@ -27,9 +37,8 @@ if nargout > 2
         if ~isempty(j), iter(k) = itNum(j); end
     end
 end
+if nargout > 3
+    parts = table(d(:, 1), d(:, 2), l(:, 1), l(:, 2), 'VariableNames', ...
+        {'CD_pressure', 'CD_viscous', 'CL_pressure', 'CL_viscous'});
 end
-
-function x = lastNumber(s)
-nums = regexp(s, '[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?', 'match');
-x = str2double(nums{end});
 end

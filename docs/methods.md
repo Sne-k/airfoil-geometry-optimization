@@ -188,6 +188,12 @@ Summary:
   - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
     against the seed at the same condition.
+  - A polar of this analysis gives values only if at least 12 angles converged, on both sides of 0° or
+    at it (the rule of the optimiser). The XFOIL wrapper stops a sweep at a time limit. Normally that
+    cuts only angles beyond stall, which do not converge; on an overloaded machine it once cut a sweep
+    short and left a polar that gave a wrong peak. A polar whose sweep was stopped is therefore computed
+    again and accepted only when the same angles converge twice in a row; otherwise the table has no
+    value for it (`collect_population_results.m`).
 
 ## 7. Morphing analyses (`Morphing/`)
 
@@ -219,6 +225,17 @@ Results: [results/cfd](../results/cfd/README.md).
 - **Convergence.** The force coefficients are printed every 50 iterations. A run counts as steady if,
   over its last reports, CL varies by less than 10⁻⁴ and CD by less than 10⁻⁵. The tables give the last
   value, the mean and the range, and the scaled residuals at the last iteration.
+- **Runs that cycle** (`cycleStatistics.m`). The Transition SST runs of the design study do not settle:
+  the laminar shear layer of the separation bubble rolls up into a train of small separation cells that
+  drifts during the iterations, and the forces cycle with it. For such a run the period is a lag at
+  which the drag history repeats. The measure is the mean square difference between the history and
+  the history one lag earlier, divided by twice the variance; the first 600 second-order iterations
+  are left out. The candidates are the lags where the measure has a local minimum below 0.2, and the
+  period is the shortest candidate whose value is within 0.05 of the lowest one. The forces are the
+  means over the last whole periods, and the lowest and highest values in those periods are given with
+  them. These means differ little from the means over all second-order iterations after the first 600
+  (`results/cfd/README.md` gives the numbers). The solver settings that were tried against the cycle
+  are in `transition_tests.m`.
 - **Models.** k-ω SST (fully turbulent) with the free-stream values of the NASA case (0.052 %, viscosity
   ratio 0.009), and Transition SST (γ–Re_θ; Langtry & Menter 2009).
 - **Transition SST inflow.** XFOIL's Ncrit = 9 corresponds to Tu ≈ 0.07 % by Mack's relation
@@ -227,9 +244,14 @@ Results: [results/cfd](../results/cfd/README.md).
   the design study uses a pseudo-time step of 20 chord passages, so that the turbulence from the far
   field has reached the airfoil before the second-order stage; a repeat of the NASA case with this
   start-up gives the same forces.
-- **Surface data.** Every run writes the pressure coefficient and the wall shear stress on the airfoil.
-  The transition location is taken where the skin friction rises fastest, and the separation location
-  where it first becomes negative (`transitionFromCf.m`).
+- **Surface data.** Every run writes the pressure coefficient and the wall shear stress on the airfoil
+  at its last iteration; the Transition SST runs of the design study also every 200 iterations over
+  their last 2400, and their surface data are the means over these snapshots. The transition location
+  is the middle of the rise of the mean skin friction from its minimum to the turbulent level behind it
+  (a moving average over seven wall faces keeps short waves in a separated region from setting it), and
+  the separation location is where the mean skin friction first becomes negative (`transitionFromCf.m`).
+  A cycle whose period is a multiple of 200 iterations is sampled at few of its phases, so the mean
+  distribution of such a run is less smooth.
 - **Verification** (`verify_naca0012.m`). NASA Turbulence Modeling Resource, 2D NACA 0012 case: SST,
   M = 0.15, Re = 6 × 10⁶. Three geometrically similar meshes (refinement ratio √2; 50,292, 100,240 and
   200,376 cells) at 0°, 10° and 15°, and the medium resolution with the far field at 20 and 100 chords.
@@ -238,10 +260,13 @@ Results: [results/cfd](../results/cfd/README.md).
   - Discretisation uncertainty of the drag by the grid convergence index (Celik et al. 2008): 0.67 % on
     the fine and 1.61 % on the medium mesh at 10°.
   - A far field 20 chords away raises the drag at 10° by 9.4 %; 100 chords still by 1.5 %.
-- **Design study** (`run_design_study.m`, `design_study_xfoil.m`). NACA 2412, the smooth and the wavy
-  optimised design and the earlier PARSEC design at Re = 10⁶ and M = 0.15: Transition SST at 0°, 2°, 3°,
-  4°, 5°, 6°, 7° and 8° (4000 second-order iterations) and SST at 0°, 2°, 4°, 6° and 8° (3000). XFOIL is
-  run at the same Mach number with free transition and with transition fixed at 5 % chord.
+- **Design study** (`run_design_study.m`, `designStudyAirfoils.m`, `design_study_xfoil.m`). Six
+  airfoils at Re = 10⁶ and M = 0.15: NACA 2412; the smooth and the wavy design optimised for the peak
+  CL/CD with free transition and the earlier PARSEC design; and two designs optimised for free and
+  tripped flow together (the mean, and the lower value). SST at 0°, 2°, 4°, 6°, 8° and 10° (3000
+  second-order iterations) and Transition SST at 0°, 2°, 3°, 4°, 5°, 6°, 7° and 8° (5000). NACA 2412 at
+  4° is repeated with both models on a mesh refined by √2 in both directions. XFOIL is run at the same
+  Mach number with free transition and with transition fixed at 5 % chord.
 
 ## 9. Software and hardware
 
