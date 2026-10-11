@@ -189,11 +189,16 @@ Summary:
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
     against the seed at the same condition.
   - A polar of this analysis gives values only if at least 12 angles converged, on both sides of 0° or
-    at it (the rule of the optimiser). The XFOIL wrapper stops a sweep at a time limit. Normally that
-    cuts only angles beyond stall, which do not converge; on an overloaded machine it once cut a sweep
-    short and left a polar that gave a wrong peak. A polar whose sweep was stopped is therefore computed
-    again and accepted only when the same angles converge twice in a row; otherwise the table has no
-    value for it (`collect_population_results.m`).
+    at it (the rule of the optimiser). The rule was added after one design gave a wrong peak: XFOIL did
+    not converge at the first angle of the sweep (0°) and then at none of the following ones, because
+    every angle starts from the solution of the one before, and a peak was taken from the three negative
+    angles that were left. The wrapper now starts such a sweep afresh from the next angle (up to four
+    angles further), which recovers the polar in that case.
+  - The wrapper also stops a sweep at a time limit. Normally that cuts only angles beyond stall, which
+    do not converge. So that a busy machine cannot change a result, this analysis uses three times the
+    standard limit, and a polar whose sweep was still stopped is computed again and accepted only when
+    the same angles converge twice in a row; otherwise the table has no value for it
+    (`collect_population_results.m`).
 
 ## 7. Morphing analyses (`Morphing/`)
 

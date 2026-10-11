@@ -15,7 +15,9 @@ function [pol, info] = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, r
 %   the other end or use up its time limit. If XFOIL stops converging
 %   before the end of a part, it is restarted from the last converged angle
 %   with half the step, and the restart is kept only if it reproduces that
-%   angle (up to three times per part). Points with a drag below the
+%   angle (up to three times per part). If it does not converge at the
+%   first angle of a part, the part is started afresh from the next angle
+%   (up to four angles further), because otherwise all its angles are lost. Points with a drag below the
 %   laminar flat-plate value, or on a spurious low-drag branch outside the
 %   drag bucket, are removed.
 %
@@ -28,8 +30,13 @@ function [pol, info] = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, r
 %   pol = XFOILPOLAR(..., restarts, flow) changes the flow settings; flow is
 %   a struct with any of the fields Mach (default 0; XFOIL applies the
 %   Karman-Tsien correction), Ncrit (default 9, the e^n transition
-%   criterion) and Xtr ([top bottom] forced transition x/c, default [1 1] =
-%   free transition). [pol, info] = XFOILPOLAR(...) also returns the header
+%   criterion), Xtr ([top bottom] forced transition x/c, default [1 1] =
+%   free transition) and TimeFactor (default 1), which multiplies the time
+%   limit of every sweep (see runSweep below). An analysis whose result must
+%   not depend on how busy the machine is should use a larger factor: on a
+%   loaded machine the standard limit can end a sweep while XFOIL is still
+%   working through angles that do not converge, before it reaches angles
+%   that do. [pol, info] = XFOILPOLAR(...) also returns the header
 %   of XFOIL's polar file (info.header), which lists the settings XFOIL used,
 %   and info.timedOut, which is true if a sweep was stopped by the time
 %   limit (see runSweep below). Such a polar can lack angles that XFOIL would
@@ -68,6 +75,8 @@ end
 if ~isempty(vpar)
     flowCmd = [flowCmd sprintf('VPAR\n') vpar newline];
 end
+limitFactor = 1;
+if isfield(flow, 'TimeFactor'), limitFactor = flow.TimeFactor; end
 
 work = tempname;
 mkdir(work);
@@ -81,8 +90,8 @@ fclose(fid);
 
 a = alphaRange(1):alphaRange(3):alphaRange(2);
 [~, i0] = min(abs(a));
-[dUp, info.header, outUp] = sweepWithRestarts(work, exe, Re, a(i0:end), panels, 'up', restarts, flowCmd);
-[dDown, ~, outDown] = sweepWithRestarts(work, exe, Re, a(i0-1:-1:1), panels, 'down', restarts, flowCmd);
+[dUp, info.header, outUp] = sweepWithRestarts(work, exe, Re, a(i0:end), panels, 'up', restarts, flowCmd, limitFactor);
+[dDown, ~, outDown] = sweepWithRestarts(work, exe, Re, a(i0-1:-1:1), panels, 'down', restarts, flowCmd, limitFactor);
 d = [dUp; dDown];
 info.timedOut = outUp || outDown;
 
@@ -126,7 +135,7 @@ end
 d = d(keep, :);
 end
 
-function [d, header, timedOut] = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts, flowCmd)
+function [d, header, timedOut] = sweepWithRestarts(work, exe, Re, angles, panels, tag, restarts, flowCmd, limitFactor)
 % Sweeps over angles. Once a solution diverges, XFOIL starts every
 % following angle from it and usually fails on all of them. If the sweep
 % stops converging before the last angle, it is restarted from the last
@@ -134,13 +143,24 @@ function [d, header, timedOut] = sweepWithRestarts(work, exe, Re, angles, panels
 % three times). The restart must first reproduce the last converged point
 % (CL/CD within 2 %); otherwise its results are discarded, because a fresh
 % start can land on a different, spurious solution.
-[d, header, timedOut] = runSweep(work, exe, Re, angles, panels, [tag '1'], flowCmd);
-if ~restarts || isempty(d) || numel(angles) < 2, return; end
+[d, header, timedOut] = runSweep(work, exe, Re, angles, panels, [tag '1'], flowCmd, limitFactor);
+if ~restarts || numel(angles) < 2, return; end
+% If XFOIL does not converge at the first angle, it fails on all that follow,
+% because every angle starts from the solution of the one before. The sweep
+% is then started afresh from the next angle (up to four angles further).
+shift = 0;
+while isempty(d) && shift < 4 && numel(angles) > shift + 2
+    shift = shift + 1;
+    angles = angles(2:end);
+    [d, header, out] = runSweep(work, exe, Re, angles, panels, sprintf('%ss%d', tag, shift), flowCmd, limitFactor);
+    timedOut = timedOut || out;
+end
+if isempty(d), return; end
 step = angles(2) - angles(1);
 for attempt = 2:4
     j = find(abs(angles - d(end, 1)) < 1e-6, 1);   % last converged angle
     if isempty(j) || j == numel(angles), break; end
-    [r, ~, out] = runSweep(work, exe, Re, angles(j):step/2:angles(end), panels, sprintf('%s%d', tag, attempt), flowCmd);
+    [r, ~, out] = runSweep(work, exe, Re, angles(j):step/2:angles(end), panels, sprintf('%s%d', tag, attempt), flowCmd, limitFactor);
     timedOut = timedOut || out;
     ld0 = d(end, 2) / d(end, 3);
     if isempty(r) || abs(r(1, 1) - d(end, 1)) > 1e-6 || abs(r(1, 2)/r(1, 3) - ld0) > 0.02*abs(ld0)
@@ -153,7 +173,7 @@ for attempt = 2:4
 end
 end
 
-function [d, header, timedOut] = runSweep(work, exe, Re, angles, panels, tag, flowCmd)
+function [d, header, timedOut] = runSweep(work, exe, Re, angles, panels, tag, flowCmd, limitFactor)
 % One XFOIL run over the given angles; returns the rows of its polar file,
 % the header lines above them, and whether the time limit stopped the run
 d = zeros(0, 7);
@@ -172,7 +192,7 @@ fprintf(fid, ['PLOP\nG F\n\nLOAD af.dat\n' pane 'OPER\nVISC %g\n' flowCmd 'ITER 
     'PACC\npol_%s.txt\n\nASEQ %g %g %g\nPACC\n\nQUIT\n'], Re, tag, angles(1), angles(end), step);
 fclose(fid);
 
-% Stop XFOIL if it hangs: 60 s plus 2 s per angle (timeout.exe ships with
+% Stop XFOIL if it hangs: 60 s plus 2 s per angle, times limitFactor (timeout.exe ships with
 % Git for Windows). A converging sweep needs a few seconds, so the limit
 % only stops a hanging XFOIL. It is generous on purpose: with a tight limit
 % (formerly 10 s plus 0.5 s per angle) a machine slowed down by the
@@ -180,7 +200,7 @@ fclose(fid);
 % sweeps short, and the results depended on the speed of the machine.
 guard = 'C:\Program Files\Git\usr\bin\timeout.exe';
 if isfile(guard)
-    cmd = sprintf('"%s" %d "%s"', guard, ceil(60 + 2*numel(angles)), exe);
+    cmd = sprintf('"%s" %d "%s"', guard, ceil(limitFactor * (60 + 2*numel(angles))), exe);
 else
     cmd = sprintf('"%s"', exe);
 end
