@@ -6,10 +6,11 @@ The RANS runs check the XFOIL results with an independent method. This folder ha
 |---|---|---|
 | [timestep_study](timestep_study) | which solver settings give a steady solution | done |
 | [verification](verification) | the set-up against NASA's NACA 0012 case | done |
-| [designs](designs) | the NACA 2412 designs with Transition SST and SST | XFOIL side and SST done; Transition SST in progress |
+| [designs](designs) | the NACA 2412 designs with Transition SST and SST | done |
+| [transition_tests](transition_tests) | solver settings tried for the Transition SST runs | done |
 
 All files are written by `MATLAB/CFD/collect_cfd_results.m` from the outputs of `timestep_study.m`,
-`verify_naca0012.m` and `run_design_study.m`. The Fluent transcripts are not published, because they
+`verify_naca0012.m`, `run_design_study.m` and `transition_tests.m`. The Fluent transcripts are not published, because they
 contain local paths.
 
 ## Verification on NASA's NACA 0012 case
@@ -119,6 +120,10 @@ the earlier PARSEC design); and two designs optimised for free and tripped flow 
 gives the same forces as the
 verification (CL 1.0757, CD 0.01284).
 
+**How the batch ran.** In two parts with identical Fluent journals: the first 22 runs from commit 5120ea6,
+the others from commit b4da378 ([designs/run_info.json](designs/run_info.json)). The restart was forced by
+the machine running out of memory during one Transition SST run; that run was repeated in full.
+
 ### Fully turbulent flow (SST)
 
 All six airfoils at 0° to 10° (36 runs, all steady). CL/CD from Fluent, and in brackets from XFOIL with
@@ -156,8 +161,7 @@ the boundary layers tripped at 5 % chord ([designs/comparison.csv](designs/compa
 
 ### Transition SST
 
-The six airfoils at 4° are discussed here. The other angles are still running; the files in `designs/`
-hold the runs that are finished.
+All six airfoils at 0° to 8° (48 runs), and NACA 2412 at 4° on the refined mesh.
 
 **The runs do not settle.** Lift and drag cycle, for NACA 2412 with a period of 2550 iterations
 ([designs/history.csv](designs/history.csv), [designs/cycle_naca2412_a4.csv](designs/cycle_naca2412_a4.csv)):
@@ -183,8 +187,26 @@ hold the runs that are finished.
 - **Inflow.** The turbulence intensity one chord ahead of the airfoil is 0.0717 %, which corresponds to
   Ncrit = 8.95 by Mack's relation.
 
-The solver settings that were tried against the cycle are in `MATLAB/CFD/transition_tests.m`; their
-runs are queued behind the design study.
+**Solver settings do not remove the cycle.** `MATLAB/CFD/transition_tests.m` repeats NACA 2412 at 4° with
+five settings, 4000 second-order iterations each ([transition_tests/forces.csv](transition_tests/forces.csv)):
+
+| Setting | Mean CD | CD, lowest to highest | CL/CD |
+|---|---:|---:|---:|
+| S: the settings of the design study | 0.00617 | 0.00561 to 0.00673 | 117.5 |
+| R: relaxation factor 0.3 for the two transition equations | 0.00619 | 0.00564 to 0.00672 | 117.3 |
+| U: first-order upwinding for the two transition equations | 0.00650 | 0.00626 to 0.00672 | 111.8 |
+| O: pseudo-time step of one chord passage from the start | 0.00633 | 0.00582 to 0.00675 | 115.1 |
+| A: Fluent's automatic pseudo-time step | 0.00626 | 0.00556 to 0.00696 | 115.8 |
+
+![Force histories with five solver settings](transition_tests/transition_tests.png)
+
+None of the five runs is steady. The mean drag lies between 0.00617 and 0.00650. First-order upwinding
+gives the smallest swing and the highest mean, and its drag is still drifting at the end of the run.
+
+**The mesh does not remove it either.** On the mesh refined by √2 in both directions the same case cycles
+with a period of 3350 iterations instead of 2550. Its mean drag is 0.00620 against 0.00613 on the mesh of
+the design study (1.0 % apart), its CL/CD 117.1 against 118.2, and its transition location 0.569 against
+0.582 ([designs/mesh_check.csv](designs/mesh_check.csv)).
 
 **The six airfoils at 4°** (means over whole cycles; [designs/forces.csv](designs/forces.csv),
 [designs/comparison.csv](designs/comparison.csv)):
@@ -200,13 +222,59 @@ runs are queued behind the design study.
 
 \* XFOIL did not converge at 4° for this airfoil; the value is the mean of 3.5° and 4.5°.
 
-- **All six runs cycle,** with periods of 400 to 2800 iterations. The design without curvature limits
-  swings most. The mean over whole cycles differs by at most 0.73 % in drag from the mean over all
-  second-order iterations after the first 600, so the choice of the window matters little.
-- **At this angle the transition model confirms a gain of the designs, smaller than XFOIL's.** Against
-  NACA 2412 the smooth design gains 24.7 % (XFOIL 34.3 %), the design without curvature limits 11.2 %
-  (33.9 %), the PARSEC design 30.8 % (80.2 %) and the design optimised for free and tripped flow 15.0 %
-  (24.3 %). One angle is not the polar: the best values need the other seven angles.
-- **The transition model places transition further aft than XFOIL on every airfoil,** by 0.07 to 0.32
-  chords on the upper surface. The location is the middle of the rise of the mean skin friction
-  (`MATLAB/CFD/transitionFromCf.m`).
+The transition location is the middle of the rise of the mean skin friction
+(`MATLAB/CFD/transitionFromCf.m`).
+
+**All angles.** CL/CD as means over whole cycles, and in brackets XFOIL with free transition at Ncrit 9
+([designs/comparison.csv](designs/comparison.csv)):
+
+| Airfoil | 0° | 2° | 3° | 4° | 5° | 6° | 7° | 8° |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| NACA 2412 | 51.9 (40.5) | 96.3 (76.7) | 109.4 (91.1) | 118.2 (101.0) | 122.1 (103.3) | 121.6 (96.2) | 121.9 (89.8) | 112.1 (85.0) |
+| optimised, smooth | 79.4 (71.6) | 119.5 (110.2) | 135.6 (128.5) | 147.4 (135.7) | 153.9 (140.6) | 153.9 (140.4) | 147.3 (127.6) | 140.6 (88.1) |
+| optimised, no curvature limits | 70.0 (52.2) | 104.4 (112.5) | 118.2 (125.2) | 131.4 (135.3) | 142.0 (143.3) | 148.2 (145.7) | 146.9 (118.8) | 144.0 (86.5) |
+| PARSEC design | 77.2 (70.3) | 126.7 (106.0) | 142.7 (141.8) | 154.6 (182.1) | 167.2 (150.0) | 165.3 (99.6) | 138.1 (87.2) | 116.3 (79.2) |
+| optimised for free and tripped flow (mean) | 71.9 (58.9) | 113.7 (100.6) | 123.4 (116.1) | 135.8 (125.6) | 139.8 (133.6) | 142.4 (137.9) | 142.9 (133.9) | 138.0 (90.6) |
+| optimised for the worse of free and tripped | 52.5 (29.9) | 90.6 (64.3) | 104.4 (78.6) | 112.0 (91.1) | 114.6 (100.5) | 115.5 (103.1) | 115.0 (103.3) | 113.2 (101.7) |
+
+Two XFOIL values are means of the neighbouring angles, because XFOIL did not converge at the angle itself
+(4° for the design without curvature limits, 7° for the PARSEC design).
+
+**Best CL/CD over these angles** ([designs/peaks.csv](designs/peaks.csv)):
+
+| Airfoil | Fluent, Transition SST | Gain over NACA 2412 | XFOIL at the same angles | Gain over NACA 2412 |
+|---|---:|---:|---:|---:|
+| NACA 2412 | 122.1 at 5° | | 103.3 | |
+| optimised, smooth | 153.9 at 6° | +26.1 % | 140.6 | +36.1 % |
+| optimised, no curvature limits | 148.2 at 6° | +21.5 % | 145.7 | +41.1 % |
+| PARSEC design | 167.2 at 5° | +37.0 % | 182.1 | +76.3 % |
+| optimised for free and tripped flow (mean) | 142.9 at 7° | +17.1 % | 137.9 | +33.5 % |
+| optimised for the worse of free and tripped | 115.5 at 6° | −5.4 % | 103.3 | 0.0 % |
+
+![Best values of the designs by method](designs/design_gains.png)
+
+- **The transition model confirms the gains of the designs at about half to three quarters of the size
+  that XFOIL gives.** The three designs optimised for free transition alone gain 21.5 to 37.0 % over
+  NACA 2412, against 36.1 to 76.3 % in XFOIL.
+- **The gains are smaller because Fluent rates the original higher.** Its CL/CD for NACA 2412 is 16.9 to
+  35.8 % above XFOIL's over these angles. In all 48 runs it has transition on the upper surface further
+  aft than XFOIL, by 0.05 to 0.48 chords, so every airfoil has more laminar flow, and the original
+  profits most.
+- **The design optimised for free and tripped flow together is the only one that is ahead of NACA 2412
+  with both models:** 17.1 % with the transition model and 3.3 % in fully turbulent flow. The designs
+  optimised for free transition alone gain more with the transition model and lose 0.4 to 15.6 % in fully
+  turbulent flow.
+- **How strongly the runs cycle depends on the angle.** Only one of the 48 runs meets the criterion for a
+  steady solution. A period was found in 28, between 400 and 3350 iterations. The drag swings most at 2°
+  to 4°; at 5° to 7° it varies by less than 4 % of its mean for every airfoil except the design without
+  curvature limits, which swings by up to 58 %. The mean over whole cycles differs by at most 0.89 % in
+  drag from the mean over all second-order iterations after the first 600, so the choice of the window
+  matters little.
+
+**Which model is closer to a measurement cannot be decided here,** because there is no measurement at
+this condition. Two things speak for caution with the transition model: XFOIL's own drag with free
+transition is already below the wind-tunnel data for NACA 0012 ([validation](../validation/README.md)), and
+the transition model predicts less drag still; and Eça et al. (2022) found for the Eppler 387 airfoil
+that this model gave the largest separation bubble and the largest difference from the experiment
+(`docs/literature.md`). What the comparison does show is that the size of the gain depends strongly on
+the transition model.
