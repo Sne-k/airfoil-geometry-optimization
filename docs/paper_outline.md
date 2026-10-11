@@ -1,6 +1,6 @@
 # Paper outline (working document)
 
-State: 11 October 2026. This outline says what the paper would claim, which result supports each claim,
+State: 12 October 2026. This outline says what the paper would claim, which result supports each claim,
 and what is still missing. Nothing here is final; the team decides the scope, the title, the authors and
 the journal.
 
@@ -24,7 +24,7 @@ checklist.
 | # | Contribution | Evidence | State |
 |---|---|---|---|
 | 1 | One reported gain taken apart into metric, numerical artefacts, shape artefacts and transition assumption | NACA 2412: `results/paper`, `results/README.md`, `results/cfd/designs/xfoil.csv` | available |
-| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (188 runs, 11 done) |
+| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (188 runs, 80 done); first tables for the peak and fixed-angle formulations |
 | 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | available (six airfoils, 84 runs) |
 | 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; other airfoils not planned |
 | 5 | Audit of how such results are reported, and a checklist | `docs/literature.md`, sections 8–13 | first version done |
@@ -64,7 +64,9 @@ the question, the approach and the contributions.
   smooth against wavy designs (3.8 %); spurious optima removed by the checks; Ncrit and tripped flow.
 - 5.2 The population: distribution of the gains by formulation; what survives at Ncrit 5 and with
   tripped flow; spread over seeds; effect of the curvature limits; gain as a function of the angle at
-  which it is reported.
+  which it is reported. First result (80 of 188 runs): the designs optimised for peak CL/CD gain a
+  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when
+  tripped; the designs optimised at 2° gain 49.1 % at 2° and 24.8 % at the peak.
 - 5.3 The robust formulations. First result (NACA 2412): the single-point design keeps its gain between
   Ncrit 5 and 11 and loses it only when tripped; the mean of free and tripped flow as objective keeps
   25 to 32 % with free transition and loses nothing when tripped; the worst case of the two gives up the
@@ -86,9 +88,9 @@ the Transition SST runs do not all settle).
 | Item | Content | Source | State |
 |---|---|---|---|
 | Fig. 1 | Original and optimised NACA 2412 shapes, with curvature | `results/paper` | available |
-| Fig. 2 | The decomposition of the NACA 2412 gain (bar chart) | `results/paper/gain_decomposition.png` (`MATLAB/Paper/gain_decomposition.m`) | available; the two RANS bars follow with the design study |
-| Fig. 3 | Population: gain by condition for each formulation | `results/population/gains_by_condition.png` | after the batch |
-| Fig. 4 | Population: gain by reporting angle | `results/population/gain_by_angle.png` | after the batch |
+| Fig. 2 | The decomposition of the NACA 2412 gain (bar chart) | `results/paper/gain_decomposition.png` (`MATLAB/Paper/gain_decomposition.m`) | available |
+| Fig. 3 | Population: gain by condition for each formulation | `results/population/gains_by_condition.png` | first version (80 runs); final after the batch |
+| Fig. 4 | Population: gain by reporting angle | `results/population/gain_by_angle.png` | first version (80 runs); final after the batch |
 | Fig. 5 | Fluent verification: forces, pressure and skin friction | `results/cfd/verification` | available |
 | Fig. 6 | RANS and XFOIL polars of the six airfoils | `results/cfd/designs/design_polars.png` | available |
 | Fig. 7 | The force cycle of a Transition SST run and the mean skin friction | `results/cfd/designs/transition_cycle.png` | available |
