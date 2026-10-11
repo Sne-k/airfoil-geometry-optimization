@@ -1,7 +1,7 @@
 # CFD
 
-RANS checks of the XFOIL results with ANSYS Fluent. The set-up is verified on NASA's NACA 0012 case; the
-design study of the NACA 2412 designs is running. Results and their discussion:
+RANS checks of the XFOIL results with ANSYS Fluent. The set-up is verified on NASA's NACA 0012 case, and
+six airfoils (NACA 2412 and five designs) are compared with XFOIL. Results and their discussion:
 [results/cfd](../../results/cfd/README.md).
 
 ## Files

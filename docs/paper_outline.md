@@ -1,6 +1,6 @@
 # Paper outline (working document)
 
-State: 5 October 2026. This outline says what the paper would claim, which result supports each claim,
+State: 11 October 2026. This outline says what the paper would claim, which result supports each claim,
 and what is still missing. Nothing here is final; the team decides the scope, the title, the authors and
 the journal.
 
@@ -25,8 +25,8 @@ checklist.
 |---|---|---|---|
 | 1 | One reported gain taken apart into metric, numerical artefacts, shape artefacts and transition assumption | NACA 2412: `results/paper`, `results/README.md`, `results/cfd/designs/xfoil.csv` | available |
 | 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (188 runs, 11 done) |
-| 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | set-up verified; design study running (six airfoils) |
-| 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412) | XFOIL part done; RANS check queued |
+| 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | available (six airfoils, 84 runs) |
+| 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; other airfoils not planned |
 | 5 | Audit of how such results are reported, and a checklist | `docs/literature.md`, sections 8–13 | first version done |
 | 6 | Open, checked tools: optimiser with curvature limits, verified Fluent set-up, provenance of every number | repository, `tools/check_numbers.py` | available |
 
@@ -90,8 +90,8 @@ the Transition SST runs do not all settle).
 | Fig. 3 | Population: gain by condition for each formulation | `results/population/gains_by_condition.png` | after the batch |
 | Fig. 4 | Population: gain by reporting angle | `results/population/gain_by_angle.png` | after the batch |
 | Fig. 5 | Fluent verification: forces, pressure and skin friction | `results/cfd/verification` | available |
-| Fig. 6 | RANS and XFOIL polars of the six airfoils | `results/cfd/designs/design_polars.png` | running |
-| Fig. 7 | The force cycle of a Transition SST run and the mean skin friction | `results/cfd/designs/transition_cycle.png` | running |
+| Fig. 6 | RANS and XFOIL polars of the six airfoils | `results/cfd/designs/design_polars.png` | available |
+| Fig. 7 | The force cycle of a Transition SST run and the mean skin friction | `results/cfd/designs/transition_cycle.png` | available |
 | Tab. 1 | Audit of reporting practice | `docs/literature/screening_summary.csv` | available |
 | Tab. 2 | Mesh convergence and domain size | `results/cfd/verification` | available |
 | Tab. 3 | Seeds: spread of the result | `results/paper/cases.csv`, `results/population/seeds.csv` | partly |

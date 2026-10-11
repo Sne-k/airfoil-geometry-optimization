@@ -57,7 +57,7 @@ What the table shows:
 
 Two of these designs (`robusttrip_s3`, `robusttripworst_s1`) are part of the RANS design study
 ([results/cfd](../cfd/README.md)). In fully turbulent Fluent runs their best CL/CD is 3.3 % and 1.5 %
-above that of NACA 2412; the runs with the transition model are in progress.
+above that of NACA 2412, and with the transition model 17.1 % above and 5.4 % below.
 
 ## Files
 

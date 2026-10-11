@@ -239,10 +239,11 @@ Web of Science must still be checked.
      original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).
    - Physical drag filters removed spurious XFOIL optima such as L/D 836 and 984.
    - The steps are collected in one table and figure (`results/paper/gain_decomposition.csv`).
-   - CFD: verification done for SST; the design study is running. Its Transition SST runs cycle
-     instead of settling, which is itself a point for the comparison: Eça et al. (2022) name the
-     iterative error as a difficulty of these models and find that γ–Re_θ gives the largest separation
-     bubble on the Eppler 387.
+   - RANS (`results/cfd`): in fully turbulent flow the designs optimised for free transition alone have
+     no advantage; with a transition model they keep one, at about half to three quarters of the size
+     XFOIL gives. The Transition SST runs cycle instead of settling, which is itself a point for the
+     comparison: Eça et al. (2022) name the iterative error as a difficulty of these models and find
+     that γ–Re_θ gives the largest separation bubble on the Eppler 387.
 2. **Metric choice.** In the audit, 9 of the 14 in-scope works whose objective could be classified pose
    it at fixed angles of attack. At a fixed angle a cambered design gains mostly because it carries
    more lift.
@@ -277,8 +278,8 @@ Web of Science must still be checked.
 | Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | written (same script); waits for the batch |
 | Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | done for NACA 2412 (four runs): the single-point design was not sensitive to Ncrit in the first place (`results/population/README.md`) |
 | Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped |
-| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | verification done; design study running, extended by two of the robust designs |
-| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | cause found (drifting separation cells in the laminar bubble); runs and tests queued (`MATLAB/CFD/transition_tests.m`) |
+| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | done for six airfoils (`results/cfd/README.md`) |
+| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | done: cause, five solver settings, refined mesh, means over whole cycles (`results/cfd/README.md`) |
 | Reporting checklist | 2, 3 | draft in section 13 |
 | Optimise with RANS in the loop to see how the optimum itself moves | 1 | not feasible on the laptop; name as future work |
 | Wind-tunnel test of a design | 1 | outside this project; name as a limitation |
