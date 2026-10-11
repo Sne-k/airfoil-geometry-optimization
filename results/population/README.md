@@ -21,6 +21,10 @@ both surfaces (`conditions.csv`). A gain is always taken against the original ai
 condition. A polar gives a value only if at least 12 angles converged around 0°; where it does not, the
 tables have no value and `summary.csv` counts it.
 
+Two of the 30 `peak` runs (NACA 2418 and NACA 4409) ran while the computer was short of memory, so XFOIL
+sweeps of their search may have been stopped by the time limit. Their designs are analysed like all
+others and are in the tables. Both runs are repeated before the final tables.
+
 ## What survives away from the design condition (30 airfoils)
 
 Gain in peak CL/CD in per cent, over the 30 airfoils (`summary.csv`).
