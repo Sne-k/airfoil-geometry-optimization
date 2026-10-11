@@ -266,6 +266,11 @@ results/paper/README.md,| Smooth shape: with curvature limits (three seeds) | +3
 results/paper/README.md,| The smooth design at other Ncrit (5 to 11) and Reynolds numbers (0.5 to 2 million) | +25.9 to +49.5 % |,25.9,results/paper/gain_decomposition.csv,one(step=6)['gain_low_percent']
 results/paper/README.md,| The smooth design at other Ncrit (5 to 11) and Reynolds numbers (0.5 to 2 million) | +25.9 to +49.5 % |,49.5,results/paper/gain_decomposition.csv,one(step=6)['gain_high_percent']
 results/paper/README.md,| The smooth design with boundary layers tripped at 5 % chord | −5.9 % |,−5.9,results/paper/gain_decomposition.csv,one(step=7)['gain_percent']
+results/paper/README.md,| The smooth design in RANS with a transition model (Transition SST) | +26.1 % (24.7 to 27.5) |,26.1,results/paper/gain_decomposition.csv,"one(description='smooth design, RANS with Transition SST')['gain_percent']"
+results/paper/README.md,| The smooth design in RANS with a transition model (Transition SST) | +26.1 % (24.7 to 27.5) |,24.7,results/paper/gain_decomposition.csv,"one(description='smooth design, RANS with Transition SST')['gain_low_percent']"
+results/paper/README.md,| The smooth design in RANS with a transition model (Transition SST) | +26.1 % (24.7 to 27.5) |,27.5,results/paper/gain_decomposition.csv,"one(description='smooth design, RANS with Transition SST')['gain_high_percent']"
+results/paper/README.md,| The smooth design in fully turbulent RANS (SST) | −0.4 % |,−0.4,results/paper/gain_decomposition.csv,"one(description='smooth design, RANS fully turbulent (SST)')['gain_percent']"
+results/paper/README.md,"  a gain of 26.1 %, about three quarters of what XFOIL gives at the same angles; in fully turbulent flow",26.1,results/paper/gain_decomposition.csv,"one(description='smooth design, RANS with Transition SST')['gain_percent']"
 results/paper/README.md,  142.6 % and 187.4 % for the same pair of airfoils.,142.6,results/paper/gain_decomposition.csv,one(step=1)['gain_percent']
 results/paper/README.md,  142.6 % and 187.4 % for the same pair of airfoils.,187.4,results/paper/gain_decomposition.csv,one(step=2)['gain_percent']
 results/paper/README.md,"- **Peak against peak, the same airfoil gains 71.0 %,** and it is a third thinner than NACA 2412.",71.0,results/paper/gain_decomposition.csv,one(step=3)['gain_percent']
