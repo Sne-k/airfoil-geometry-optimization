@@ -267,15 +267,19 @@ Web of Science must still be checked.
    - For NACA 2412 the single-point design for peak CL/CD keeps its gain between Ncrit 5 and 11 and
      loses it only with tripped boundary layers. A design optimised for the mean of free and tripped
      flow keeps 25 to 32 % with free transition and is 2 to 4 % better than the original when tripped
-     (`results/population/README.md`). The population study will show how general this is.
+     (`results/population/README.md`).
+   - Over 30 airfoils the picture is the same (population study, 80 of 188 runs). The designs optimised
+     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other
+     Ncrit and Reynolds numbers. With tripped boundary layers the median is −1.6 %, and 19 of the 30
+     designs are worse than their original.
 
 ## 12. Tasks that follow from the gaps
 
-| Task | Fills gap | State on 5 October 2026 |
+| Task | Fills gap | State on 12 October 2026 |
 |---|---|---|
-| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 188 runs running (`MATLAB/Paper/run_population_study.m`); 11 done |
-| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | written (`collect_population_results.m`); applied to the finished runs in `results/population` |
-| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | written (same script); waits for the batch |
+| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 188 runs running (`MATLAB/Paper/run_population_study.m`); 80 done: peak and fixed angle for all 30 airfoils, fixed lift for 12 |
+| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | done for the 80 finished runs (`results/population/README.md`): the gain of the peak designs survives other Ncrit and Reynolds numbers and is gone with tripped boundary layers (median −1.6 %) |
+| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | done for the peak and fixed-angle designs: a design optimised at 2° gains a median of 49.1 % at 2° and 24.8 % in peak CL/CD; the fixed-lift designs wait for the batch |
 | Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | done for NACA 2412 (four runs): the single-point design was not sensitive to Ncrit in the first place (`results/population/README.md`) |
 | Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped |
 | RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | done for six airfoils (`results/cfd/README.md`) |

@@ -106,10 +106,13 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
 - **The gains depend on laminar flow.** With boundary layers tripped at 5 % chord, XFOIL rates the
   optimised NACA 2412 designs below the original ([results/cfd](results/cfd/README.md)). A lower Ncrit
   alone does not remove the gain of the smooth design.
+- **The same holds over 30 airfoils.** Optimised for peak CL/CD, 30 baseline airfoils gain a median of
+  38.2 %. The median stays between 29.3 and 37.8 % at other Ncrit and Reynolds numbers and is −1.6 %
+  with tripped boundary layers, where 19 of the 30 designs are worse than their original
+  ([results/population](results/population/README.md); 80 of 188 runs, the batch is still running).
 - **A formulation that keeps the gain.** Optimising the mean of the peak CL/CD with free transition and
   with tripped boundary layers keeps a gain of 25 to 32 % with free transition and loses nothing when
-  tripped ([results/population](results/population/README.md)). That study, the same optimisation for
-  30 airfoils, is still running.
+  tripped (NACA 2412; [results/population](results/population/README.md)).
 - **CFD.** The Fluent set-up is verified on NASA's NACA 0012 case: lift within 1.2 % and drag within
   6.4 % of each of NASA's three reference codes, skin friction within 1.2 % of CFL3D
   ([results/cfd](results/cfd/README.md)).
