@@ -220,8 +220,8 @@ XFOIL's sensitivity to small shape details (for example a tiny "spoiler" at the 
 
 Part of the advantage of our designs may therefore come from shape details that XFOIL rewards more
 than a real flow would. `optimize_airfoil` now applies curvature limits of this kind by default (see
-[MATLAB/Optimization](../MATLAB/Optimization/README.md#curvature-limits)), and the runs are being
-repeated with them; checking the designs with CFD (`MATLAB/CFD`) is in progress.
+[MATLAB/Optimization](../MATLAB/Optimization/README.md#curvature-limits)), and the runs were
+repeated with them ([paper/](paper/README.md)); the designs are checked with CFD in [cfd/](cfd/README.md).
 
 ## Morphing (`morphing/`)
 

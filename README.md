@@ -115,8 +115,11 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   ([results/cfd](results/cfd/README.md)).
 - **Fully turbulent RANS agrees with the tripped XFOIL result.** Without laminar flow the three designs
   optimised for free transition alone are 0.4 to 15.6 % below NACA 2412 in best CL/CD, and the design
-  optimised for free and tripped flow together is 3.3 % above it. The runs with the transition model
-  are in progress.
+  optimised for free and tripped flow together is 3.3 % above it.
+- **RANS with a transition model confirms the gains at a smaller size.** The three designs optimised for
+  free transition gain 21.5 to 37.0 % over NACA 2412 in best CL/CD, against 36.1 to 76.3 % in XFOIL at
+  the same angles; the design optimised for free and tripped flow gains 17.1 %. These runs do not settle
+  but cycle, and are reported as means over whole cycles ([results/cfd](results/cfd/README.md)).
 - **Validation.** Against NACA 0012 wind-tunnel data (Ladson 1988), XFOIL's drag agrees within 3 % when
   transition is fixed at 5 % chord, but is 11–14 % too low with free transition, and its maximum lift is
   too high. Absolute L/D values from XFOIL are therefore optimistic; see
