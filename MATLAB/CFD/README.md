@@ -21,6 +21,8 @@ six airfoils (NACA 2412 and five designs) are compared with XFOIL. Results and t
 | `designStudyAirfoils.m` | The six airfoils of the design study: NACA 2412 and five optimised designs |
 | `run_design_study.m` | These airfoils with SST and Transition SST, and NACA 2412 on a refined mesh |
 | `transition_tests.m` | NACA 2412 at 4° with Transition SST under five solver settings |
+| `fluentTransientJournal.m` | Batch journal that continues a saved case time-accurately: bounded second-order implicit time stepping with the coupled solver, forces printed after every time step |
+| `run_time_accurate.m` | NACA 2412 at 4° with Transition SST in physical time, started from the pseudo-time solution of the design study |
 | `design_study_xfoil.m` | XFOIL polars of the same designs at the same condition |
 | `collect_cfd_results.m` | Turns the outputs into the tables and figures of `results/cfd` |
 | `writeRunInfo.m` | Records the code version, software and options of a batch |
@@ -72,6 +74,7 @@ timestep_study      % 13 runs, about 4 hours
 verify_naca0012     % 11 runs, about 4 hours
 run_design_study    % 87 runs, about 50 hours
 transition_tests    % 5 runs, about 3 hours
+run_time_accurate   % 1 run of 8000 time steps, about 10 hours
 design_study_xfoil  % XFOIL side of the comparison (needs XFOIL)
 collect_cfd_results % tables and figures in results/cfd
 ```
