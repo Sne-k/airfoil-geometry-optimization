@@ -1,6 +1,6 @@
 # CFD results (ANSYS Fluent)
 
-The RANS runs check the XFOIL results with an independent method. This folder has three parts:
+The RANS runs check the XFOIL results with an independent method. This folder has five parts:
 
 | Folder | Contents | State |
 |---|---|---|
@@ -8,10 +8,11 @@ The RANS runs check the XFOIL results with an independent method. This folder ha
 | [verification](verification) | the set-up against NASA's NACA 0012 case | done |
 | [designs](designs) | the NACA 2412 designs with Transition SST and SST | done |
 | [transition_tests](transition_tests) | solver settings tried for the Transition SST runs | done |
+| [time_accurate](time_accurate) | NACA 2412 at 4° with the transition model in physical time | done |
 
 All files are written by `MATLAB/CFD/collect_cfd_results.m` from the outputs of `timestep_study.m`,
-`verify_naca0012.m`, `run_design_study.m` and `transition_tests.m`. The Fluent transcripts are not published, because they
-contain local paths.
+`verify_naca0012.m`, `run_design_study.m`, `transition_tests.m` and `run_time_accurate.m`. The Fluent transcripts are not
+published, because they contain local paths.
 
 ## Verification on NASA's NACA 0012 case
 
@@ -207,6 +208,44 @@ gives the smallest swing and the highest mean, and its drag is still drifting at
 with a period of 3350 iterations instead of 2550. Its mean drag is 0.00620 against 0.00613 on the mesh of
 the design study (1.0 % apart), its CL/CD 117.1 against 118.2, and its transition location 0.569 against
 0.582 ([designs/mesh_check.csv](designs/mesh_check.csv)).
+
+**In physical time the same case gives the same mean forces.** `MATLAB/CFD/run_time_accurate.m` repeats
+the first 2400 iterations of the run above and continues from there time-accurately: 8000 time steps of
+0.001 chord passages (8 chord passages), bounded second-order implicit, at most 10 iterations per time
+step. The first part reproduces the 41 force reports of the design-study run exactly. The means are taken
+over the last 4 chord passages ([time_accurate/summary.csv](time_accurate/summary.csv),
+[time_accurate/run.csv](time_accurate/run.csv)):
+
+| | Pseudo-time, mean over whole cycles | Time-accurate, mean over 4 chord passages | Difference |
+|---|---:|---:|---:|
+| CL | 0.7249 | 0.7282 | +0.5 % |
+| CD | 0.00613 | 0.00615 | +0.2 % |
+| CL/CD | 118.2 | 118.5 | +0.3 % |
+| CD, lowest to highest | 0.00561 to 0.00673 | 0.00542 to 0.00672 | |
+| Pressure part of CD | 0.00262 | 0.00277 | +5.7 % |
+| Friction part of CD | 0.00352 | 0.00338 | −4.0 % |
+| Transition on the upper surface, x/c | 0.582 | 0.624 | |
+
+![Forces in physical time and mean skin friction](time_accurate/time_accurate.png)
+
+- **The flow is unsteady in physical time too.** Lift and drag keep oscillating; the largest line of the
+  lift spectrum is at 15.75 cycles per chord passage, which is 63 time steps per cycle. At the last time
+  step the upper surface carries 8 reversed-flow cells between x/c = 0.35 and 0.64, and over the last 39
+  time steps their pattern moves downstream by 0.0115 chords, about 0.29 of the free-stream speed. The
+  cells that drift slowly from iteration to iteration in pseudo-time are travelling cells.
+- **The mean forces agree within 0.5 %,** and the drag swings over almost the same range. The two parts
+  of the drag differ more and in opposite directions: in physical time the mean skin friction rises
+  later and more gradually behind the separated region, so the friction part is lower and the pressure
+  part higher.
+- **How well the time mean is known.** Within the averaging window the means over single chord passages
+  lie between 0.00604 and 0.00627 in drag, 3.8 % apart, so the agreement of 0.2 % is closer than a run of
+  this length can establish. The first 4 chord passages are left out; in them the solution leaves the
+  pseudo-time state, and the drag falls as low as 0.0028.
+- **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians
+  over the averaging window). One time step, one mesh and one angle were run.
+
+For this case the mean over whole pseudo-time cycles is therefore a fair estimate of the time mean of the
+model. The run does not say which model is closer to a measurement.
 
 **The six airfoils at 4°** (means over whole cycles; [designs/forces.csv](designs/forces.csv),
 [designs/comparison.csv](designs/comparison.csv)):

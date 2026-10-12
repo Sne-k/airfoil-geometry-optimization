@@ -241,6 +241,13 @@ Results: [results/cfd](../results/cfd/README.md).
   them. These means differ little from the means over all second-order iterations after the first 600
   (`results/cfd/README.md` gives the numbers). The solver settings that were tried against the cycle
   are in `transition_tests.m`.
+- **One case in physical time** (`run_time_accurate.m`, `fluentTransientJournal.m`). NACA 2412 at 4° is
+  continued from its pseudo-time solution after 2400 iterations with bounded second-order implicit time
+  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per
+  time step, the forces after every time step, wall profiles every 10 time steps over the last 4000.
+  The time means are taken over the last 4 chord passages and compared with the means over whole
+  cycles; they agree within 0.5 % in lift and drag. Switching to a transient case sets the
+  pressure-velocity coupling to SIMPLE in Fluent 2026 R1; the journal sets the coupled solver again.
 - **Models.** k-ω SST (fully turbulent) with the free-stream values of the NASA case (0.052 %, viscosity
   ratio 0.009), and Transition SST (γ–Re_θ; Langtry & Menter 2009).
 - **Transition SST inflow.** XFOIL's Ncrit = 9 corresponds to Tu ≈ 0.07 % by Mack's relation

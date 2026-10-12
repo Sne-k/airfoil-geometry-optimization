@@ -19,7 +19,9 @@ function run_time_accurate(outDir, pilot, varargin)
 %
 %   Results go to outDir (default MATLAB/output/cfd/time_accurate): the
 %   journals with their plans, the transcripts ta_start.out and ta_run.out,
-%   the profile files, meshes.csv and run_info.json.
+%   the profile files, the wall nodes of the mesh (naca2412_wall.csv, see
+%   fluentSurface), meshes.csv and run_info.json. collect_cfd_results.m
+%   makes the tables and the figure.
 %
 %   RUN_TIME_ACCURATE(outDir, true) runs a few iterations and time steps (a
 %   check of the journals).
@@ -60,6 +62,7 @@ started = datetime('now', 'TimeZone', 'UTC');
 G = airfoilCGrid(xu, yu, xl, yl, 'Radius', 500, 'WakeLength', 500, 'WakeFirstCell', 0.1, 'NNormal', 180);
 info = writeFluentMesh(fullfile(outDir, 'naca2412.msh'), G);
 fprintf('[MESH naca2412] %d cells, %d negative\n', info.nCells, info.nNegative);
+writematrix([G.X(G.iTE(1):G.iTE(2), 1), G.Y(G.iTE(1):G.iTE(2), 1)], fullfile(outDir, 'naca2412_wall.csv'));
 writetable(table({'naca2412'}, info.nCells, info.nNegative, G.firstCell, G.growth, G.wakeGrowth, 'VariableNames', ...
     {'design', 'cells', 'negative_cells', 'first_cell', 'growth', 'wake_growth'}), fullfile(outDir, 'meshes.csv'));
 

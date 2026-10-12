@@ -822,3 +822,56 @@ README.md,"  free transition gain 21.5 to 37.0 % over NACA 2412 in best CL/CD, a
 README.md,  the same angles; the design optimised for free and tripped flow gains 17.1 %. These runs do not settle,17.1,results/cfd/designs/peaks.csv,"one(method='transition', design='robust_trip_s3')['gain_over_naca2412_percent']"
 results/population/README.md,"above that of NACA 2412, and with the transition model 17.1 % above and 5.4 % below.",17.1,results/cfd/designs/peaks.csv,"one(method='transition', design='robust_trip_s3')['gain_over_naca2412_percent']"
 results/population/README.md,"above that of NACA 2412, and with the transition model 17.1 % above and 5.4 % below.",5.4,results/cfd/designs/peaks.csv,"-one(method='transition', design='trip_worst_s1')['gain_over_naca2412_percent']"
+results/cfd/README.md,the first 2400 iterations of the run above and continues from there time-accurately: 8000 time steps of,8000,results/cfd/time_accurate/run.csv,rows[0]['time_steps']
+results/cfd/README.md,"0.001 chord passages (8 chord passages), bounded second-order implicit, at most 10 iterations per time",0.001,results/cfd/time_accurate/run.csv,rows[0]['time_step']
+results/cfd/README.md,"0.001 chord passages (8 chord passages), bounded second-order implicit, at most 10 iterations per time",8,results/cfd/time_accurate/run.csv,rows[0]['chord_passages']
+results/cfd/README.md,"0.001 chord passages (8 chord passages), bounded second-order implicit, at most 10 iterations per time",10,results/cfd/time_accurate/run.csv,rows[0]['inner_iterations']
+results/cfd/README.md,step. The first part reproduces the 41 force reports of the design-study run exactly. The means are taken,41,results/cfd/time_accurate/run.csv,rows[0]['start_reports']
+results/cfd/README.md,"over the last 4 chord passages ([time_accurate/summary.csv](time_accurate/summary.csv),",4,results/cfd/time_accurate/run.csv,rows[0]['average_to'] - rows[0]['average_from']
+results/cfd/README.md,| CL | 0.7249 | 0.7282 | +0.5 % |,0.7249,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['CL']"
+results/cfd/README.md,| CL | 0.7249 | 0.7282 | +0.5 % |,0.7282,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['CL']"
+results/cfd/README.md,| CL | 0.7249 | 0.7282 | +0.5 % |,0.5,results/cfd/time_accurate/run.csv,rows[0]['CL_difference_percent']
+results/cfd/README.md,| CD | 0.00613 | 0.00615 | +0.2 % |,0.00613,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['CD']"
+results/cfd/README.md,| CD | 0.00613 | 0.00615 | +0.2 % |,0.00615,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['CD']"
+results/cfd/README.md,| CD | 0.00613 | 0.00615 | +0.2 % |,0.2,results/cfd/time_accurate/run.csv,rows[0]['CD_difference_percent']
+results/cfd/README.md,| CL/CD | 118.2 | 118.5 | +0.3 % |,118.2,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['LD']"
+results/cfd/README.md,| CL/CD | 118.2 | 118.5 | +0.3 % |,118.5,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['LD']"
+results/cfd/README.md,| CL/CD | 118.2 | 118.5 | +0.3 % |,0.3,results/cfd/time_accurate/run.csv,rows[0]['LD_difference_percent']
+results/cfd/README.md,"| CD, lowest to highest | 0.00561 to 0.00673 | 0.00542 to 0.00672 | |",0.00561,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['CD_min']"
+results/cfd/README.md,"| CD, lowest to highest | 0.00561 to 0.00673 | 0.00542 to 0.00672 | |",0.00673,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['CD_max']"
+results/cfd/README.md,"| CD, lowest to highest | 0.00561 to 0.00673 | 0.00542 to 0.00672 | |",0.00542,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['CD_min']"
+results/cfd/README.md,"| CD, lowest to highest | 0.00561 to 0.00673 | 0.00542 to 0.00672 | |",0.00672,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['CD_max']"
+results/cfd/README.md,| Pressure part of CD | 0.00262 | 0.00277 | +5.7 % |,0.00262,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['CD_pressure']"
+results/cfd/README.md,| Pressure part of CD | 0.00262 | 0.00277 | +5.7 % |,0.00277,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['CD_pressure']"
+results/cfd/README.md,| Pressure part of CD | 0.00262 | 0.00277 | +5.7 % |,5.7,results/cfd/time_accurate/summary.csv,"100*(one(method='time-accurate, mean over the averaging window')['CD_pressure']/one(method='pseudo-time, mean over whole cycles (design study)')['CD_pressure']-1)"
+results/cfd/README.md,| Friction part of CD | 0.00352 | 0.00338 | −4.0 % |,0.00352,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['CD_viscous']"
+results/cfd/README.md,| Friction part of CD | 0.00352 | 0.00338 | −4.0 % |,0.00338,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['CD_viscous']"
+results/cfd/README.md,| Friction part of CD | 0.00352 | 0.00338 | −4.0 % |,−4.0,results/cfd/time_accurate/summary.csv,"100*(one(method='time-accurate, mean over the averaging window')['CD_viscous']/one(method='pseudo-time, mean over whole cycles (design study)')['CD_viscous']-1)"
+results/cfd/README.md,"| Transition on the upper surface, x/c | 0.582 | 0.624 | |",0.582,results/cfd/time_accurate/summary.csv,"one(method='pseudo-time, mean over whole cycles (design study)')['xtr_upper']"
+results/cfd/README.md,"| Transition on the upper surface, x/c | 0.582 | 0.624 | |",0.624,results/cfd/time_accurate/summary.csv,"one(method='time-accurate, mean over the averaging window')['xtr_upper']"
+results/cfd/README.md,"  lift spectrum is at 15.75 cycles per chord passage, which is 63 time steps per cycle. At the last time",15.75,results/cfd/time_accurate/run.csv,rows[0]['frequency']
+results/cfd/README.md,"  lift spectrum is at 15.75 cycles per chord passage, which is 63 time steps per cycle. At the last time",63,results/cfd/time_accurate/run.csv,rows[0]['time_steps_per_cycle']
+results/cfd/README.md,"  step the upper surface carries 8 reversed-flow cells between x/c = 0.35 and 0.64, and over the last 39",8,results/cfd/time_accurate/run.csv,rows[0]['cells']
+results/cfd/README.md,"  step the upper surface carries 8 reversed-flow cells between x/c = 0.35 and 0.64, and over the last 39",0.35,results/cfd/time_accurate/run.csv,rows[0]['reversed_from']
+results/cfd/README.md,"  step the upper surface carries 8 reversed-flow cells between x/c = 0.35 and 0.64, and over the last 39",0.64,results/cfd/time_accurate/run.csv,rows[0]['reversed_to']
+results/cfd/README.md,"  step the upper surface carries 8 reversed-flow cells between x/c = 0.35 and 0.64, and over the last 39",39,results/cfd/time_accurate/run.csv,rows[0]['pattern_steps']
+results/cfd/README.md,"  time steps their pattern moves downstream by 0.0115 chords, about 0.29 of the free-stream speed. The",0.0115,results/cfd/time_accurate/run.csv,rows[0]['pattern_shift']
+results/cfd/README.md,"  time steps their pattern moves downstream by 0.0115 chords, about 0.29 of the free-stream speed. The",0.29,results/cfd/time_accurate/run.csv,rows[0]['pattern_speed']
+results/cfd/README.md,"- **The mean forces agree within 0.5 %,** and the drag swings over almost the same range. The two parts",0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+results/cfd/README.md,"  lie between 0.00604 and 0.00627 in drag, 3.8 % apart, so the agreement of 0.2 % is closer than a run of",0.00604,results/cfd/time_accurate/run.csv,rows[0]['CD_passage_min']
+results/cfd/README.md,"  lie between 0.00604 and 0.00627 in drag, 3.8 % apart, so the agreement of 0.2 % is closer than a run of",0.00627,results/cfd/time_accurate/run.csv,rows[0]['CD_passage_max']
+results/cfd/README.md,"  lie between 0.00604 and 0.00627 in drag, 3.8 % apart, so the agreement of 0.2 % is closer than a run of",3.8,results/cfd/time_accurate/windows.csv,100*(max([r['CD'] for r in rows if r['time_to'] > 4.5]) - min([r['CD'] for r in rows if r['time_to'] > 4.5]))/mean([r['CD'] for r in rows if r['time_to'] > 4.5])
+results/cfd/README.md,"  lie between 0.00604 and 0.00627 in drag, 3.8 % apart, so the agreement of 0.2 % is closer than a run of",0.2,results/cfd/time_accurate/run.csv,rows[0]['CD_difference_percent']
+results/cfd/README.md,  this length can establish. The first 4 chord passages are left out; in them the solution leaves the,4,results/cfd/time_accurate/run.csv,rows[0]['average_from']
+results/cfd/README.md,"  pseudo-time state, and the drag falls as low as 0.0028.",0.0028,results/cfd/time_accurate/windows.csv,min(r['CD_min'] for r in rows)
+results/cfd/README.md,- **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians,2.6,results/cfd/time_accurate/run.csv,min(rows[0][k] for k in rows[0] if k.startswith('residual_fall'))
+results/cfd/README.md,- **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians,5.1,results/cfd/time_accurate/run.csv,max(rows[0][k] for k in rows[0] if k.startswith('residual_fall'))
+README.md,  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+MATLAB/CFD/README.md,and the mean lift and drag are within 0.5 % of the means over whole cycles.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+docs/methods.md,"  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per",8000,results/cfd/time_accurate/run.csv,rows[0]['time_steps']
+docs/methods.md,"  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per",0.001,results/cfd/time_accurate/run.csv,rows[0]['time_step']
+docs/methods.md,"  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per",10,results/cfd/time_accurate/run.csv,rows[0]['inner_iterations']
+docs/methods.md,  The time means are taken over the last 4 chord passages and compared with the means over whole,4,results/cfd/time_accurate/run.csv,rows[0]['average_to'] - rows[0]['average_from']
+docs/methods.md,  cycles; they agree within 0.5 % in lift and drag. Switching to a transient case sets the,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+docs/literature.md,whose mean forces agree with the cycle means within 0.5 % (`results/cfd/README.md`) |,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+docs/paper_outline.md,  means within 0.5 %.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
