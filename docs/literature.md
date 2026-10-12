@@ -275,7 +275,7 @@ Web of Science must still be checked.
 
 ## 12. Tasks that follow from the gaps
 
-| Task | Fills gap | State on 12 October 2026 |
+| Task | Fills gap | State on 13 October 2026 |
 |---|---|---|
 | Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 188 runs running (`MATLAB/Paper/run_population_study.m`); 80 done: peak and fixed angle for all 30 airfoils, fixed lift for 12 |
 | Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | done for the 80 finished runs (`results/population/README.md`): the gain of the peak designs survives other Ncrit and Reynolds numbers and is gone with tripped boundary layers (median −1.6 %) |
@@ -283,7 +283,7 @@ Web of Science must still be checked.
 | Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | done for NACA 2412 (four runs): the single-point design was not sensitive to Ncrit in the first place (`results/population/README.md`) |
 | Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped |
 | RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | done for six airfoils (`results/cfd/README.md`) |
-| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | done: cause, five solver settings, refined mesh, means over whole cycles (`results/cfd/README.md`) |
+| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | done: cause, five solver settings, refined mesh, means over whole cycles, and one case in physical time, whose mean forces agree with the cycle means within 0.5 % (`results/cfd/README.md`) |
 | Reporting checklist | 2, 3 | draft in section 13 |
 | Optimise with RANS in the loop to see how the optimum itself moves | 1 | not feasible on the laptop; name as future work |
 | Wind-tunnel test of a design | 1 | outside this project; name as a limitation |

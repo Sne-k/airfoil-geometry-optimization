@@ -16,6 +16,27 @@ an XFOIL artefact.
 
 ![Morphing from NACA 2412 to the XFOIL-optimised airfoil](results/xfoil/morph_to_design.gif)
 
+## How to go through the project
+
+The work grew in steps, and each step answers a question that the one before left open. This is the
+order in which to read it. Every row names the document with the results and the folder with the code.
+
+| Step | Question | Results | Code |
+|---|---|---|---|
+| 1 | What did the mini project do? A geometric objective, a genetic algorithm followed by `fmincon`, a morphing sequence, analysis in XFLR5 | [The report method](#the-report-method) | `MATLAB/Optimization/optimize_naca_ga_nlp.m`, `MATLAB/Morphing` |
+| 2 | What changes when XFOIL runs inside the optimisation loop? | [Results](#results), [results/README.md](results/README.md) | `MATLAB/Optimization`, `MATLAB/Aerodynamics` |
+| 3 | Does the method work for any airfoil, and how does it compare with an established tool? | [Optimise any airfoil](#optimise-any-airfoil), [results/README.md](results/README.md) | `MATLAB/Optimization/optimize_airfoil.m`, `MATLAB/Paper/benchmark_xoptfoil2.m` |
+| 4 | How far can XFOIL be trusted? | [results/validation](results/validation/README.md) | `MATLAB/Validation` |
+| 5 | What is left of the gain with smooth shapes and several random seeds, and what is one reported gain made of? | [results/paper](results/paper/README.md) | `MATLAB/Paper` |
+| 6 | Does the gain hold for other airfoils and away from the design condition, and can a formulation keep it? | [results/population](results/population/README.md) | `MATLAB/Paper/run_population_study.m` |
+| 7 | Does an independent method confirm it? RANS, fully turbulent and with a transition model | [results/cfd](results/cfd/README.md) | `MATLAB/CFD` |
+| 8 | What does morphing add? | [results/README.md](results/README.md) | `MATLAB/Morphing` |
+| 9 | How was everything done, what has been published on it, and what would a paper claim? | [docs/methods.md](docs/methods.md), [docs/literature.md](docs/literature.md), [docs/paper_outline.md](docs/paper_outline.md) | |
+
+The short answers are in [Results](#results) and [Further results](#further-results) below. To run the
+steps yourself, see [Running the code](#running-the-code). `tools/check_numbers.py` checks the numbers
+in these documents against the result files.
+
 ## Results
 
 All airfoils analysed with XFOIL under the same conditions: Re = 10⁶, M = 0, Ncrit = 9, α = −2° to 18°.
@@ -122,7 +143,8 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
 - **RANS with a transition model confirms the gains at a smaller size.** The three designs optimised for
   free transition gain 21.5 to 37.0 % over NACA 2412 in best CL/CD, against 36.1 to 76.3 % in XFOIL at
   the same angles; the design optimised for free and tripped flow gains 17.1 %. These runs do not settle
-  but cycle, and are reported as means over whole cycles ([results/cfd](results/cfd/README.md)).
+  but cycle, and are reported as means over whole cycles ([results/cfd](results/cfd/README.md)). A
+  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %.
 - **Validation.** Against NACA 0012 wind-tunnel data (Ladson 1988), XFOIL's drag agrees within 3 % when
   transition is fixed at 5 % chord, but is 11–14 % too low with free transition, and its maximum lift is
   too high. Absolute L/D values from XFOIL are therefore optimistic; see
@@ -198,7 +220,8 @@ results/
   morphing/       morphing envelope and nose/trailing-edge morphing
   validation/     XFOIL against wind-tunnel data (experimental data, polars, comparison)
   paper/          smooth-shape results with three random seeds (basis of the planned paper)
-  cfd/            Fluent: verification on NASA's NACA 0012 case, time-step study, design study
+  cfd/            Fluent: verification on NASA's NACA 0012 case, time-step study, design study,
+                  one case in physical time
   population/     the same optimisation for 30 airfoils (in progress); robust formulations for NACA 2412
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
@@ -245,6 +268,33 @@ Outputs are written to `MATLAB/output/` (not tracked). Each XFOIL optimisation t
 10–50 minutes on 8 cores. To analyse an
 airfoil in XFLR5, open its `.dat` file (File → Open). XFLR5 accepts at most 300 points per foil; the
 exported files have 199–299.
+
+The later studies are separate batches. Each of the long ones skips runs that are already finished, so
+it can be stopped and started again:
+
+```matlab
+% in MATLAB/Paper
+run_paper_batch              % 37 optimisations with curvature limits and random seeds, about 21 hours
+collect_paper_results        % tables and figures in results/paper
+sensitivity_designs          % the designs at other Ncrit and Reynolds numbers
+run_population_study         % 188 optimisations for 30 airfoils; 11 of them need coordinate files
+                             % from the UIUC database (see the help text of the script)
+collect_population_results   % tables and figures in results/population
+% in MATLAB/CFD: needs ANSYS Fluent, see MATLAB/CFD/README.md
+timestep_study               % about 4 hours
+verify_naca0012              % about 4 hours
+run_design_study             % 87 runs, about 50 hours
+transition_tests             % about 3 hours
+run_time_accurate            % about 9 hours
+design_study_xfoil           % XFOIL side of the comparison
+collect_cfd_results          % tables and figures in results/cfd
+% in MATLAB/Paper again
+gain_decomposition           % one reported gain taken apart, from the result files above
+```
+
+```bash
+python tools/check_numbers.py
+```
 
 ## Development history
 

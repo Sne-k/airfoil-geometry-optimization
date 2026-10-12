@@ -57,6 +57,8 @@ drag cycle with it. `transition_tests.m` holds the solver settings that were tri
 design study therefore runs these cases for 5000 second-order iterations, writes the wall data every
 200 iterations over the last 2400, and `collect_cfd_results.m` reports means over whole cycles
 together with the lowest and highest value (`cycleStatistics.m`). The fully turbulent SST runs settle.
+`run_time_accurate.m` continues one of these cases in physical time: the cells then travel downstream,
+and the mean lift and drag are within 0.5 % of the means over whole cycles.
 
 ## Verification in short
 
@@ -74,7 +76,7 @@ timestep_study      % 13 runs, about 4 hours
 verify_naca0012     % 11 runs, about 4 hours
 run_design_study    % 87 runs, about 50 hours
 transition_tests    % 5 runs, about 3 hours
-run_time_accurate   % 1 run of 8000 time steps, about 10 hours
+run_time_accurate   % 1 run of 8000 time steps, about 9 hours
 design_study_xfoil  % XFOIL side of the comparison (needs XFOIL)
 collect_cfd_results % tables and figures in results/cfd
 ```

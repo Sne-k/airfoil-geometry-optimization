@@ -1,6 +1,6 @@
 # Paper outline (working document)
 
-State: 12 October 2026. This outline says what the paper would claim, which result supports each claim,
+State: 13 October 2026. This outline says what the paper would claim, which result supports each claim,
 and what is still missing. Nothing here is final; the team decides the scope, the title, the authors and
 the journal.
 
@@ -25,7 +25,7 @@ checklist.
 |---|---|---|---|
 | 1 | One reported gain taken apart into metric, numerical artefacts, shape artefacts and transition assumption | NACA 2412: `results/paper`, `results/README.md`, `results/cfd/designs/xfoil.csv` | available |
 | 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (188 runs, 80 done); first tables for the peak and fixed-angle formulations |
-| 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | available (six airfoils, 84 runs) |
+| 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | available (six airfoils, 84 runs, and one time-accurate run) |
 | 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; other airfoils not planned |
 | 5 | Audit of how such results are reported, and a checklist | `docs/literature.md`, sections 8–13 | first version done |
 | 6 | Open, checked tools: optimiser with curvature limits, verified Fluent set-up, provenance of every number | repository, `tools/check_numbers.py` | available |
@@ -73,7 +73,8 @@ the question, the approach and the contributions.
   laminar gain for about 7 % in tripped flow.
 - 5.4 RANS: do the designs keep their ranking and their gain; transition locations against XFOIL; the
   behaviour of the Transition SST runs (force cycle from drifting separation cells in the laminar
-  bubble, means over whole cycles).
+  bubble, means over whole cycles); one case in physical time, whose mean forces agree with the cycle
+  means within 0.5 %.
 - 5.5 Optimiser comparison at equal budget (GA, particle swarm, Bayesian optimisation) and the
   benchmark against Xoptfoil2.
 
