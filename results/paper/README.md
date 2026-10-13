@@ -135,6 +135,8 @@ of the project report to what is left under stricter conditions.
 | Smooth shape: with curvature limits (three seeds) | +33.2 % (31.6 to 35.5) |
 | The smooth design at other Ncrit (5 to 11) and Reynolds numbers (0.5 to 2 million) | +25.9 to +49.5 % |
 | The smooth design with boundary layers tripped at 5 % chord | −5.9 % |
+| The smooth design in RANS with a transition model (Transition SST) | +26.1 % (24.7 to 27.5) |
+| The smooth design in fully turbulent RANS (SST) | −0.4 % |
 
 - **A gain at a fixed angle is the largest number, and it depends on the analysis.** The original has a
   small CL/CD at 0°, so the ratio reacts strongly to details: XFLR5 in the report and XFOIL here give
@@ -143,9 +145,10 @@ of the project report to what is left under stricter conditions.
 - **With thickness and pitching moment kept, 33 to 38 % remain,** and the smooth shape costs about five
   points of that.
 - **The gain survives other values of Ncrit and Reynolds number, but not the loss of laminar flow.**
-
-The two last steps, RANS with and without a transition model, are added by the same script when the
-Fluent design study is complete ([results/cfd](../cfd/README.md)).
+- **RANS gives the same picture with other numbers.** With a transition model the smooth design keeps
+  a gain of 26.1 %, about three quarters of what XFOIL gives at the same angles; in fully turbulent flow
+  it has none. The range of the Transition SST value comes from the force cycles of the two runs
+  ([results/cfd](../cfd/README.md)).
 
 ## Morphing between the smooth cruise and loiter designs
 

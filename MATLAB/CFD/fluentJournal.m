@@ -55,6 +55,9 @@ function plan = fluentJournal(file, meshFile, alpha, varargin)
 %                   <name>_it<iteration>.prof every 'every' iterations
 %                   during the last 'span' iterations of an angle, for
 %                   averages over a solution that does not settle       ([])
+%     'State'       name (without extension) of a case and a data file
+%                   written after the last block, from which
+%                   fluentTransientJournal continues time-accurately    ('')
 %
 %   The default free-stream turbulence is that of the NASA Turbulence
 %   Modeling Resource NACA 0012 case. The command sequences were checked
@@ -79,6 +82,7 @@ ip.addParameter('TransitionRelax', []);
 ip.addParameter('Probes', []);
 ip.addParameter('Surface', '');
 ip.addParameter('SurfaceEvery', []);
+ip.addParameter('State', '');
 ip.parse(varargin{:});
 o = ip.Results;
 alpha = alpha(:).';
@@ -157,6 +161,7 @@ for i = 1:numel(alpha)
     end
     if ~isempty(o.Surface), surface(w, name); end
 end
+if ~isempty(o.State), w('/file/write-case-data %s', o.State); end
 w('/exit yes');
 plan = array2table(rows, 'VariableNames', {'alpha', 'iteration', 'order'});
 end
