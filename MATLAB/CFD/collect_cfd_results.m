@@ -1,10 +1,11 @@
-function collect_cfd_results(runDir, outDir)
+function collect_cfd_results(runDir, outDir, only)
 %COLLECT_CFD_RESULTS  Tables and figures of the Fluent runs.
 %   COLLECT_CFD_RESULTS(runDir, outDir) reads the output folders of
-%   timestep_study.m, verify_naca0012.m, run_design_study.m and
-%   transition_tests.m in runDir (default MATLAB/output/cfd, with the
-%   folders timestep_study, verification, designs and transition_tests;
-%   missing folders are skipped) and writes to outDir (default results/cfd):
+%   timestep_study.m, verify_naca0012.m, run_design_study.m,
+%   transition_tests.m and run_time_accurate.m in runDir (default
+%   MATLAB/output/cfd, with the folders timestep_study, verification,
+%   designs, transition_tests and time_accurate; missing folders are
+%   skipped) and writes to outDir (default results/cfd):
 %     timestep_study/   forces.csv, history.csv, meshes.csv,
 %                       timestep_history.png
 %     verification/     forces.csv, history.csv, meshes.csv, run_info.json,
@@ -33,6 +34,17 @@ function collect_cfd_results(runDir, outDir)
 %                       design_surface.png
 %     transition_tests/ forces.csv (one row per solver setting), history.csv,
 %                       meshes.csv, run_info.json, transition_tests.png
+%     time_accurate/    history.csv (forces after every time step),
+%                       windows.csv (means over single chord passages),
+%                       summary.csv (time means over the averaging window
+%                       against the cycle means of the design study, read
+%                       from outDir/designs), run.csv (time step, averaging
+%                       window, largest line of the lift spectrum, fall of
+%                       the residuals within a time step, motion of the
+%                       reversed-flow cells, check of the start against
+%                       the design-study run), surface.csv
+%                       (time-mean pressure and skin friction), meshes.csv,
+%                       run_info.json, time_accurate.png
 %   A run counts as steady if, over its last force reports (500 iterations
 %   in the NACA 0012 runs; 1000 with SST and 2400 with Transition SST in
 %   the design study), CL varies by less than 1e-4 and CD by less than
@@ -41,25 +53,35 @@ function collect_cfd_results(runDir, outDir)
 %   and the highest value in those cycles, and their surface data are means
 %   over the wall profiles written during those cycles. Run times and file
 %   names of the transcripts are left out.
+%
+%   COLLECT_CFD_RESULTS(runDir, outDir, only) processes only the named
+%   folders, for example 'time_accurate' or {'designs', 'time_accurate'}.
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
 addpath(here);
 if nargin < 1 || isempty(runDir), runDir = fullfile(root, 'output', 'cfd'); end
 if nargin < 2 || isempty(outDir), outDir = fullfile(root, '..', 'results', 'cfd'); end
+if nargin < 3, only = {}; end
+only = cellstr(only);
+wanted = @(name) isempty(only) || any(strcmp(name, only));
 tol = struct('CL', 1e-4, 'CD', 1e-5);
-if isfile(fullfile(runDir, 'timestep_study', 'verification_forces.csv'))
+if wanted('timestep_study') && isfile(fullfile(runDir, 'timestep_study', 'verification_forces.csv'))
     timestepStudy(fullfile(runDir, 'timestep_study'), fullfile(outDir, 'timestep_study'), tol);
 end
-if isfile(fullfile(runDir, 'verification', 'forces.csv'))
+if wanted('verification') && isfile(fullfile(runDir, 'verification', 'forces.csv'))
     verification(fullfile(runDir, 'verification'), fullfile(outDir, 'verification'), tol, ...
         fullfile(root, '..', 'results', 'validation', 'experimental', 'CLCD_Ladson_expdata.dat'));
 end
-if isfile(fullfile(runDir, 'designs', 'forces.csv'))
+if wanted('designs') && isfile(fullfile(runDir, 'designs', 'forces.csv'))
     designs(fullfile(runDir, 'designs'), fullfile(outDir, 'designs'), tol);
 end
-if isfile(fullfile(runDir, 'transition_tests', 'forces.csv'))
+if wanted('transition_tests') && isfile(fullfile(runDir, 'transition_tests', 'forces.csv'))
     transitionTests(fullfile(runDir, 'transition_tests'), fullfile(outDir, 'transition_tests'), tol);
+end
+if wanted('time_accurate') && isfile(fullfile(runDir, 'time_accurate', 'ta_run.out'))
+    timeAccurate(fullfile(runDir, 'time_accurate'), fullfile(outDir, 'time_accurate'), fullfile(outDir, 'designs'), ...
+        fullfile(runDir, 'designs'));
 end
 end
 
@@ -745,6 +767,193 @@ for q = 1:2
 end
 exportgraphics(f, fullfile(out, 'transition_tests.png'), 'Resolution', 130);
 close(f);
+end
+
+%% ------------------------------------------------------------------ time-accurate run
+function timeAccurate(in, out, designs, designRuns)
+% NACA 2412 at 4 deg with Transition SST in physical time (run_time_accurate.m), against the pseudo-time run of
+% the design study: designs is the folder with its tables, designRuns the folder with its transcripts
+if ~exist(out, 'dir'), mkdir(out); end
+if isfile(fullfile(in, 'meshes.csv')), copyfile(fullfile(in, 'meshes.csv'), fullfile(out, 'meshes.csv')); end
+info = jsondecode(fileread(fullfile(in, 'run_info.json')));
+txt = fileread(fullfile(in, 'ta_run.out'));
+rel = regexp(txt, 'Welcome to ANSYS Fluent ([^\r\n]*)', 'tokens', 'once');
+build = regexp(txt, 'Build Id:\s*(\d+)', 'tokens', 'once');
+if ~isempty(rel), info.fluent = strtrim(rel{1}); end
+if ~isempty(build), info.fluent = [info.fluent ', build ' build{1}]; end
+if contains(txt, 'student version', 'IgnoreCase', true), info.fluent = [info.fluent ' (student licence)']; end
+fid = fopen(fullfile(out, 'run_info.json'), 'w');  fprintf(fid, '%s\n', jsonencode(info, 'PrettyPrint', true));  fclose(fid);
+
+plan = readtable(fullfile(in, 'ta_run_plan.csv'));
+[cd, cl, ~, parts] = fluentForces(fullfile(in, 'ta_run.out'));
+n = min(numel(cd), height(plan));
+H = table(plan.step(1:n), plan.time(1:n), cl(1:n), cd(1:n), parts.CD_pressure(1:n), parts.CD_viscous(1:n), ...
+    'VariableNames', {'step', 'time', 'CL', 'CD', 'CD_pressure', 'CD_viscous'});
+writetable(H, fullfile(out, 'history.csv'));
+if n < height(plan)
+    fprintf('[TIME-ACCURATE] INCOMPLETE: %d of %d time steps; no further tables\n', n, height(plan));
+    return;
+end
+dt = plan.time(2) - plan.time(1);                      % chord passages
+every = info.options.run.SurfaceEvery(1);              % time steps between wall profiles
+nAvg = info.options.run.SurfaceEvery(2);               % time steps of the averaging window, at the end
+inner = info.options.run.Inner;
+
+% Means over single chord passages
+per = round(1 / dt);
+nw = floor(n / per);
+Wn = zeros(nw, 9);
+for k = 1:nw
+    j = (k - 1) * per + (1:per);
+    Wn(k, :) = [H.time(j(1)) - dt, H.time(j(end)), mean(H.CL(j)), mean(H.CD(j)), mean(H.CD_pressure(j)), ...
+        mean(H.CD_viscous(j)), mean(H.CL(j)) / mean(H.CD(j)), min(H.CD(j)), max(H.CD(j))];
+end
+Wn = array2table(Wn, 'VariableNames', {'time_from', 'time_to', 'CL', 'CD', 'CD_pressure', 'CD_viscous', 'LD', 'CD_min', 'CD_max'});
+writetable(Wn, fullfile(out, 'windows.csv'));
+
+% Time means over the averaging window
+use = H.step > n - nAvg;
+A = H(use, :);
+inWindow = Wn.time_from >= A.time(1) - 1.5 * dt;        % the chord passages inside the averaging window
+
+% Largest line of the lift spectrum above two cycles per chord passage (Hann window, linear trend removed)
+m = height(A);
+x = detrend(A.CL) .* (0.5 - 0.5 * cos(2 * pi * (0:m-1).' / m));
+amp = abs(fft(x));
+freq = (0:m-1).' / (m * dt);
+band = find(freq >= 2 & freq <= 100);
+[~, j] = max(amp(band));
+frequency = freq(band(j));
+
+% Fall of the residuals within a time step (orders of magnitude, median over the averaging window)
+names = {'continuity', 'x_velocity', 'y_velocity', 'energy', 'k', 'omega', 'intermit', 'retheta'};
+tok = regexp(txt, '(?m)^\s*(\d+)((?:\s+\d\.\d+e[-+]\d+){8})\s', 'tokens');
+fall = nan(1, 8);
+if ~isempty(tok)
+    it = cellfun(@(t) str2double(t{1}), tok).';
+    R = cell2mat(cellfun(@(t) sscanf(t{2}, '%f').', tok, 'UniformOutput', false).');
+    [~, first] = unique(it, 'last');                   % the first line of a time step repeats the previous iteration
+    R = R(first, :);
+    if size(R, 1) >= n * inner
+        R = R(end - n * inner + 1:end, :);
+        a = R(1:inner:end, :);  b = R(inner:inner:end, :);
+        fall = median(log10(a(use, :) ./ b(use, :)), 1);
+    end
+end
+
+% Time-mean pressure and skin friction from the wall profiles of the averaging window
+T0 = 288.15;  Rgas = 8314.47 / 28.966;                 % as in fluentJournal
+qInf = 0.5 * (101325 / (Rgas * T0)) * (info.options.run.Mach * sqrt(1.4 * Rgas * T0))^2;
+wall = readmatrix(fullfile(in, 'naca2412_wall.csv'));
+steps = n - nAvg + every:every:n;
+cf = [];  cp = [];
+for k = 1:numel(steps)
+    s = fluentSurface(fullfile(in, sprintf('ta_run_step%d.prof', steps(k))), wall, qInf);
+    cf(:, k) = s.cf;  cp(:, k) = s.cp; %#ok<AGROW>
+end
+s.cp = mean(cp, 2);  s.cf = mean(cf, 2);  s.cf_min = min(cf, [], 2);  s.cf_max = max(cf, [], 2);
+writetable(s(:, {'surface', 'x', 'y', 'cp', 'cf', 'cf_min', 'cf_max'}), fullfile(out, 'surface.csv'));
+u = s(strcmp(s.surface, 'upper'), :);  [xtrU, xsepU] = transitionFromCf(u.x, u.cf);
+l = s(strcmp(s.surface, 'lower'), :);  xtrL = transitionFromCf(l.x, l.cf);
+
+% Motion of the reversed-flow cells of the upper surface over the last wall profiles (one per time step): the
+% shift of the skin-friction pattern between the first and the last of them, from their cross-correlation
+last = info.options.run.SurfaceLast;
+dx = 0.0005;  xg = (0.30:dx:0.75).';
+g = zeros(numel(xg), 2);
+both = [n - last + 1, n];
+for k = 1:2
+    q = fluentSurface(fullfile(in, sprintf('ta_run_step%d.prof', both(k))), wall, qInf);
+    q = q(strcmp(q.surface, 'upper') & q.x > 0.2, :);
+    g(:, k) = interp1(q.x, q.cf, xg);
+end
+g0 = g - mean(g, 1);
+shifts = -60:60;
+match = arrayfun(@(j) sum(g0(max(1, 1 + j):min(end, end + j), 2) .* g0(max(1, 1 - j):min(end, end - j), 1)), shifts);
+[~, j] = max(match);
+patternShift = shifts(j) * dx;                         % chords, positive downstream
+reversed = g(:, 2) < 0;
+cells = sum(diff([false; reversed]) == 1);
+
+% The pseudo-time run of the design study: cycle means, and its force history for the check of the start
+ref = [];  refS = [];
+if isfile(fullfile(designs, 'forces.csv'))
+    F = readtable(fullfile(designs, 'forces.csv'), 'Delimiter', ',');
+    ref = F(strcmp(F.model, 'transition') & strcmp(F.design, 'naca2412') & F.alpha == 4, :);
+end
+if isfile(fullfile(designs, 'surface.csv'))
+    S = readtable(fullfile(designs, 'surface.csv'), 'Delimiter', ',');
+    refS = S(strcmp(S.model, 'transition') & strcmp(S.design, 'naca2412') & S.alpha == 4 & strcmp(S.surface, 'upper'), :);
+end
+startCheck = nan(1, 3);                                % force reports, largest difference in CD and in CL
+if isfile(fullfile(in, 'ta_start.out')) && isfile(fullfile(designRuns, 'transition_naca2412_a4.out'))
+    [c1, l1] = fluentForces(fullfile(in, 'ta_start.out'));
+    [c0, l0] = fluentForces(fullfile(designRuns, 'transition_naca2412_a4.out'));
+    k = 1:min(numel(c1), numel(c0));
+    startCheck = [numel(c1), max(abs(c1(k) - c0(k))), max(abs(l1(k) - l0(k)))];
+end
+
+vars = {'CL', 'CD', 'LD', 'CL_min', 'CL_max', 'CD_min', 'CD_max', 'LD_min', 'LD_max', 'CD_pressure', 'CD_viscous', ...
+    'xtr_upper', 'xtr_lower', 'xsep_upper'};
+ld = A.CL ./ A.CD;
+rows = {'time-accurate, mean over the averaging window', mean(A.CL), mean(A.CD), mean(A.CL) / mean(A.CD), min(A.CL), ...
+    max(A.CL), min(A.CD), max(A.CD), min(ld), max(ld), mean(A.CD_pressure), mean(A.CD_viscous), xtrU, xtrL, xsepU};
+if ~isempty(ref)
+    rows(2, :) = [{'pseudo-time, mean over whole cycles (design study)'}, table2cell(ref(1, vars))];
+end
+Y = cell2table(rows, 'VariableNames', [{'method'}, vars]);
+writetable(Y, fullfile(out, 'summary.csv'));
+
+Q = table(dt, n, n * dt, inner, info.options.run.Tolerance, A.time(1) - dt, A.time(end), numel(steps), frequency, ...
+    1 / (frequency * dt), min(Wn.CD(inWindow)), max(Wn.CD(inWindow)), min(Wn.CL(inWindow)), max(Wn.CL(inWindow)), ...
+    startCheck(1), startCheck(2), startCheck(3), 'VariableNames', {'time_step', 'time_steps', 'chord_passages', ...
+    'inner_iterations', 'residual_criterion', 'average_from', 'average_to', 'wall_profiles', 'frequency', ...
+    'time_steps_per_cycle', 'CD_passage_min', 'CD_passage_max', 'CL_passage_min', 'CL_passage_max', 'start_reports', ...
+    'start_max_difference_CD', 'start_max_difference_CL'});
+Q.cells = cells;                                       % reversed-flow cells of the upper surface at the last time step
+Q.reversed_from = xg(find(reversed, 1));
+Q.reversed_to = xg(find(reversed, 1, 'last'));
+Q.pattern_steps = last - 1;                            % time steps between the two profiles compared
+Q.pattern_shift = patternShift;
+Q.pattern_speed = patternShift / ((last - 1) * dt);    % in units of the free-stream speed
+if ~isempty(ref)
+    Q.CL_difference_percent = 100 * (mean(A.CL) / ref.CL(1) - 1);
+    Q.CD_difference_percent = 100 * (mean(A.CD) / ref.CD(1) - 1);
+    Q.LD_difference_percent = 100 * (mean(A.CL) / mean(A.CD) / ref.LD(1) - 1);
+end
+for k = 1:8, Q.(['residual_fall_' names{k}]) = fall(k); end
+writetable(Q, fullfile(out, 'run.csv'));
+
+f = figure('Color', 'w', 'Position', [80 80 1500 430], 'Visible', 'off');
+tiledlayout(1, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
+qty = {'CD', 'CL'};  ylab = {'C_D', 'C_L'};  fmt = {'%.4f', '%.3f'};
+for q = 1:2
+    nexttile;  hold on;  box on;  grid on;
+    plot(H.time, H.(qty{q}), '-', 'Color', [0.55 0.55 0.55], 'LineWidth', 0.6, 'DisplayName', 'time-accurate');
+    plot(A.time([1 end]), mean(A.(qty{q})) * [1 1], 'k-', 'LineWidth', 1.8, 'DisplayName', 'its mean over the averaging window');
+    if ~isempty(ref)
+        plot(H.time([1 end]), ref.(qty{q})(1) * [1 1], 'r--', 'LineWidth', 1.3, 'DisplayName', 'pseudo-time: mean over whole cycles');
+        plot(H.time([1 end]), ref.([qty{q} '_min'])(1) * [1 1], 'r:', 'LineWidth', 1.1, 'DisplayName', 'pseudo-time: lowest and highest');
+        plot(H.time([1 end]), ref.([qty{q} '_max'])(1) * [1 1], 'r:', 'LineWidth', 1.1, 'HandleVisibility', 'off');
+    end
+    xlabel('time in chord passages');  ylabel(ylab{q});  plainTicks(gca, fmt{q});
+    if q == 1
+        ylim([0.0025 0.0075]);  legend('Location', 'southeast');
+        title('NACA 2412, \alpha = 4\circ, Transition SST');
+    end
+end
+nexttile;  hold on;  box on;  grid on;
+plot(u.x, u.cf, 'k-', 'LineWidth', 1.4, 'DisplayName', 'time-accurate, time mean');
+if ~isempty(refS)
+    plot(refS.x, refS.cf, 'r--', 'LineWidth', 1.3, 'DisplayName', 'pseudo-time, mean over whole cycles');
+end
+yline(0, 'k:', 'HandleVisibility', 'off');
+xlabel('x / c');  ylabel('C_f, upper surface');  xlim([0 1]);  ylim([-0.003 0.012]);  plainTicks(gca, '%.3f');
+legend('Location', 'northeast');
+exportgraphics(f, fullfile(out, 'time_accurate.png'), 'Resolution', 130);
+close(f);
+fprintf('[TIME-ACCURATE] CD %.6f, CL %.5f, CL/CD %.1f over %g chord passages; largest line %.2f per chord passage\n', ...
+    mean(A.CD), mean(A.CL), mean(A.CL) / mean(A.CD), nAvg * dt, frequency);
 end
 
 %% ------------------------------------------------------------------ helpers

@@ -1,7 +1,7 @@
 # CFD
 
-RANS checks of the XFOIL results with ANSYS Fluent. The set-up is verified on NASA's NACA 0012 case; the
-design study of the NACA 2412 designs is running. Results and their discussion:
+RANS checks of the XFOIL results with ANSYS Fluent. The set-up is verified on NASA's NACA 0012 case, and
+six airfoils (NACA 2412 and five designs) are compared with XFOIL. Results and their discussion:
 [results/cfd](../../results/cfd/README.md).
 
 ## Files
@@ -21,6 +21,8 @@ design study of the NACA 2412 designs is running. Results and their discussion:
 | `designStudyAirfoils.m` | The six airfoils of the design study: NACA 2412 and five optimised designs |
 | `run_design_study.m` | These airfoils with SST and Transition SST, and NACA 2412 on a refined mesh |
 | `transition_tests.m` | NACA 2412 at 4° with Transition SST under five solver settings |
+| `fluentTransientJournal.m` | Batch journal that continues a saved case time-accurately: bounded second-order implicit time stepping with the coupled solver, forces printed after every time step |
+| `run_time_accurate.m` | NACA 2412 at 4° with Transition SST in physical time, started from the pseudo-time solution of the design study |
 | `design_study_xfoil.m` | XFOIL polars of the same designs at the same condition |
 | `collect_cfd_results.m` | Turns the outputs into the tables and figures of `results/cfd` |
 | `writeRunInfo.m` | Records the code version, software and options of a batch |
@@ -55,6 +57,8 @@ drag cycle with it. `transition_tests.m` holds the solver settings that were tri
 design study therefore runs these cases for 5000 second-order iterations, writes the wall data every
 200 iterations over the last 2400, and `collect_cfd_results.m` reports means over whole cycles
 together with the lowest and highest value (`cycleStatistics.m`). The fully turbulent SST runs settle.
+`run_time_accurate.m` continues one of these cases in physical time: the cells then travel downstream,
+and the mean lift and drag are within 0.5 % of the means over whole cycles.
 
 ## Verification in short
 
@@ -72,6 +76,7 @@ timestep_study      % 13 runs, about 4 hours
 verify_naca0012     % 11 runs, about 4 hours
 run_design_study    % 87 runs, about 50 hours
 transition_tests    % 5 runs, about 3 hours
+run_time_accurate   % 1 run of 8000 time steps, about 9 hours
 design_study_xfoil  % XFOIL side of the comparison (needs XFOIL)
 collect_cfd_results % tables and figures in results/cfd
 ```

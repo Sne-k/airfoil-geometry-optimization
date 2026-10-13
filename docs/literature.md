@@ -239,10 +239,11 @@ Web of Science must still be checked.
      original** (best CL/CD 68.3, 70.1 and 53.2 against 72.6; `results/cfd/designs/xfoil.csv`).
    - Physical drag filters removed spurious XFOIL optima such as L/D 836 and 984.
    - The steps are collected in one table and figure (`results/paper/gain_decomposition.csv`).
-   - CFD: verification done for SST; the design study is running. Its Transition SST runs cycle
-     instead of settling, which is itself a point for the comparison: Eça et al. (2022) name the
-     iterative error as a difficulty of these models and find that γ–Re_θ gives the largest separation
-     bubble on the Eppler 387.
+   - RANS (`results/cfd`): in fully turbulent flow the designs optimised for free transition alone have
+     no advantage; with a transition model they keep one, at about half to three quarters of the size
+     XFOIL gives. The Transition SST runs cycle instead of settling, which is itself a point for the
+     comparison: Eça et al. (2022) name the iterative error as a difficulty of these models and find
+     that γ–Re_θ gives the largest separation bubble on the Eppler 387.
 2. **Metric choice.** In the audit, 9 of the 14 in-scope works whose objective could be classified pose
    it at fixed angles of attack. At a fixed angle a cambered design gains mostly because it carries
    more lift.
@@ -266,19 +267,23 @@ Web of Science must still be checked.
    - For NACA 2412 the single-point design for peak CL/CD keeps its gain between Ncrit 5 and 11 and
      loses it only with tripped boundary layers. A design optimised for the mean of free and tripped
      flow keeps 25 to 32 % with free transition and is 2 to 4 % better than the original when tripped
-     (`results/population/README.md`). The population study will show how general this is.
+     (`results/population/README.md`).
+   - Over 30 airfoils the picture is the same (population study, 80 of 188 runs). The designs optimised
+     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other
+     Ncrit and Reynolds numbers. With tripped boundary layers the median is −1.6 %, and 19 of the 30
+     designs are worse than their original.
 
 ## 12. Tasks that follow from the gaps
 
-| Task | Fills gap | State on 5 October 2026 |
+| Task | Fills gap | State on 13 October 2026 |
 |---|---|---|
-| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 188 runs running (`MATLAB/Paper/run_population_study.m`); 11 done |
-| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | written (`collect_population_results.m`); applied to the finished runs in `results/population` |
-| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | written (same script); waits for the batch |
+| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 188 runs running (`MATLAB/Paper/run_population_study.m`); 80 done: peak and fixed angle for all 30 airfoils, fixed lift for 12 |
+| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | done for the 80 finished runs (`results/population/README.md`): the gain of the peak designs survives other Ncrit and Reynolds numbers and is gone with tripped boundary layers (median −1.6 %) |
+| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | done for the peak and fixed-angle designs: a design optimised at 2° gains a median of 49.1 % at 2° and 24.8 % in peak CL/CD; the fixed-lift designs wait for the batch |
 | Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | done for NACA 2412 (four runs): the single-point design was not sensitive to Ncrit in the first place (`results/population/README.md`) |
 | Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped |
-| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | verification done; design study running, extended by two of the robust designs |
-| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | cause found (drifting separation cells in the laminar bubble); runs and tests queued (`MATLAB/CFD/transition_tests.m`) |
+| RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | done for six airfoils (`results/cfd/README.md`) |
+| Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | done: cause, five solver settings, refined mesh, means over whole cycles, and one case in physical time, whose mean forces agree with the cycle means within 0.5 % (`results/cfd/README.md`) |
 | Reporting checklist | 2, 3 | draft in section 13 |
 | Optimise with RANS in the loop to see how the optimum itself moves | 1 | not feasible on the laptop; name as future work |
 | Wind-tunnel test of a design | 1 | outside this project; name as a limitation |

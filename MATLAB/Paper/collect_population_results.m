@@ -31,12 +31,13 @@ function collect_population_results(runDir, outDir, airfoilDir, workers, only)
 %   MATLAB/airfoils/uiuc).
 %
 %   A polar gives values only if it is usable by the rule of the optimiser:
-%   at least 12 converged angles, on both sides of 0 deg or at it. The
-%   polars must also not depend on the load of the machine. xfoilPolar stops
-%   a sweep at a time limit; normally that only cuts a tail of angles beyond
-%   stall that do not converge, but on an overloaded machine it can cut
-%   angles that would have converged. A polar whose sweep was stopped is
-%   therefore computed again and accepted when the same angles converge
+%   at least 12 converged angles, on both sides of 0 deg or at it. (Without
+%   the rule, a polar of which only a few negative angles had converged once
+%   gave a wrong peak.) The polars must also not depend on how busy the
+%   machine is. xfoilPolar stops a sweep at a time limit; normally that only
+%   cuts a tail of angles beyond stall that do not converge. The analysis
+%   uses three times the standard limit, and a polar whose sweep was still
+%   stopped is computed again and accepted when the same angles converge
 %   twice in a row (up to four runs); otherwise the row is marked
 %   (no_stable_polar) and has no values.
 %
@@ -222,6 +223,7 @@ end
 function [p, unstable] = stablePolar(xu, yu, xl, yl, Re, exe, flow)
 % XFOIL polar that does not depend on the load of the machine (see the header)
 unstable = false;
+flow.TimeFactor = 3;
 [p, info] = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe, [], true, flow);
 if ~info.timedOut, return; end
 for attempt = 2:4
