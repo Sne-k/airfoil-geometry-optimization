@@ -177,7 +177,7 @@ docs/methods.md,  - Discretisation uncertainty of the drag by the grid convergen
 docs/methods.md,    the fine and 1.61 % on the medium mesh at 10°.,1.61,results/cfd/verification/grid_convergence.csv,"one(alpha=10, quantity='CD')['GCI_medium_percent']"
 docs/methods.md,  - A far field 20 chords away raises the drag at 10° by 9.4 %; 100 chords still by 1.5 %.,9.4,results/cfd/verification/farfield.csv,one(far_field_chords=20)['CD_difference_percent']
 docs/methods.md,  - A far field 20 chords away raises the drag at 10° by 9.4 %; 100 chords still by 1.5 %.,1.5,results/cfd/verification/farfield.csv,one(far_field_chords=100)['CD_difference_percent']
-results/population/README.md,"**State: 12 October 2026, 80 of 188 runs.**",80,results/population/runs.csv,len(rows)
+results/population/README.md,"**State: 12 October 2026, 80 of 217 runs.**",80,results/population/runs.csv,len(rows)
 results/population/README.md,| `peak` | peak CL/CD | 30 of 30 airfoils (seed 1); seeds 2 and 3 still to come |,30,results/population/runs.csv,len(sel(formulation='peak'))
 results/population/README.md,| `alpha2` | CL/CD at 2° | 30 of 30 |,30,results/population/runs.csv,len(sel(formulation='alpha2'))
 results/population/README.md,| `cldes` | CL/CD at the lift coefficient where the original has its peak | 12 of 30 |,12,results/population/runs.csv,len(sel(formulation='cldes'))
@@ -394,9 +394,9 @@ README.md,  38.2 %. The median stays between 29.3 and 37.8 % at other Ncrit and 
 README.md,  38.2 %. The median stays between 29.3 and 37.8 % at other Ncrit and Reynolds numbers and is −1.6 %,−1.6,results/population/summary.csv,"one(formulation='peak', condition='tripped')['median_gain_percent']"
 README.md,"  with tripped boundary layers, where 19 of the 30 designs are worse than their original",19,results/population/summary.csv,"one(formulation='peak', condition='tripped')['designs_worse_than_original']"
 README.md,"  with tripped boundary layers, where 19 of the 30 designs are worse than their original",30,results/population/summary.csv,"one(formulation='peak', condition='tripped')['airfoils']"
-README.md,"  ([results/population](results/population/README.md); 80 of 188 runs, the batch is still running).",80,results/population/runs.csv,len(rows)
-docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 188 runs). The designs optimised",30,results/population/summary.csv,"one(formulation='peak', condition='tripped')['airfoils']"
-docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 188 runs). The designs optimised",80,results/population/runs.csv,len(rows)
+README.md,"  ([results/population](results/population/README.md); 80 of 217 runs, the batch is still running).",80,results/population/runs.csv,len(rows)
+docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 217 runs). The designs optimised",30,results/population/summary.csv,"one(formulation='peak', condition='tripped')['airfoils']"
+docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 217 runs). The designs optimised",80,results/population/runs.csv,len(rows)
 docs/literature.md,     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other,38.2,results/population/summary.csv,"one(formulation='peak', condition='design')['median_gain_percent']"
 docs/literature.md,     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other,29.3,results/population/summary.csv,"min(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"
 docs/literature.md,     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other,37.8,results/population/summary.csv,"max(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"
@@ -410,8 +410,8 @@ docs/literature.md,done for the 80 finished runs (`results/population/README.md`
 docs/literature.md,done for the 80 finished runs (`results/population/README.md`): the gain of the peak designs survives other Ncrit and Reynolds numbers and is gone with tripped boundary layers (median −1.6 %) |,−1.6,results/population/summary.csv,"one(formulation='peak', condition='tripped')['median_gain_percent']"
 docs/literature.md,a design optimised at 2° gains a median of 49.1 % at 2° and 24.8 % in peak CL/CD; the fixed-lift designs wait for the batch |,49.1,results/population/conditions.csv,"median([r['LD_2deg_gain_percent'] for r in sel(formulation='alpha2', condition='design', seed=1) if r['LD_2deg_gain_percent'] == r['LD_2deg_gain_percent']])"
 docs/literature.md,a design optimised at 2° gains a median of 49.1 % at 2° and 24.8 % in peak CL/CD; the fixed-lift designs wait for the batch |,24.8,results/population/conditions.csv,"median([r['LDmax_gain_percent'] for r in sel(formulation='alpha2', condition='design', seed=1) if r['LDmax_gain_percent'] == r['LDmax_gain_percent']])"
-docs/paper_outline.md,"batch running (188 runs, 80 done); first tables for the peak and fixed-angle formulations |",80,results/population/runs.csv,len(rows)
-docs/paper_outline.md,  which it is reported. First result (80 of 188 runs): the designs optimised for peak CL/CD gain a,80,results/population/runs.csv,len(rows)
+docs/paper_outline.md,"batch running (217 runs, 80 done); first tables for the peak and fixed-angle formulations |",80,results/population/runs.csv,len(rows)
+docs/paper_outline.md,  which it is reported. First result (80 of 217 runs): the designs optimised for peak CL/CD gain a,80,results/population/runs.csv,len(rows)
 docs/paper_outline.md,"  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when",38.2,results/population/summary.csv,"one(formulation='peak', condition='design')['median_gain_percent']"
 docs/paper_outline.md,"  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when",29.3,results/population/summary.csv,"min(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"
 docs/paper_outline.md,"  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when",37.8,results/population/summary.csv,"max(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"

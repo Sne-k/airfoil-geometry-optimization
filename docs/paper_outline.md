@@ -24,9 +24,9 @@ checklist.
 | # | Contribution | Evidence | State |
 |---|---|---|---|
 | 1 | One reported gain taken apart into metric, numerical artefacts, shape artefacts and transition assumption | NACA 2412: `results/paper`, `results/README.md`, `results/cfd/designs/xfoil.csv` | available |
-| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (188 runs, 80 done); first tables for the peak and fixed-angle formulations |
+| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (217 runs, 80 done); first tables for the peak and fixed-angle formulations |
 | 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | available (six airfoils, 84 runs, and one time-accurate run) |
-| 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; other airfoils not planned |
+| 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; the other 29 airfoils are run at the end of the batch |
 | 5 | Audit of how such results are reported, and a checklist | `docs/literature.md`, sections 8–13 | first version done |
 | 6 | Open, checked tools: optimiser with curvature limits, verified Fluent set-up, provenance of every number | repository, `tools/check_numbers.py` | available |
 
@@ -64,7 +64,7 @@ the question, the approach and the contributions.
   smooth against wavy designs (3.8 %); spurious optima removed by the checks; Ncrit and tripped flow.
 - 5.2 The population: distribution of the gains by formulation; what survives at Ncrit 5 and with
   tripped flow; spread over seeds; effect of the curvature limits; gain as a function of the angle at
-  which it is reported. First result (80 of 188 runs): the designs optimised for peak CL/CD gain a
+  which it is reported. First result (80 of 217 runs): the designs optimised for peak CL/CD gain a
   median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when
   tripped; the designs optimised at 2° gain 49.1 % at 2° and 24.8 % at the peak.
 - 5.3 The robust formulations. First result (NACA 2412): the single-point design keeps its gain between
