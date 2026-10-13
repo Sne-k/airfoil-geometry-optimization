@@ -1,6 +1,6 @@
 # Population study (in progress)
 
-**State: 12 October 2026, 80 of 188 runs.** The batch (`MATLAB/Paper/run_population_study.m`) optimises
+**State: 12 October 2026, 80 of 217 runs.** The batch (`MATLAB/Paper/run_population_study.m`) optimises
 30 baseline airfoils under several formulations. The tables in this folder are written by
 `MATLAB/Paper/collect_population_results.m` from the runs that are finished, and are replaced when the
 batch ends.
@@ -12,6 +12,7 @@ batch ends.
 | `cldes` | CL/CD at the lift coefficient where the original has its peak | 12 of 30 |
 | `nocurv` | peak CL/CD without curvature limits | none yet |
 | robust formulations | NACA 2412 only, see below | 8 of 8 |
+| `robusttrip` for the other 29 airfoils | mean of the peak CL/CD with free transition and with tripped boundary layers, seed 1 | none yet |
 
 Settings of every run: XFOIL at Re = 10⁶ and M = 0, CST shape with 14 design variables (order 6),
 genetic algorithm followed by `fmincon`, limits on thickness, pitching moment and curvature
