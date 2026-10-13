@@ -285,7 +285,7 @@ timestep_study               % about 4 hours
 verify_naca0012              % about 4 hours
 run_design_study             % 87 runs, about 50 hours
 transition_tests             % about 3 hours
-run_time_accurate            % about 9 hours
+run_time_accurate            % about 18 hours
 design_study_xfoil           % XFOIL side of the comparison
 collect_cfd_results          % tables and figures in results/cfd
 % in MATLAB/Paper again

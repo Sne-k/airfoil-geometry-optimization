@@ -20,6 +20,10 @@ function plan = fluentTransientJournal(file, state, alpha, varargin)
 %     'Steps'       number of the last time step                     (8000)
 %     'FirstStep'   number of the first time step; larger than 1 to
 %                   continue from a file <tag>_step<FirstStep-1>         (1)
+%     'Switch'      true switches the case from the steady to the
+%                   time-accurate formulation; false if the state was
+%                   written by a time-accurate run (Fluent rejects the
+%                   switch in a case that is time-accurate already)   (true)
 %     'Inner'       largest number of iterations per time step         (10)
 %     'Tolerance'   fall of the residuals that ends a time step      (1e-3)
 %     'Residuals'   number of residuals of the case: 6 for the SST model,
@@ -45,6 +49,7 @@ ip.addParameter('Mach', 0.15);
 ip.addParameter('TimeStep', 0.001);
 ip.addParameter('Steps', 8000);
 ip.addParameter('FirstStep', 1);
+ip.addParameter('Switch', true);
 ip.addParameter('Inner', 10);
 ip.addParameter('Tolerance', 1e-3);
 ip.addParameter('Residuals', 8);
@@ -64,8 +69,10 @@ cleaner = onCleanup(@() fclose(fid));
 w = @(varargin) fprintf(fid, [varargin{1} '\n'], varargin{2:end});
 w('/file/confirm-overwrite no');
 w('/file/read-case-data %s.cas.h5', state);
-w('/define/models/unsteady-2nd-order-bounded? yes');
-w('/solve/set/p-v-coupling 24');                                    % coupled
+if o.Switch
+    w('/define/models/unsteady-2nd-order-bounded? yes');
+    w('/solve/set/p-v-coupling 24');                                % coupled
+end
 w('/solve/set/transient-controls/time-step-size %.6e', o.TimeStep / U);   % chord 1 m
 w('/solve/monitors/residual/criterion-type 1');                     % relative to the start of the time step
 w(['/solve/monitors/residual/relative-conv-criteria' repmat(sprintf(' %g', o.Tolerance), 1, o.Residuals)]);
