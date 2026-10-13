@@ -177,7 +177,7 @@ docs/methods.md,  - Discretisation uncertainty of the drag by the grid convergen
 docs/methods.md,    the fine and 1.61 % on the medium mesh at 10°.,1.61,results/cfd/verification/grid_convergence.csv,"one(alpha=10, quantity='CD')['GCI_medium_percent']"
 docs/methods.md,  - A far field 20 chords away raises the drag at 10° by 9.4 %; 100 chords still by 1.5 %.,9.4,results/cfd/verification/farfield.csv,one(far_field_chords=20)['CD_difference_percent']
 docs/methods.md,  - A far field 20 chords away raises the drag at 10° by 9.4 %; 100 chords still by 1.5 %.,1.5,results/cfd/verification/farfield.csv,one(far_field_chords=100)['CD_difference_percent']
-results/population/README.md,"**State: 12 October 2026, 80 of 188 runs.**",80,results/population/runs.csv,len(rows)
+results/population/README.md,"**State: 12 October 2026, 80 of 217 runs.**",80,results/population/runs.csv,len(rows)
 results/population/README.md,| `peak` | peak CL/CD | 30 of 30 airfoils (seed 1); seeds 2 and 3 still to come |,30,results/population/runs.csv,len(sel(formulation='peak'))
 results/population/README.md,| `alpha2` | CL/CD at 2° | 30 of 30 |,30,results/population/runs.csv,len(sel(formulation='alpha2'))
 results/population/README.md,| `cldes` | CL/CD at the lift coefficient where the original has its peak | 12 of 30 |,12,results/population/runs.csv,len(sel(formulation='cldes'))
@@ -394,9 +394,9 @@ README.md,  38.2 %. The median stays between 29.3 and 37.8 % at other Ncrit and 
 README.md,  38.2 %. The median stays between 29.3 and 37.8 % at other Ncrit and Reynolds numbers and is −1.6 %,−1.6,results/population/summary.csv,"one(formulation='peak', condition='tripped')['median_gain_percent']"
 README.md,"  with tripped boundary layers, where 19 of the 30 designs are worse than their original",19,results/population/summary.csv,"one(formulation='peak', condition='tripped')['designs_worse_than_original']"
 README.md,"  with tripped boundary layers, where 19 of the 30 designs are worse than their original",30,results/population/summary.csv,"one(formulation='peak', condition='tripped')['airfoils']"
-README.md,"  ([results/population](results/population/README.md); 80 of 188 runs, the batch is still running).",80,results/population/runs.csv,len(rows)
-docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 188 runs). The designs optimised",30,results/population/summary.csv,"one(formulation='peak', condition='tripped')['airfoils']"
-docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 188 runs). The designs optimised",80,results/population/runs.csv,len(rows)
+README.md,"  ([results/population](results/population/README.md); 80 of 217 runs, the batch is still running).",80,results/population/runs.csv,len(rows)
+docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 217 runs). The designs optimised",30,results/population/summary.csv,"one(formulation='peak', condition='tripped')['airfoils']"
+docs/literature.md,"   - Over 30 airfoils the picture is the same (population study, 80 of 217 runs). The designs optimised",80,results/population/runs.csv,len(rows)
 docs/literature.md,     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other,38.2,results/population/summary.csv,"one(formulation='peak', condition='design')['median_gain_percent']"
 docs/literature.md,     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other,29.3,results/population/summary.csv,"min(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"
 docs/literature.md,     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other,37.8,results/population/summary.csv,"max(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"
@@ -410,8 +410,8 @@ docs/literature.md,done for the 80 finished runs (`results/population/README.md`
 docs/literature.md,done for the 80 finished runs (`results/population/README.md`): the gain of the peak designs survives other Ncrit and Reynolds numbers and is gone with tripped boundary layers (median −1.6 %) |,−1.6,results/population/summary.csv,"one(formulation='peak', condition='tripped')['median_gain_percent']"
 docs/literature.md,a design optimised at 2° gains a median of 49.1 % at 2° and 24.8 % in peak CL/CD; the fixed-lift designs wait for the batch |,49.1,results/population/conditions.csv,"median([r['LD_2deg_gain_percent'] for r in sel(formulation='alpha2', condition='design', seed=1) if r['LD_2deg_gain_percent'] == r['LD_2deg_gain_percent']])"
 docs/literature.md,a design optimised at 2° gains a median of 49.1 % at 2° and 24.8 % in peak CL/CD; the fixed-lift designs wait for the batch |,24.8,results/population/conditions.csv,"median([r['LDmax_gain_percent'] for r in sel(formulation='alpha2', condition='design', seed=1) if r['LDmax_gain_percent'] == r['LDmax_gain_percent']])"
-docs/paper_outline.md,"batch running (188 runs, 80 done); first tables for the peak and fixed-angle formulations |",80,results/population/runs.csv,len(rows)
-docs/paper_outline.md,  which it is reported. First result (80 of 188 runs): the designs optimised for peak CL/CD gain a,80,results/population/runs.csv,len(rows)
+docs/paper_outline.md,"batch running (217 runs, 80 done); first tables for the peak and fixed-angle formulations |",80,results/population/runs.csv,len(rows)
+docs/paper_outline.md,  which it is reported. First result (80 of 217 runs): the designs optimised for peak CL/CD gain a,80,results/population/runs.csv,len(rows)
 docs/paper_outline.md,"  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when",38.2,results/population/summary.csv,"one(formulation='peak', condition='design')['median_gain_percent']"
 docs/paper_outline.md,"  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when",29.3,results/population/summary.csv,"min(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"
 docs/paper_outline.md,"  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when",37.8,results/population/summary.csv,"max(r['median_gain_percent'] for r in sel(formulation='peak') if r['condition'] not in ('design', 'tripped'))"
@@ -866,7 +866,19 @@ results/cfd/README.md,  this length can establish. The first 4 chord passages ar
 results/cfd/README.md,"  pseudo-time state, and the drag falls as low as 0.0028.",0.0028,results/cfd/time_accurate/windows.csv,min(r['CD_min'] for r in rows)
 results/cfd/README.md,- **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians,2.6,results/cfd/time_accurate/run.csv,min(rows[0][k] for k in rows[0] if k.startswith('residual_fall'))
 results/cfd/README.md,- **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians,5.1,results/cfd/time_accurate/run.csv,max(rows[0][k] for k in rows[0] if k.startswith('residual_fall'))
-README.md,  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+README.md,"  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %, and halving its",0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+README.md,  time step changes them by at most 0.02 %.,0.02,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['half_CL_difference_percent']), abs(rows[0]['half_CD_difference_percent']))"
+results/cfd/README.md,  saved state after 4 chord passages (8000 time steps of 0.0005 chord passages). The mean drag changes by,4,results/cfd/time_accurate/run.csv,rows[0]['half_from_time_step'] * rows[0]['time_step']
+results/cfd/README.md,  saved state after 4 chord passages (8000 time steps of 0.0005 chord passages). The mean drag changes by,8000,results/cfd/time_accurate/run.csv,rows[0]['half_time_steps']
+results/cfd/README.md,  saved state after 4 chord passages (8000 time steps of 0.0005 chord passages). The mean drag changes by,0.0005,results/cfd/time_accurate/run.csv,rows[0]['half_time_step']
+results/cfd/README.md,"  0.02 % and the mean lift by 0.002 %, the means over single chord passages differ by at most 0.09 % of",0.02,results/cfd/time_accurate/run.csv,abs(rows[0]['half_CD_difference_percent'])
+results/cfd/README.md,"  0.02 % and the mean lift by 0.002 %, the means over single chord passages differ by at most 0.09 % of",0.002,results/cfd/time_accurate/run.csv,abs(rows[0]['half_CL_difference_percent'])
+results/cfd/README.md,"  0.02 % and the mean lift by 0.002 %, the means over single chord passages differ by at most 0.09 % of",0.09,results/cfd/time_accurate/run.csv,rows[0]['half_passage_CD_difference_percent']
+results/cfd/README.md,"  the mean drag, and the largest line of the lift spectrum stays at 15.75 cycles per chord passage. In",15.75,results/cfd/time_accurate/run.csv,rows[0]['half_frequency']
+docs/methods.md,  The averaging window was repeated with half the time step from the saved state after 4000 time steps,4000,results/cfd/time_accurate/run.csv,rows[0]['half_from_time_step']
+docs/methods.md,  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.,8000,results/cfd/time_accurate/run.csv,rows[0]['half_time_steps']
+docs/methods.md,  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.,0.0005,results/cfd/time_accurate/run.csv,rows[0]['half_time_step']
+docs/methods.md,  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.,0.02,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['half_CL_difference_percent']), abs(rows[0]['half_CD_difference_percent']))"
 MATLAB/CFD/README.md,and the mean lift and drag are within 0.5 % of the means over whole cycles.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
 docs/methods.md,"  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per",8000,results/cfd/time_accurate/run.csv,rows[0]['time_steps']
 docs/methods.md,"  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per",0.001,results/cfd/time_accurate/run.csv,rows[0]['time_step']

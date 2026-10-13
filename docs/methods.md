@@ -184,7 +184,8 @@ Summary:
     range of the search.
   - NACA 2412 is also optimised for the mean of the peak CL/CD at Ncrit = 5 and 9 (seeds 1 to 3) and for
     the lower of the two (seed 1), and in the same way for free transition (Ncrit 9) together with
-    transition fixed at 5 % chord on both surfaces.
+    transition fixed at 5 % chord on both surfaces. The mean of free and fixed transition is also the
+    objective of one run (seed 1) for each of the other 29 airfoils.
   - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
     against the seed at the same condition.
@@ -248,6 +249,8 @@ Results: [results/cfd](../results/cfd/README.md).
   The time means are taken over the last 4 chord passages and compared with the means over whole
   cycles; they agree within 0.5 % in lift and drag. Switching to a transient case sets the
   pressure-velocity coupling to SIMPLE in Fluent 2026 R1; the journal sets the coupled solver again.
+  The averaging window was repeated with half the time step from the saved state after 4000 time steps
+  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.
 - **Models.** k-ω SST (fully turbulent) with the free-stream values of the NASA case (0.052 %, viscosity
   ratio 0.009), and Transition SST (γ–Re_θ; Langtry & Menter 2009).
 - **Transition SST inflow.** XFOIL's Ncrit = 9 corresponds to Tu ≈ 0.07 % by Mack's relation

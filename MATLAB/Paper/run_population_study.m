@@ -13,7 +13,7 @@ function run_population_study(outDir, airfoilDir, workers, pilot)
 %   sd7062, sg6043, fx63137, nlf416, rg15, e423, mh32, ah79100b, goe398.
 %   Missing files are skipped with a message.
 %
-%   Runs, in this order (188 for 30 airfoils):
+%   Runs, in this order (217 for 30 airfoils):
 %     robust   NACA 2412 only: peak CL/CD averaged over Ncrit = 5 and 9
 %              (seeds 1-3) and its worst case over the two (seed 1); and the
 %              same for free transition (Ncrit 9) together with transition
@@ -25,6 +25,8 @@ function run_population_study(outDir, airfoilDir, workers, pilot)
 %              its peak CL/CD, rounded to 0.05, seed 1     (every airfoil)
 %     nocurv   peak CL/CD without curvature limits, seed 1 (every airfoil)
 %     peak     seeds 2 and 3                               (every airfoil)
+%     robusttrip  the mean of free transition and tripped flow, as for
+%              NACA 2412 above, seed 1               (every other airfoil)
 %   A lift coefficient common to all airfoils does not work: the highly
 %   cambered ones do not fly at CL = 0.5 within the angle range of the
 %   analysis. The design lift coefficients are written to baselines.csv in
@@ -34,7 +36,7 @@ function run_population_study(outDir, airfoilDir, workers, pilot)
 %
 %   RUN_POPULATION_STUDY(outDir, airfoilDir, workers) sets the number of
 %   parallel workers (default 6; a run takes about 35 minutes with 6).
-%   RUN_POPULATION_STUDY(outDir, airfoilDir, workers, true) runs six very
+%   RUN_POPULATION_STUDY(outDir, airfoilDir, workers, true) runs seven very
 %   short searches (a check of the set-up).
 
 here = fileparts(mfilename('fullpath'));
@@ -107,10 +109,14 @@ for s = 2:3
         runs(end+1, :) = {sprintf('%s_peak_s%d', A{k, 1}, s), {A{k, 2}, 'Seed', s}}; %#ok<AGROW>
     end
 end
+for k = 1:size(A, 1)                                 % free and tripped flow together, for the other airfoils
+    if strcmp(A{k, 1}, 'NACA_2412'), continue; end
+    runs(end+1, :) = {sprintf('%s_robusttrip_s1', A{k, 1}), {A{k, 2}, 'Seed', 1, 'Conditions', trip}}; %#ok<AGROW>
+end
 if pilot                                             % one run of every kind
     last = A{end, 1};
     keep = {'NACA_2412_robustmean_s1', 'NACA_2412_robusttrip_s1', 'NACA_2412_peak_s1', [last '_alpha2_s1'], ...
-        [last '_cldes_s1'], [last '_nocurv_s1']};
+        [last '_cldes_s1'], [last '_nocurv_s1'], [last '_robusttrip_s1']};
     runs = runs(ismember(runs(:, 1), keep), :);
 end
 fprintf('[BATCH] %d runs, %d airfoils\n', size(runs, 1), size(A, 1));

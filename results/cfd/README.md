@@ -242,7 +242,12 @@ over the last 4 chord passages ([time_accurate/summary.csv](time_accurate/summar
   this length can establish. The first 4 chord passages are left out; in them the solution leaves the
   pseudo-time state, and the drag falls as low as 0.0028.
 - **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians
-  over the averaging window). One time step, one mesh and one angle were run.
+  over the averaging window). One mesh and one angle were run.
+- **The time step is small enough.** The averaging window was repeated with half the time step, from the
+  saved state after 4 chord passages (8000 time steps of 0.0005 chord passages). The mean drag changes by
+  0.02 % and the mean lift by 0.002 %, the means over single chord passages differ by at most 0.09 % of
+  the mean drag, and the largest line of the lift spectrum stays at 15.75 cycles per chord passage. In
+  the figure the two histories lie on top of each other.
 
 For this case the mean over whole pseudo-time cycles is therefore a fair estimate of the time mean of the
 model. The run does not say which model is closer to a measurement.
