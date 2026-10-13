@@ -866,7 +866,19 @@ results/cfd/README.md,  this length can establish. The first 4 chord passages ar
 results/cfd/README.md,"  pseudo-time state, and the drag falls as low as 0.0028.",0.0028,results/cfd/time_accurate/windows.csv,min(r['CD_min'] for r in rows)
 results/cfd/README.md,- **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians,2.6,results/cfd/time_accurate/run.csv,min(rows[0][k] for k in rows[0] if k.startswith('residual_fall'))
 results/cfd/README.md,- **Numerical quality.** Within a time step the residuals fall by 2.6 to 5.1 orders of magnitude (medians,5.1,results/cfd/time_accurate/run.csv,max(rows[0][k] for k in rows[0] if k.startswith('residual_fall'))
-README.md,  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+README.md,"  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %, and halving its",0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+README.md,  time step changes them by at most 0.02 %.,0.02,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['half_CL_difference_percent']), abs(rows[0]['half_CD_difference_percent']))"
+results/cfd/README.md,  saved state after 4 chord passages (8000 time steps of 0.0005 chord passages). The mean drag changes by,4,results/cfd/time_accurate/run.csv,rows[0]['half_from_time_step'] * rows[0]['time_step']
+results/cfd/README.md,  saved state after 4 chord passages (8000 time steps of 0.0005 chord passages). The mean drag changes by,8000,results/cfd/time_accurate/run.csv,rows[0]['half_time_steps']
+results/cfd/README.md,  saved state after 4 chord passages (8000 time steps of 0.0005 chord passages). The mean drag changes by,0.0005,results/cfd/time_accurate/run.csv,rows[0]['half_time_step']
+results/cfd/README.md,"  0.02 % and the mean lift by 0.002 %, the means over single chord passages differ by at most 0.09 % of",0.02,results/cfd/time_accurate/run.csv,abs(rows[0]['half_CD_difference_percent'])
+results/cfd/README.md,"  0.02 % and the mean lift by 0.002 %, the means over single chord passages differ by at most 0.09 % of",0.002,results/cfd/time_accurate/run.csv,abs(rows[0]['half_CL_difference_percent'])
+results/cfd/README.md,"  0.02 % and the mean lift by 0.002 %, the means over single chord passages differ by at most 0.09 % of",0.09,results/cfd/time_accurate/run.csv,rows[0]['half_passage_CD_difference_percent']
+results/cfd/README.md,"  the mean drag, and the largest line of the lift spectrum stays at 15.75 cycles per chord passage. In",15.75,results/cfd/time_accurate/run.csv,rows[0]['half_frequency']
+docs/methods.md,  The averaging window was repeated with half the time step from the saved state after 4000 time steps,4000,results/cfd/time_accurate/run.csv,rows[0]['half_from_time_step']
+docs/methods.md,  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.,8000,results/cfd/time_accurate/run.csv,rows[0]['half_time_steps']
+docs/methods.md,  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.,0.0005,results/cfd/time_accurate/run.csv,rows[0]['half_time_step']
+docs/methods.md,  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.,0.02,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['half_CL_difference_percent']), abs(rows[0]['half_CD_difference_percent']))"
 MATLAB/CFD/README.md,and the mean lift and drag are within 0.5 % of the means over whole cycles.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
 docs/methods.md,"  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per",8000,results/cfd/time_accurate/run.csv,rows[0]['time_steps']
 docs/methods.md,"  stepping and the coupled solver: 8000 time steps of 0.001 chord passages, at most 10 iterations per",0.001,results/cfd/time_accurate/run.csv,rows[0]['time_step']

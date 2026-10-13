@@ -35,6 +35,8 @@ function collect_cfd_results(runDir, outDir, only)
 %     transition_tests/ forces.csv (one row per solver setting), history.csv,
 %                       meshes.csv, run_info.json, transition_tests.png
 %     time_accurate/    history.csv (forces after every time step),
+%                       history_half.csv (the averaging window repeated
+%                       with half the time step, if that session was run),
 %                       windows.csv (means over single chord passages),
 %                       summary.csv (time means over the averaging window
 %                       against the cycle means of the design study, read
@@ -44,7 +46,7 @@ function collect_cfd_results(runDir, outDir, only)
 %                       reversed-flow cells, check of the start against
 %                       the design-study run), surface.csv
 %                       (time-mean pressure and skin friction), meshes.csv,
-%                       run_info.json, time_accurate.png
+%                       run_info.json, run_info_half.json, time_accurate.png
 %   A run counts as steady if, over its last force reports (500 iterations
 %   in the NACA 0012 runs; 1000 with SST and 2400 with Transition SST in
 %   the design study), CL varies by less than 1e-4 and CD by less than
@@ -777,11 +779,7 @@ if ~exist(out, 'dir'), mkdir(out); end
 if isfile(fullfile(in, 'meshes.csv')), copyfile(fullfile(in, 'meshes.csv'), fullfile(out, 'meshes.csv')); end
 info = jsondecode(fileread(fullfile(in, 'run_info.json')));
 txt = fileread(fullfile(in, 'ta_run.out'));
-rel = regexp(txt, 'Welcome to ANSYS Fluent ([^\r\n]*)', 'tokens', 'once');
-build = regexp(txt, 'Build Id:\s*(\d+)', 'tokens', 'once');
-if ~isempty(rel), info.fluent = strtrim(rel{1}); end
-if ~isempty(build), info.fluent = [info.fluent ', build ' build{1}]; end
-if contains(txt, 'student version', 'IgnoreCase', true), info.fluent = [info.fluent ' (student licence)']; end
+info.fluent = fluentRelease(txt, info.fluent);
 fid = fopen(fullfile(out, 'run_info.json'), 'w');  fprintf(fid, '%s\n', jsonencode(info, 'PrettyPrint', true));  fclose(fid);
 
 plan = readtable(fullfile(in, 'ta_run_plan.csv'));
@@ -816,14 +814,7 @@ use = H.step > n - nAvg;
 A = H(use, :);
 inWindow = Wn.time_from >= A.time(1) - 1.5 * dt;        % the chord passages inside the averaging window
 
-% Largest line of the lift spectrum above two cycles per chord passage (Hann window, linear trend removed)
-m = height(A);
-x = detrend(A.CL) .* (0.5 - 0.5 * cos(2 * pi * (0:m-1).' / m));
-amp = abs(fft(x));
-freq = (0:m-1).' / (m * dt);
-band = find(freq >= 2 & freq <= 100);
-[~, j] = max(amp(band));
-frequency = freq(band(j));
+frequency = taLine(A.CL, dt);                          % largest line of the lift spectrum
 
 % Fall of the residuals within a time step (orders of magnitude, median over the averaging window)
 names = {'continuity', 'x_velocity', 'y_velocity', 'energy', 'k', 'omega', 'intermit', 'retheta'};
@@ -846,12 +837,7 @@ T0 = 288.15;  Rgas = 8314.47 / 28.966;                 % as in fluentJournal
 qInf = 0.5 * (101325 / (Rgas * T0)) * (info.options.run.Mach * sqrt(1.4 * Rgas * T0))^2;
 wall = readmatrix(fullfile(in, 'naca2412_wall.csv'));
 steps = n - nAvg + every:every:n;
-cf = [];  cp = [];
-for k = 1:numel(steps)
-    s = fluentSurface(fullfile(in, sprintf('ta_run_step%d.prof', steps(k))), wall, qInf);
-    cf(:, k) = s.cf;  cp(:, k) = s.cp; %#ok<AGROW>
-end
-s.cp = mean(cp, 2);  s.cf = mean(cf, 2);  s.cf_min = min(cf, [], 2);  s.cf_max = max(cf, [], 2);
+s = taSurface(in, 'ta_run', steps, wall, qInf);
 writetable(s(:, {'surface', 'x', 'y', 'cp', 'cf', 'cf_min', 'cf_max'}), fullfile(out, 'surface.csv'));
 u = s(strcmp(s.surface, 'upper'), :);  [xtrU, xsepU] = transitionFromCf(u.x, u.cf);
 l = s(strcmp(s.surface, 'lower'), :);  xtrL = transitionFromCf(l.x, l.cf);
@@ -893,6 +879,41 @@ if isfile(fullfile(in, 'ta_start.out')) && isfile(fullfile(designRuns, 'transiti
     startCheck = [numel(c1), max(abs(c1(k) - c0(k))), max(abs(l1(k) - l0(k)))];
 end
 
+% The averaging window repeated with half the time step (session ta_half), if it was run
+half = struct('rows', {{}}, 'H', []);
+if isfile(fullfile(in, 'ta_half.out')) && isfile(fullfile(in, 'ta_half_plan.csv')) && isfile(fullfile(in, 'run_info_half.json'))
+    infoH = jsondecode(fileread(fullfile(in, 'run_info_half.json')));
+    oh = infoH.options.half;
+    planH = readtable(fullfile(in, 'ta_half_plan.csv'));
+    [cdH, clH, ~, partsH] = fluentForces(fullfile(in, 'ta_half.out'));
+    nH = height(planH);
+    if numel(cdH) < nH
+        fprintf('[TIME-ACCURATE] ta_half is incomplete: %d of %d time steps; it is left out\n', numel(cdH), nH);
+    elseif oh.From ~= n - nAvg || abs(nH * oh.TimeStep - nAvg * dt) > 1e-9
+        fprintf('[TIME-ACCURATE] ta_half does not cover the averaging window; it is left out\n');
+    else
+        k = (1:nH).';
+        Hh = table(planH.step, oh.From * dt + planH.time, clH(k), cdH(k), partsH.CD_pressure(k), partsH.CD_viscous(k), ...
+            'VariableNames', H.Properties.VariableNames);
+        writetable(Hh, fullfile(out, 'history_half.csv'));
+        infoH.fluent = fluentRelease(fileread(fullfile(in, 'ta_half.out')), infoH.fluent);
+        fid = fopen(fullfile(out, 'run_info_half.json'), 'w');  fprintf(fid, '%s\n', jsonencode(infoH, 'PrettyPrint', true));  fclose(fid);
+        sH = taSurface(in, 'ta_half', oh.SurfaceEvery(1):oh.SurfaceEvery(1):nH, wall, qInf);
+        uH = sH(strcmp(sH.surface, 'upper'), :);  [xtrH, xsepH] = transitionFromCf(uH.x, uH.cf);
+        lH = sH(strcmp(sH.surface, 'lower'), :);  xtrHL = transitionFromCf(lH.x, lH.cf);
+        ldH = Hh.CL ./ Hh.CD;
+        half.rows = {'time-accurate with half the time step, same window', mean(Hh.CL), mean(Hh.CD), mean(Hh.CL) / mean(Hh.CD), ...
+            min(Hh.CL), max(Hh.CL), min(Hh.CD), max(Hh.CD), min(ldH), max(ldH), mean(Hh.CD_pressure), mean(Hh.CD_viscous), ...
+            xtrH, xtrHL, xsepH};
+        half.H = Hh;
+        half.o = oh;
+        perH = round(1 / oh.TimeStep);                  % time steps per chord passage
+        pm = arrayfun(@(j) mean(Hh.CD((j - 1) * perH + (1:perH))), (1:floor(nH / perH)).');
+        half.passage = 100 * max(abs(pm - Wn.CD(inWindow))) / mean(A.CD);
+        half.frequency = taLine(Hh.CL, oh.TimeStep);
+    end
+end
+
 vars = {'CL', 'CD', 'LD', 'CL_min', 'CL_max', 'CD_min', 'CD_max', 'LD_min', 'LD_max', 'CD_pressure', 'CD_viscous', ...
     'xtr_upper', 'xtr_lower', 'xsep_upper'};
 ld = A.CL ./ A.CD;
@@ -901,6 +922,7 @@ rows = {'time-accurate, mean over the averaging window', mean(A.CL), mean(A.CD),
 if ~isempty(ref)
     rows(2, :) = [{'pseudo-time, mean over whole cycles (design study)'}, table2cell(ref(1, vars))];
 end
+if ~isempty(half.rows), rows(end+1, :) = half.rows; end
 Y = cell2table(rows, 'VariableNames', [{'method'}, vars]);
 writetable(Y, fullfile(out, 'summary.csv'));
 
@@ -922,6 +944,16 @@ if ~isempty(ref)
     Q.LD_difference_percent = 100 * (mean(A.CL) / mean(A.CD) / ref.LD(1) - 1);
 end
 for k = 1:8, Q.(['residual_fall_' names{k}]) = fall(k); end
+if ~isempty(half.rows)                                 % the run with half the time step against the run above
+    Q.half_time_step = half.o.TimeStep;
+    Q.half_time_steps = height(half.H);
+    Q.half_from_time_step = half.o.From;
+    Q.half_frequency = half.frequency;
+    Q.half_CL_difference_percent = 100 * (mean(half.H.CL) / mean(A.CL) - 1);
+    Q.half_CD_difference_percent = 100 * (mean(half.H.CD) / mean(A.CD) - 1);
+    Q.half_LD_difference_percent = 100 * (mean(half.H.CL) / mean(half.H.CD) / (mean(A.CL) / mean(A.CD)) - 1);
+    Q.half_passage_CD_difference_percent = half.passage;   % largest difference in the means over single chord passages
+end
 writetable(Q, fullfile(out, 'run.csv'));
 
 f = figure('Color', 'w', 'Position', [80 80 1500 430], 'Visible', 'off');
@@ -930,7 +962,11 @@ qty = {'CD', 'CL'};  ylab = {'C_D', 'C_L'};  fmt = {'%.4f', '%.3f'};
 for q = 1:2
     nexttile;  hold on;  box on;  grid on;
     plot(H.time, H.(qty{q}), '-', 'Color', [0.55 0.55 0.55], 'LineWidth', 0.6, 'DisplayName', 'time-accurate');
-    plot(A.time([1 end]), mean(A.(qty{q})) * [1 1], 'k-', 'LineWidth', 1.8, 'DisplayName', 'its mean over the averaging window');
+    if ~isempty(half.H)
+        plot(half.H.time, half.H.(qty{q}), '-', 'Color', [0.2 0.45 0.8], 'LineWidth', 0.6, ...
+            'DisplayName', 'time-accurate, half the time step');
+    end
+    plot(A.time([1 end]), mean(A.(qty{q})) * [1 1], 'k-', 'LineWidth', 1.8, 'DisplayName', 'time-accurate: mean over the averaging window');
     if ~isempty(ref)
         plot(H.time([1 end]), ref.(qty{q})(1) * [1 1], 'r--', 'LineWidth', 1.3, 'DisplayName', 'pseudo-time: mean over whole cycles');
         plot(H.time([1 end]), ref.([qty{q} '_min'])(1) * [1 1], 'r:', 'LineWidth', 1.1, 'DisplayName', 'pseudo-time: lowest and highest');
@@ -957,6 +993,39 @@ fprintf('[TIME-ACCURATE] CD %.6f, CL %.5f, CL/CD %.1f over %g chord passages; la
 end
 
 %% ------------------------------------------------------------------ helpers
+function s = fluentRelease(txt, s)
+% Fluent release and build from the text of a transcript; s comes back unchanged if the transcript does not
+% name them
+rel = regexp(txt, 'Welcome to ANSYS Fluent ([^\r\n]*)', 'tokens', 'once');
+build = regexp(txt, 'Build Id:\s*(\d+)', 'tokens', 'once');
+if ~isempty(rel), s = strtrim(rel{1}); end
+if ~isempty(build), s = [s ', build ' build{1}]; end
+if contains(txt, 'student version', 'IgnoreCase', true), s = [s ' (student licence)']; end
+end
+
+function f = taLine(x, dt)
+% Frequency of the largest line of a spectrum above two cycles per chord passage (Hann window, linear trend
+% removed); dt is the sampling interval in chord passages
+m = numel(x);
+x = detrend(x(:)) .* (0.5 - 0.5 * cos(2 * pi * (0:m-1).' / m));
+amp = abs(fft(x));
+freq = (0:m-1).' / (m * dt);
+band = find(freq >= 2 & freq <= 100);
+[~, j] = max(amp(band));
+f = freq(band(j));
+end
+
+function s = taSurface(in, tag, steps, wall, qInf)
+% Mean pressure and skin friction over the wall profiles <tag>_step<step>.prof of a time-accurate run, with the
+% lowest and the highest skin friction at every point
+cf = [];  cp = [];
+for k = 1:numel(steps)
+    s = fluentSurface(fullfile(in, sprintf('%s_step%d.prof', tag, steps(k))), wall, qInf);
+    cf(:, k) = s.cf;  cp(:, k) = s.cp; %#ok<AGROW>
+end
+s.cp = mean(cp, 2);  s.cf = mean(cf, 2);  s.cf_min = min(cf, [], 2);  s.cf_max = max(cf, [], 2);
+end
+
 function x = xfoilAt(X, condition, design, alpha)
 % XFOIL values of an airfoil at one angle (one table row: alpha, CL, CD, xtrTop, xtrBot, interpolated);
 % the mean of the two neighbouring angles, 0.5 deg away, if XFOIL has no value at the angle itself;

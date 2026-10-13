@@ -249,6 +249,8 @@ Results: [results/cfd](../results/cfd/README.md).
   The time means are taken over the last 4 chord passages and compared with the means over whole
   cycles; they agree within 0.5 % in lift and drag. Switching to a transient case sets the
   pressure-velocity coupling to SIMPLE in Fluent 2026 R1; the journal sets the coupled solver again.
+  The averaging window was repeated with half the time step from the saved state after 4000 time steps
+  (8000 time steps of 0.0005 chord passages); the mean lift and drag change by at most 0.02 %.
 - **Models.** k-ω SST (fully turbulent) with the free-stream values of the NASA case (0.052 %, viscosity
   ratio 0.009), and Transition SST (γ–Re_θ; Langtry & Menter 2009).
 - **Transition SST inflow.** XFOIL's Ncrit = 9 corresponds to Tu ≈ 0.07 % by Mack's relation

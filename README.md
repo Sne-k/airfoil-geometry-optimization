@@ -144,7 +144,8 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   free transition gain 21.5 to 37.0 % over NACA 2412 in best CL/CD, against 36.1 to 76.3 % in XFOIL at
   the same angles; the design optimised for free and tripped flow gains 17.1 %. These runs do not settle
   but cycle, and are reported as means over whole cycles ([results/cfd](results/cfd/README.md)). A
-  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %.
+  time-accurate run of NACA 2412 at 4° gives the same mean lift and drag within 0.5 %, and halving its
+  time step changes them by at most 0.02 %.
 - **Validation.** Against NACA 0012 wind-tunnel data (Ladson 1988), XFOIL's drag agrees within 3 % when
   transition is fixed at 5 % chord, but is 11–14 % too low with free transition, and its maximum lift is
   too high. Absolute L/D values from XFOIL are therefore optimistic; see
