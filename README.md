@@ -130,7 +130,7 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
 - **The same holds over 30 airfoils.** Optimised for peak CL/CD, 30 baseline airfoils gain a median of
   38.2 %. The median stays between 29.3 and 37.8 % at other Ncrit and Reynolds numbers and is −1.6 %
   with tripped boundary layers, where 19 of the 30 designs are worse than their original
-  ([results/population](results/population/README.md); 80 of 188 runs, the batch is still running).
+  ([results/population](results/population/README.md); 80 of 217 runs, the batch is still running).
 - **A formulation that keeps the gain.** Optimising the mean of the peak CL/CD with free transition and
   with tripped boundary layers keeps a gain of 25 to 32 % with free transition and loses nothing when
   tripped (NACA 2412; [results/population](results/population/README.md)).
@@ -277,7 +277,7 @@ it can be stopped and started again:
 run_paper_batch              % 37 optimisations with curvature limits and random seeds, about 21 hours
 collect_paper_results        % tables and figures in results/paper
 sensitivity_designs          % the designs at other Ncrit and Reynolds numbers
-run_population_study         % 188 optimisations for 30 airfoils; 11 of them need coordinate files
+run_population_study         % 217 optimisations for 30 airfoils; 11 of them need coordinate files
                              % from the UIUC database (see the help text of the script)
 collect_population_results   % tables and figures in results/population
 % in MATLAB/CFD: needs ANSYS Fluent, see MATLAB/CFD/README.md
