@@ -110,7 +110,9 @@ the Transition SST runs do not all settle).
    of AI tools; the code, the analysis and this documentation were produced with an AI assistant, and
    that has to be disclosed in the form the journal requires.
 4. **Data.** A release of the repository with a DOI (Zenodo) when the paper is submitted.
-5. **Searches still missing.** Scopus and Web of Science with the six strings of `docs/literature.md`.
+5. **Databases.** Scopus and Web of Science are not available to the team (the VTU consortium does not
+   include them). The search uses OpenAlex and Semantic Scholar, and the paper must name them as the
+   databases searched.
 
 ## What must be true before submission
 
