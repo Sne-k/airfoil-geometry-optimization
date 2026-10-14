@@ -202,6 +202,15 @@ Summary:
     standard limit, and a polar whose sweep was still stopped is computed again and accepted only when
     the same angles converge twice in a row; otherwise the table has no value for it
     (`collect_population_results.m`).
+  - The batch ran on a laptop that at times went into standby. The time limit runs on the wall clock,
+    so a sweep that was under way when the machine went to sleep can be stopped on waking and return
+    fewer angles. During the search this can only make a candidate look worse, never better: a peak
+    taken from fewer angles is not higher, and a polar with too few angles is rejected. It cannot reach
+    the tables, because every value in them comes from the analysis above. Standby on battery also
+    suspends the runs, so the run times in `runs.csv` include hours of sleep; the median time per
+    evaluation is the measure of effort.
+  - At times Windows did not let MATLAB delete a temporary XFOIL folder at the end of a sweep (a file was
+    still open). MATLAB logs this as a warning and the run continues; the result is not affected.
 
 ## 7. Morphing analyses (`Morphing/`)
 
