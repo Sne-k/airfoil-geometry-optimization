@@ -103,9 +103,11 @@ most for the positioning of this project:
 ## 7. Robust design under transition uncertainty
 
 Designing for a range of transition conditions is established for natural-laminar-flow airfoils, mostly
-transonic and with RANS. Caboni et al. (2018) already treat XFOIL's Ncrit as uncertain when they optimise
-a wind-turbine airfoil. This project does not claim the idea. What it adds is the fully tripped boundary
-layer as the second condition, and the same formulation applied to 30 airfoils.
+transonic and with RANS. With XFOIL, Caboni et al. (2018) maximise the mean of the lift-to-drag ratio at
+Ncrit = 0.5 and 9.5 for a wind-turbine airfoil and call this the "pseudo-deterministic" approach, close to
+common practice. That is the construction of our `robustmean` and `robusttrip` formulations. This project
+does not claim the formulation. What it adds is the fully tripped boundary layer as the second condition,
+the comparison with the single-point design, and the same formulation applied to 30 airfoils.
 
 | Reference | What it does | Content |
 |---|---|---|
@@ -115,7 +117,7 @@ layer as the second condition, and the same formulation applied to 30 airfoils.
 | Li, J., Gao, Z., Huang, J. & Zhao, K. (2013). Robust design of NLF airfoils. *Chinese Journal of Aeronautics* 26(2), 309–318. doi:10.1016/j.cja.2013.02.007 | robust design of laminar-flow airfoils | abstract (title) |
 | Chen, Y. et al. (2023). Adjoint-based robust optimization design of laminar flow airfoil under flight condition uncertainties. *Aerospace Science and Technology* 140, 108465. doi:10.1016/j.ast.2023.108465 | adjoint-based robust design under uncertain flight conditions | abstract (title) |
 | Rashad, R. & Zingg, D. W. (2016). Aerodynamic shape optimization for natural laminar flow using a discrete-adjoint approach. *AIAA Journal* 54(11), 3321–3337. doi:10.2514/1.J054940 | laminar-flow optimisation with RANS and transition prediction | abstract (title) |
-| Caboni, M., Minisci, E. & Riccardi, A. (2018). Aerodynamic design optimization of wind turbine airfoils under aleatory and epistemic uncertainty. *J. Phys.: Conf. Ser.* 1037, 042011. doi:10.1088/1742-6596/1037/4/042011 | XFOIL optimisation of a wind-turbine airfoil with Ncrit treated as uncertain (probability and imprecise-probability approaches), compared with a conventionally optimised airfoil; one airfoil | abstract (found by the Semantic Scholar search) |
+| Caboni, M., Minisci, E. & Riccardi, A. (2018). Aerodynamic design optimization of wind turbine airfoils under aleatory and epistemic uncertainty. *J. Phys.: Conf. Ser.* 1037, 042011. doi:10.1088/1742-6596/1037/4/042011 | FFA-W3-241 (24 % thick) at Re = 12 × 10⁶, Bézier shape with 11 variables, objective the mean CL/CD at 5°, 7° and 10°. Three formulations: the mean of that objective at Ncrit = 0.5 and 9.5 ("pseudo-deterministic"), the mean under a probability distribution of Ncrit with its standard deviation limited, and a belief-based reliability measure (evidence theory). The two uncertainty-based designs have about 25 % lower standard deviation for about 1.4 % lower mean, mainly through a larger thickness. One airfoil, no RANS check | read (full text, repository copy) |
 | Suprayitno, Yu, J. C., Aminnudin & Wulandari, R. (2020). Airfoil aerodynamics optimization under uncertain operating conditions. *J. Phys.: Conf. Ser.* 1446, 012014. doi:10.1088/1742-6596/1446/1/012014 | XFOIL, NACA 0012, PARSEC, Taguchi method: mean and standard deviation of L/D under varying Mach number and angle | abstract |
 
 These entries must be read before they are used for more than the statement that such work exists.
