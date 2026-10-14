@@ -887,3 +887,12 @@ docs/methods.md,  The time means are taken over the last 4 chord passages and co
 docs/methods.md,  cycles; they agree within 0.5 % in lift and drag. Switching to a transient case sets the,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
 docs/literature.md,whose mean forces agree with the cycle means within 0.5 % (`results/cfd/README.md`) |,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
 docs/paper_outline.md,  means within 0.5 %.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+docs/literature.md,| Q1 | 232 |,232,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q1_')][0]['hits']
+docs/literature.md,| Q2 | 145 |,145,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q2_')][0]['hits']
+docs/literature.md,| Q3 | 21 |,21,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q3_')][0]['hits']
+docs/literature.md,| Q4 | 2 |,2,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q4_')][0]['hits']
+docs/literature.md,| Q5 | 3 |,3,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q5_')][0]['hits']
+docs/literature.md,| Q6 | 73 |,73,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q6_')][0]['hits']
+docs/literature.md,- Together 426 different works; 375 of them were found by the OpenAlex search as well.,426,docs/literature/semanticscholar_candidates.csv,len(rows)
+docs/literature.md,- Together 426 different works; 375 of them were found by the OpenAlex search as well.,375,docs/literature/semanticscholar_candidates.csv,len([r for r in rows if r['in_openalex_search'] == 'yes'])
+docs/literature.md,"- Of the 51 found only here, most are outside the scope (wind-turbine blades, propellers, noise,",51,docs/literature/semanticscholar_candidates.csv,len([r for r in rows if r['in_openalex_search'] == 'no'])

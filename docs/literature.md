@@ -64,6 +64,7 @@ lead to, and a draft reporting checklist.
 | Owoyele, O. & Pal, P. (2021). A novel machine learning-based optimization algorithm (ActivO) for accelerating simulation-driven engine design. *Applied Energy* 285, 116455. doi:10.1016/j.apenergy.2021.116455 | the optimiser used by Song et al. (2022) | abstract |
 | Li, J., Du, X. & Martins, J. R. R. A. (2022). Machine learning in aerodynamic shape optimization. *Progress in Aerospace Sciences* 134, 100849. doi:10.1016/j.paerosci.2022.100849 | review of surrogate and learning-based optimisation | abstract |
 | He, X., Li, J., Mader, C. A., Yildirim, A. & Martins, J. R. R. A. (2019). Robust aerodynamic shape optimization — from a circle to an airfoil. *Aerospace Science and Technology* 87, 48–61. doi:10.1016/j.ast.2019.01.051 | robustness of RANS-based shape optimisation | to check |
+| Meliani, M., Bartoli, N., Lefebvre, T., Bouhlel, M.-A., Martins, J. R. R. A. & Morlier, J. (2019). Multi-fidelity efficient global optimization: methodology and application to airfoil shape design. AIAA Aviation 2019 Forum, paper 2019-3236. doi:10.2514/6.2019-3236 | Bayesian optimisation that combines XFOIL and RANS (ADflow) as two fidelities | abstract (found by the Semantic Scholar search) |
 | Xoptfoil2, J. Guenzel, <https://github.com/jxjo/Xoptfoil2> (2.0.0) | XFOIL-based optimiser with curvature constraints against numerical artefacts | read (documentation and source) |
 
 ## 5. Airfoil optimisation studies with XFOIL (comparison and metrics)
@@ -102,8 +103,9 @@ most for the positioning of this project:
 ## 7. Robust design under transition uncertainty
 
 Designing for a range of transition conditions is established for natural-laminar-flow airfoils, mostly
-transonic and with RANS. This project applies the idea to low-speed XFOIL optimisation; it does not
-claim the idea.
+transonic and with RANS. Caboni et al. (2018) already treat XFOIL's Ncrit as uncertain when they optimise
+a wind-turbine airfoil. This project does not claim the idea. What it adds is the fully tripped boundary
+layer as the second condition, and the same formulation applied to 30 airfoils.
 
 | Reference | What it does | Content |
 |---|---|---|
@@ -113,6 +115,7 @@ claim the idea.
 | Li, J., Gao, Z., Huang, J. & Zhao, K. (2013). Robust design of NLF airfoils. *Chinese Journal of Aeronautics* 26(2), 309–318. doi:10.1016/j.cja.2013.02.007 | robust design of laminar-flow airfoils | abstract (title) |
 | Chen, Y. et al. (2023). Adjoint-based robust optimization design of laminar flow airfoil under flight condition uncertainties. *Aerospace Science and Technology* 140, 108465. doi:10.1016/j.ast.2023.108465 | adjoint-based robust design under uncertain flight conditions | abstract (title) |
 | Rashad, R. & Zingg, D. W. (2016). Aerodynamic shape optimization for natural laminar flow using a discrete-adjoint approach. *AIAA Journal* 54(11), 3321–3337. doi:10.2514/1.J054940 | laminar-flow optimisation with RANS and transition prediction | abstract (title) |
+| Caboni, M., Minisci, E. & Riccardi, A. (2018). Aerodynamic design optimization of wind turbine airfoils under aleatory and epistemic uncertainty. *J. Phys.: Conf. Ser.* 1037, 042011. doi:10.1088/1742-6596/1037/4/042011 | XFOIL optimisation of a wind-turbine airfoil with Ncrit treated as uncertain (probability and imprecise-probability approaches), compared with a conventionally optimised airfoil; one airfoil | abstract (found by the Semantic Scholar search) |
 | Suprayitno, Yu, J. C., Aminnudin & Wulandari, R. (2020). Airfoil aerodynamics optimization under uncertain operating conditions. *J. Phys.: Conf. Ser.* 1446, 012014. doi:10.1088/1742-6596/1446/1/012014 | XFOIL, NACA 0012, PARSEC, Taguchi method: mean and standard deviation of L/D under varying Mach number and angle | abstract |
 
 These entries must be read before they are used for more than the statement that such work exists.
@@ -134,9 +137,32 @@ account) for works from 2010 on whose **title or abstract** matches, and writes 
 
 Together 598 different works; 329 of them name XFOIL (Q1, Q3 or Q5).
 
+**Second database (Semantic Scholar, 14 October 2026).** `docs/literature/search_semanticscholar.py` runs
+the same six strings in Semantic Scholar (open, no account; title and abstract, from 2010) and writes
+`semanticscholar_queries.csv` and `semanticscholar_candidates.csv`.
+
+| Query | Hits |
+|---|---:|
+| Q1 | 232 |
+| Q2 | 145 |
+| Q3 | 21 |
+| Q4 | 2 |
+| Q5 | 3 |
+| Q6 | 73 |
+
+- Together 426 different works; 375 of them were found by the OpenAlex search as well.
+- Of the 51 found only here, most are outside the scope (wind-turbine blades, propellers, noise,
+  composites). Two are new and relevant and have been added: Caboni et al. (2018) in section 7 and
+  Meliani et al. (2019) in section 4. Two others were already in the list under other titles (Adler
+  et al. 2022; Hollom & Qin 2021).
+- The research gaps of section 11 still hold. Caboni et al. (2018) is the closest earlier work for gap
+  5; it treats one airfoil.
+
 **Limits.**
-- Scopus and Web of Science need an institutional account and were not searched. The team should run
-  the same strings there before the paper is submitted.
+- Scopus and Web of Science need an institutional account. The college's subscription (VTU consortium)
+  includes neither; it gives ScienceDirect, IEEE Xplore, Taylor & Francis, Cambridge Core, Emerald, ICE
+  and ProQuest. The search therefore rests on two open indexes, OpenAlex and Semantic Scholar, and the
+  paper has to say so.
 - A work whose abstract does not name XFOIL is missed. Pangas & Gamboa (2025) is an example: it uses
   XFOIL through XOPTFOIL and was known from another source.
 - Google Scholar was not used (no reproducible query interface).
@@ -256,7 +282,7 @@ Web of Science must still be checked.
    swarm analysed only 70–85 of its 640 designs. Michael et al. (2026) report the related effect that
    filtering saves 61 % of the solver calls.
 5. **Off-design robustness of designs and of morphing.** Multi-point and robust formulations exist
-   (section 7; Pangas & Gamboa 2025; Suprayitno et al. 2020), and Abouzoul et al. (2026) evaluate
+   (section 7; Pangas & Gamboa 2025; Suprayitno et al. 2020; Caboni et al. 2018), and Abouzoul et al. (2026) evaluate
    performance along the morphing path. What is missing for XFOIL-based single-point optimisation is a
    statement over many airfoils of how much of the gain survives a change of the transition condition.
    *This project:*
@@ -308,7 +334,8 @@ Web of Science must still be checked.
 
 ## Still to do for a publishable review
 
-- Run the six search strings in Scopus and Web of Science (institutional access).
+- Scopus and Web of Science are not available to the team (see section 8); the search uses OpenAlex and
+  Semantic Scholar instead.
 - Read the full texts marked "abstract" or "to check", above all section 7 and the audit works behind
   bot checks.
 - Extend the audit sample if the paper leans on its counts: with 18 in-scope works they are indicative.
