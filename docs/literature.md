@@ -32,7 +32,7 @@ lead to, and a draft reporting checklist.
 | Thomas, J. L. & Salas, M. D. (1986). Far-field boundary conditions for transonic lifting solutions to the Euler equations. *AIAA Journal* 24(7), 1074–1080. doi:10.2514/3.9394 | point-vortex correction of the far-field boundary; named by the NASA TMR as the alternative to a 500-chord domain | abstract |
 | Celik, I. B., Ghia, U., Roache, P. J., Freitas, C. J., Coleman, H. & Raad, P. E. (2008). Procedure for estimation and reporting of uncertainty due to discretization in CFD applications. *Journal of Fluids Engineering* 130(7), 078001. doi:10.1115/1.2960953 | grid convergence index, used for the CFD mesh study | read (the procedure as hosted by ASME with the journal's editorial policy statement on numerical accuracy; its equations 1 to 7 were compared with `gridConvergence.m`, and its advice of a refinement factor above 1.3 is met by √2). That copy names Celik, Ghia, Roache and Freitas as authors; the journal article is usually cited with Coleman and Raad as well, and Crossref lists no authors, so the author list is still **to check** on the article page |
 | Roache, P. J. (1994). Perspective: a method for uniform reporting of grid refinement studies. *Journal of Fluids Engineering* 116(3), 405–413. doi:10.1115/1.2910291 | origin of the grid convergence index | abstract |
-| Morgado, J., Vizinho, R., Silvestre, M. A. R. & Páscoa, J. C. (2016). XFOIL vs CFD performance predictions for high lift low Reynolds number airfoils. *Aerospace Science and Technology* 52, 207–214. doi:10.1016/j.ast.2016.02.031 | XFOIL compared with RANS for high-lift low-Re airfoils | abstract |
+| Morgado, J., Vizinho, R., Silvestre, M. A. R. & Páscoa, J. C. (2016). XFOIL vs CFD performance predictions for high lift low Reynolds number airfoils. *Aerospace Science and Technology* 52, 207–214. doi:10.1016/j.ast.2016.02.031 | E387 and S1223 at Re = 2 × 10⁵: XFOIL, k-ω SST and a modified k-kl-ω transition model (Fluent, OpenFOAM) against the UIUC wind-tunnel data. XFOIL gives the best overall prediction of the three; transition models in RANS are needed for 3D and unsteady cases | read (full text) |
 | Adler, E. J., Christison Gray, A. & Martins, J. R. R. A. (2022). To CFD or not to CFD? Comparing RANS and viscous panel methods for airfoil shape optimization. 33rd ICAS Congress, paper ICAS2022_0905 | optimal shapes depend on the analysis tool; modelling transition gives significantly lower-drag designs; "few, if any" earlier studies compared this | abstract |
 
 ## 2. Validation and verification data
@@ -63,7 +63,7 @@ lead to, and a draft reporting checklist.
 | Deb, K. (2000). An efficient constraint handling method for genetic algorithms. *Computer Methods in Applied Mechanics and Engineering* 186(2–4), 311–338. doi:10.1016/S0045-7825(99)00389-8 | feasibility rules used here | abstract |
 | Owoyele, O. & Pal, P. (2021). A novel machine learning-based optimization algorithm (ActivO) for accelerating simulation-driven engine design. *Applied Energy* 285, 116455. doi:10.1016/j.apenergy.2021.116455 | the optimiser used by Song et al. (2022) | abstract |
 | Li, J., Du, X. & Martins, J. R. R. A. (2022). Machine learning in aerodynamic shape optimization. *Progress in Aerospace Sciences* 134, 100849. doi:10.1016/j.paerosci.2022.100849 | review of surrogate and learning-based optimisation | abstract |
-| He, X., Li, J., Mader, C. A., Yildirim, A. & Martins, J. R. R. A. (2019). Robust aerodynamic shape optimization — from a circle to an airfoil. *Aerospace Science and Technology* 87, 48–61. doi:10.1016/j.ast.2019.01.051 | robustness of RANS-based shape optimisation | to check |
+| He, X., Li, J., Mader, C. A., Yildirim, A. & Martins, J. R. R. A. (2019). Robust aerodynamic shape optimization — from a circle to an airfoil. *Aerospace Science and Technology* 87, 48–61. doi:10.1016/j.ast.2019.01.051 | robustness of the optimisation process (not of the design): parametrisation, mesh deformation and flow-solver failures on the ADODG NACA 0012 and RAE 2822 benchmarks. Reported optima of the same benchmark differ between groups by up to 23 drag counts (solver, mesh, parametrisation, constraints); RANS optimisations from many starting shapes, including a circle, reach the same optimum, which supports unimodality of these RANS problems | read (full text) |
 | Meliani, M., Bartoli, N., Lefebvre, T., Bouhlel, M.-A., Martins, J. R. R. A. & Morlier, J. (2019). Multi-fidelity efficient global optimization: methodology and application to airfoil shape design. AIAA Aviation 2019 Forum, paper 2019-3236. doi:10.2514/6.2019-3236 | Bayesian optimisation that combines XFOIL and RANS (ADflow) as two fidelities | abstract (found by the Semantic Scholar search) |
 | Xoptfoil2, J. Guenzel, <https://github.com/jxjo/Xoptfoil2> (2.0.0) | XFOIL-based optimiser with curvature constraints against numerical artefacts | read (documentation and source) |
 
@@ -86,7 +86,7 @@ most for the positioning of this project:
 | Hoyos, J. D. et al. (2021). Airfoil shape optimization: comparative study of meta-heuristic algorithms, airfoil parameterization methods and Reynolds number impact. *IOP Conf. Ser.: Mater. Sci. Eng.* 1154, 012016. doi:10.1088/1757-899x/1154/1/012016 | GA, particle swarm and sine-cosine algorithm with three parameterisations; XFOIL and OpenFOAM | abstract |
 | Fakhari, S. M. & Mrad, H. (2025). Aerodynamic shape optimization of NACA airfoils based on a novel unconstrained conjugate gradient algorithm. *Journal of Engineering Research* 13(3), 2026–2035. doi:10.1016/j.jer.2024.07.020 | NACA 4412 and NACA 2415, Bézier, XFOIL; L/D +13.7 % and +32 % | abstract |
 | Khan et al. (2025). Aerodynamic analysis and ANN-based optimization of NACA airfoils for enhanced UAV performance. *Scientific Reports* 15. doi:10.1038/s41598-025-95848-4 | NACA 2412, 4415 and 0012; a neural network trained on fully turbulent SST results is optimised with a GA; XFOIL is only compared | read |
-| Ribeiro, A. F. P., Awruch, A. M. & Gomes, H. M. (2012). An airfoil optimization technique for wind turbines. *Applied Mathematical Modelling* 36(10), 4898–4907. doi:10.1016/j.apm.2011.12.026 | airfoil optimisation for wind turbines | to check |
+| Ribeiro, A. F. P., Awruch, A. M. & Gomes, H. M. (2012). An airfoil optimization technique for wind turbines. *Applied Mathematical Modelling* 36(10), 4898–4907. doi:10.1016/j.apm.2011.12.026 | RANS (Spalart-Allmaras, fully turbulent) with single- and multi-objective genetic algorithms and a neural-network surrogate for a wind-turbine airfoil; the far field had to be placed further than the 100 chords recommended in the literature | read (full text) |
 | El Houd, A. & Hallou, Y. (2019). Optimization study of NACA airfoil using nonlinear programming & genetic algorithms. Project report, ENSAM Meknès (code on GitHub) | reference study of the project report; NACA 2412, PARSEC, area objective | read |
 
 ## 6. Morphing
@@ -105,20 +105,21 @@ most for the positioning of this project:
 Designing for a range of transition conditions is established for natural-laminar-flow airfoils, mostly
 transonic and with RANS. With XFOIL, Caboni et al. (2018) maximise the mean of the lift-to-drag ratio at
 Ncrit = 0.5 and 9.5 for a wind-turbine airfoil and call this the "pseudo-deterministic" approach, close to
-common practice. That is the construction of our `robustmean` and `robusttrip` formulations. This project
+common practice, and Hollom & Qin (2021) optimise a laminar-flow aerofoil with XFOIL for Ncrit spread
+between 9 and 0. That is the construction of our `robustmean` and `robusttrip` formulations. This project
 does not claim the formulation. What it adds is the fully tripped boundary layer as the second condition,
 the comparison with the single-point design, and the same formulation applied to 30 airfoils.
 
 | Reference | What it does | Content |
 |---|---|---|
 | Hollom, J. & Qin, N. (2018). Quantification and multi-point optimization of natural laminar flow airfoil robustness to transition amplification factor. AIAA paper 2018-1161. doi:10.2514/6.2018-1161 | robustness of laminar-flow airfoils to the critical N factor, improved by multi-point optimisation | abstract (title) |
-| Hollom, J. & Qin, N. (2021). Uncertainty analysis and robust shape optimisation for laminar flow aerofoils. *The Aeronautical Journal* 125(1284), 365–388. doi:10.1017/aer.2020.63 | robust shape optimisation of laminar-flow aerofoils under uncertainty | abstract (title) |
-| Zhao, H., Gao, Z., Gao, Y. & Wang, C. (2017). Effective robust design of high lift NLF airfoil under multi-parameter uncertainty. *Aerospace Science and Technology* 68, 530–542. doi:10.1016/j.ast.2017.06.009 | robust design of a high-lift laminar-flow airfoil | abstract (title) |
-| Li, J., Gao, Z., Huang, J. & Zhao, K. (2013). Robust design of NLF airfoils. *Chinese Journal of Aeronautics* 26(2), 309–318. doi:10.1016/j.cja.2013.02.007 | robust design of laminar-flow airfoils | abstract (title) |
+| Hollom, J. & Qin, N. (2021). Uncertainty analysis and robust shape optimisation for laminar flow aerofoils. *The Aeronautical Journal* 125(1284), 365–388. doi:10.1017/aer.2020.63 | Ncrit treated as uncertain (half-normal distribution from 9 down to 0, standing for surface and flow quality). NLF(2)-0215 at subsonic speed with XFOIL (300 panels, CST shape) and RAE 2822 transonic. Robust optimisation lowers mean drag and its standard deviation, with a trade-off between the two; robustness gained at one design point can be lost off-design; the pitching moment of the optimised aerofoils grew considerably. One aerofoil per case | read (full text) |
+| Zhao, H., Gao, Z., Gao, Y. & Wang, C. (2017). Effective robust design of high lift NLF airfoil under multi-parameter uncertainty. *Aerospace Science and Technology* 68, 530–542. doi:10.1016/j.ast.2017.06.009 | transonic high-lift NLF airfoil at low Reynolds number, RANS with γ-Re_θ transition, robust design with polynomial chaos and Kriging. The deterministic design is ill-posed: its drag rises sharply off the design point; robust design over Mach number and angle of attack or lift avoids this | read (full text) |
+| Li, J., Gao, Z., Huang, J. & Zhao, K. (2013). Robust design of NLF airfoils. *Chinese Journal of Aeronautics* 26(2), 309–318. doi:10.1016/j.cja.2013.02.007 | NLF-0115 with RANS and the γ-Re_θ transition model (checked against wind-tunnel data of NLF-0416), NURBS free-form deformation, particle swarm with Kriging; robust over uncertain lift coefficient and Mach number; the design keeps laminar flow over the uncertain range | read (full text) |
 | Chen, Y. et al. (2023). Adjoint-based robust optimization design of laminar flow airfoil under flight condition uncertainties. *Aerospace Science and Technology* 140, 108465. doi:10.1016/j.ast.2023.108465 | adjoint-based robust design under uncertain flight conditions | abstract (title) |
 | Rashad, R. & Zingg, D. W. (2016). Aerodynamic shape optimization for natural laminar flow using a discrete-adjoint approach. *AIAA Journal* 54(11), 3321–3337. doi:10.2514/1.J054940 | laminar-flow optimisation with RANS and transition prediction | abstract (title) |
 | Caboni, M., Minisci, E. & Riccardi, A. (2018). Aerodynamic design optimization of wind turbine airfoils under aleatory and epistemic uncertainty. *J. Phys.: Conf. Ser.* 1037, 042011. doi:10.1088/1742-6596/1037/4/042011 | FFA-W3-241 (24 % thick) at Re = 12 × 10⁶, Bézier shape with 11 variables, objective the mean CL/CD at 5°, 7° and 10°. Three formulations: the mean of that objective at Ncrit = 0.5 and 9.5 ("pseudo-deterministic"), the mean under a probability distribution of Ncrit with its standard deviation limited, and a belief-based reliability measure (evidence theory). The two uncertainty-based designs have about 25 % lower standard deviation for about 1.4 % lower mean, mainly through a larger thickness. One airfoil, no RANS check | read (full text, repository copy) |
-| Suprayitno, Yu, J. C., Aminnudin & Wulandari, R. (2020). Airfoil aerodynamics optimization under uncertain operating conditions. *J. Phys.: Conf. Ser.* 1446, 012014. doi:10.1088/1742-6596/1446/1/012014 | XFOIL, NACA 0012, PARSEC, Taguchi method: mean and standard deviation of L/D under varying Mach number and angle | abstract |
+| Suprayitno, Yu, J. C., Aminnudin & Wulandari, R. (2020). Airfoil aerodynamics optimization under uncertain operating conditions. *J. Phys.: Conf. Ser.* 1446, 012014. doi:10.1088/1742-6596/1446/1/012014 | XFOIL, NACA 0012, nine PARSEC variables, Taguchi L27 array: mean and standard deviation of L/D under uncertain Mach number or angle of attack; the gain is reported as a signal-to-noise ratio (21.76 to 36.79, "69 %"), not as L/D | read (full text) |
 
 These entries must be read before they are used for more than the statement that such work exists.
 
@@ -260,6 +261,9 @@ Web of Science must still be checked.
    within 6 %. We did not find a study that takes one design problem and separates the reported gain
    into its parts: the metric, numerical artefacts, shape artefacts, the transition assumption, and
    what survives in RANS.
+   He et al. (2019) find that optima reported for the same RANS benchmark differ by up to 23 drag counts
+   between groups, and Morgado et al. (2016) find XFOIL at least as close to wind-tunnel data as two RANS
+   models at Re = 2 × 10⁵, so neither tool can serve as the reference by default.
    *This project so far:*
    - Smoothness limits cost 3.8 % of peak CL/CD on NACA 2412.
    - The earlier wavy PARSEC design keeps +36 % of its +74 % at Ncrit = 5.
@@ -279,12 +283,14 @@ Web of Science must still be checked.
 3. **Variability of stochastic optimisers.** One of 8 works read in full reports repeated runs, and no
    abstract of 238 mentions them.
    *This project:* the spread over three seeds is ±1.2 to ±9.1 in peak CL/CD (NACA 4412: 158.6–176.9).
+   For gradient-based RANS optimisation He et al. (2019) reach the same optimum from many starting shapes;
+   with XFOIL and a stochastic optimiser the seeds end at different designs, so one run is not enough.
 4. **Comparing optimisers fairly.** The ranking of GA, particle swarm and Bayesian optimisation depends on
    whether the budget counts all evaluations or only XFOIL analyses. Under smoothness limits, particle
    swarm analysed only 70–85 of its 640 designs. Michael et al. (2026) report the related effect that
    filtering saves 61 % of the solver calls.
 5. **Off-design robustness of designs and of morphing.** Multi-point and robust formulations exist
-   (section 7; Pangas & Gamboa 2025; Suprayitno et al. 2020; Caboni et al. 2018), and Abouzoul et al. (2026) evaluate
+   (section 7; Pangas & Gamboa 2025; Suprayitno et al. 2020; Caboni et al. 2018; Hollom & Qin 2021), and Abouzoul et al. (2026) evaluate
    performance along the morphing path. What is missing for XFOIL-based single-point optimisation is a
    statement over many airfoils of how much of the gain survives a change of the transition condition.
    *This project:*
