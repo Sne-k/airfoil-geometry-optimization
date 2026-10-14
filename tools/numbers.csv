@@ -887,6 +887,103 @@ docs/methods.md,  The time means are taken over the last 4 chord passages and co
 docs/methods.md,  cycles; they agree within 0.5 % in lift and drag. Switching to a transient case sets the,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
 docs/literature.md,whose mean forces agree with the cycle means within 0.5 % (`results/cfd/README.md`) |,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
 docs/paper_outline.md,  means within 0.5 %.,0.5,results/cfd/time_accurate/run.csv,"max(abs(rows[0]['CL_difference_percent']), abs(rows[0]['CD_difference_percent']))"
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.352,results/cfd/e387/comparison.csv,one(alpha=0)['CL_measured']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.353,results/cfd/e387/comparison.csv,one(alpha=0)['CL_fluent']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.4,results/cfd/e387/comparison.csv,one(alpha=0)['CL_fluent_error_percent']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.386,results/cfd/e387/comparison.csv,one(alpha=0)['CL_xfoil']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",9.8,results/cfd/e387/comparison.csv,one(alpha=0)['CL_xfoil_error_percent']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.00883,results/cfd/e387/comparison.csv,one(alpha=0)['CD_measured']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.00840,results/cfd/e387/comparison.csv,one(alpha=0)['CD_fluent']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.00726,results/cfd/e387/comparison.csv,one(alpha=0)['CD_fluent_min']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.01063,results/cfd/e387/comparison.csv,one(alpha=0)['CD_fluent_max']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",−4.9,results/cfd/e387/comparison.csv,one(alpha=0)['CD_fluent_error_percent']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",0.00800,results/cfd/e387/comparison.csv,one(alpha=0)['CD_xfoil']
+results/cfd/README.md,"| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |",−9.4,results/cfd/e387/comparison.csv,one(alpha=0)['CD_xfoil_error_percent']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.573,results/cfd/e387/comparison.csv,one(alpha=2)['CL_measured']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.579,results/cfd/e387/comparison.csv,one(alpha=2)['CL_fluent']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",1.0,results/cfd/e387/comparison.csv,one(alpha=2)['CL_fluent_error_percent']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.607,results/cfd/e387/comparison.csv,one(alpha=2)['CL_xfoil']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",5.9,results/cfd/e387/comparison.csv,one(alpha=2)['CL_xfoil_error_percent']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.00990,results/cfd/e387/comparison.csv,one(alpha=2)['CD_measured']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.00980,results/cfd/e387/comparison.csv,one(alpha=2)['CD_fluent']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.00853,results/cfd/e387/comparison.csv,one(alpha=2)['CD_fluent_min']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.01314,results/cfd/e387/comparison.csv,one(alpha=2)['CD_fluent_max']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",−1.0,results/cfd/e387/comparison.csv,one(alpha=2)['CD_fluent_error_percent']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",0.00891,results/cfd/e387/comparison.csv,one(alpha=2)['CD_xfoil']
+results/cfd/README.md,"| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |",−10.0,results/cfd/e387/comparison.csv,one(alpha=2)['CD_xfoil_error_percent']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.792,results/cfd/e387/comparison.csv,one(alpha=4)['CL_measured']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.803,results/cfd/e387/comparison.csv,one(alpha=4)['CL_fluent']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",1.4,results/cfd/e387/comparison.csv,one(alpha=4)['CL_fluent_error_percent']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.826,results/cfd/e387/comparison.csv,one(alpha=4)['CL_xfoil']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",4.2,results/cfd/e387/comparison.csv,one(alpha=4)['CL_xfoil_error_percent']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.01090,results/cfd/e387/comparison.csv,one(alpha=4)['CD_measured']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.01006,results/cfd/e387/comparison.csv,one(alpha=4)['CD_fluent']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.00951,results/cfd/e387/comparison.csv,one(alpha=4)['CD_fluent_min']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.01057,results/cfd/e387/comparison.csv,one(alpha=4)['CD_fluent_max']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",−7.7,results/cfd/e387/comparison.csv,one(alpha=4)['CD_fluent_error_percent']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",0.00980,results/cfd/e387/comparison.csv,one(alpha=4)['CD_xfoil']
+results/cfd/README.md,"| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |",−10.1,results/cfd/e387/comparison.csv,one(alpha=4)['CD_xfoil_error_percent']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",1.009,results/cfd/e387/comparison.csv,one(alpha=6)['CL_measured']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",1.015,results/cfd/e387/comparison.csv,one(alpha=6)['CL_fluent']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",0.6,results/cfd/e387/comparison.csv,one(alpha=6)['CL_fluent_error_percent']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",1.035,results/cfd/e387/comparison.csv,one(alpha=6)['CL_xfoil']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",2.6,results/cfd/e387/comparison.csv,one(alpha=6)['CL_xfoil_error_percent']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",0.01170,results/cfd/e387/comparison.csv,one(alpha=6)['CD_measured']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",0.01131,results/cfd/e387/comparison.csv,one(alpha=6)['CD_fluent']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",0.01127,results/cfd/e387/comparison.csv,one(alpha=6)['CD_fluent_min']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",0.01136,results/cfd/e387/comparison.csv,one(alpha=6)['CD_fluent_max']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",−3.3,results/cfd/e387/comparison.csv,one(alpha=6)['CD_fluent_error_percent']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",0.01057,results/cfd/e387/comparison.csv,one(alpha=6)['CD_xfoil']
+results/cfd/README.md,"| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |",−9.7,results/cfd/e387/comparison.csv,one(alpha=6)['CD_xfoil_error_percent']
+results/cfd/README.md,| 0° | 0.48 | 0.486 | 0.69 | none (reversed flow to 0.95) | 0.684 |,0.48,results/cfd/e387/comparison.csv,one(alpha=0)['separation_measured']
+results/cfd/README.md,| 0° | 0.48 | 0.486 | 0.69 | none (reversed flow to 0.95) | 0.684 |,0.486,results/cfd/e387/comparison.csv,one(alpha=0)['separation_fluent']
+results/cfd/README.md,| 0° | 0.48 | 0.486 | 0.69 | none (reversed flow to 0.95) | 0.684 |,0.69,results/cfd/e387/comparison.csv,one(alpha=0)['reattachment_measured']
+results/cfd/README.md,| 0° | 0.48 | 0.486 | 0.69 | none (reversed flow to 0.95) | 0.684 |,0.95,results/cfd/e387/comparison.csv,one(alpha=0)['reversed_flow_end_fluent']
+results/cfd/README.md,| 0° | 0.48 | 0.486 | 0.69 | none (reversed flow to 0.95) | 0.684 |,0.684,results/cfd/e387/comparison.csv,one(alpha=0)['transition_xfoil']
+results/cfd/README.md,| 2° | 0.45 | 0.456 | 0.62 | none (reversed flow to 0.91) | 0.636 |,0.45,results/cfd/e387/comparison.csv,one(alpha=2)['separation_measured']
+results/cfd/README.md,| 2° | 0.45 | 0.456 | 0.62 | none (reversed flow to 0.91) | 0.636 |,0.456,results/cfd/e387/comparison.csv,one(alpha=2)['separation_fluent']
+results/cfd/README.md,| 2° | 0.45 | 0.456 | 0.62 | none (reversed flow to 0.91) | 0.636 |,0.62,results/cfd/e387/comparison.csv,one(alpha=2)['reattachment_measured']
+results/cfd/README.md,| 2° | 0.45 | 0.456 | 0.62 | none (reversed flow to 0.91) | 0.636 |,0.91,results/cfd/e387/comparison.csv,one(alpha=2)['reversed_flow_end_fluent']
+results/cfd/README.md,| 2° | 0.45 | 0.456 | 0.62 | none (reversed flow to 0.91) | 0.636 |,0.636,results/cfd/e387/comparison.csv,one(alpha=2)['transition_xfoil']
+results/cfd/README.md,| 4° | 0.40 | 0.411 | 0.58 | 0.656 | 0.580 |,0.40,results/cfd/e387/comparison.csv,one(alpha=4)['separation_measured']
+results/cfd/README.md,| 4° | 0.40 | 0.411 | 0.58 | 0.656 | 0.580 |,0.411,results/cfd/e387/comparison.csv,one(alpha=4)['separation_fluent']
+results/cfd/README.md,| 4° | 0.40 | 0.411 | 0.58 | 0.656 | 0.580 |,0.58,results/cfd/e387/comparison.csv,one(alpha=4)['reattachment_measured']
+results/cfd/README.md,| 4° | 0.40 | 0.411 | 0.58 | 0.656 | 0.580 |,0.656,results/cfd/e387/comparison.csv,one(alpha=4)['reattachment_fluent']
+results/cfd/README.md,| 4° | 0.40 | 0.411 | 0.58 | 0.656 | 0.580 |,0.580,results/cfd/e387/comparison.csv,one(alpha=4)['transition_xfoil']
+results/cfd/README.md,| 6° | 0.38 | 0.366 | 0.50 | 0.554 | 0.466 |,0.38,results/cfd/e387/comparison.csv,one(alpha=6)['separation_measured']
+results/cfd/README.md,| 6° | 0.38 | 0.366 | 0.50 | 0.554 | 0.466 |,0.366,results/cfd/e387/comparison.csv,one(alpha=6)['separation_fluent']
+results/cfd/README.md,| 6° | 0.38 | 0.366 | 0.50 | 0.554 | 0.466 |,0.50,results/cfd/e387/comparison.csv,one(alpha=6)['reattachment_measured']
+results/cfd/README.md,| 6° | 0.38 | 0.366 | 0.50 | 0.554 | 0.466 |,0.554,results/cfd/e387/comparison.csv,one(alpha=6)['reattachment_fluent']
+results/cfd/README.md,| 6° | 0.38 | 0.366 | 0.50 | 0.554 | 0.466 |,0.466,results/cfd/e387/comparison.csv,one(alpha=6)['transition_xfoil']
+results/cfd/README.md,"- **Lift.** Fluent is within 1.4 % of the measurement at all four angles; XFOIL is 2.6 to 9.8 % high, most",1.4,results/cfd/e387/comparison.csv,max(abs(r['CL_fluent_error_percent']) for r in rows)
+results/cfd/README.md,"- **Lift.** Fluent is within 1.4 % of the measurement at all four angles; XFOIL is 2.6 to 9.8 % high, most",2.6,results/cfd/e387/comparison.csv,min(abs(r['CL_xfoil_error_percent']) for r in rows)
+results/cfd/README.md,"- **Lift.** Fluent is within 1.4 % of the measurement at all four angles; XFOIL is 2.6 to 9.8 % high, most",9.8,results/cfd/e387/comparison.csv,max(abs(r['CL_xfoil_error_percent']) for r in rows)
+results/cfd/README.md,"- **Drag.** XFOIL is 9.4 to 10.1 % low at every angle, a nearly constant offset. Fluent's mean is 1.0 to",9.4,results/cfd/e387/comparison.csv,min(abs(r['CD_xfoil_error_percent']) for r in rows)
+results/cfd/README.md,"- **Drag.** XFOIL is 9.4 to 10.1 % low at every angle, a nearly constant offset. Fluent's mean is 1.0 to",10.1,results/cfd/e387/comparison.csv,max(abs(r['CD_xfoil_error_percent']) for r in rows)
+results/cfd/README.md,"- **Drag.** XFOIL is 9.4 to 10.1 % low at every angle, a nearly constant offset. Fluent's mean is 1.0 to",1.0,results/cfd/e387/comparison.csv,min(abs(r['CD_fluent_error_percent']) for r in rows)
+results/cfd/README.md,  7.7 % low.,7.7,results/cfd/e387/comparison.csv,max(abs(r['CD_fluent_error_percent']) for r in rows)
+results/cfd/README.md,"- **Where the laminar layer separates,** Fluent is within 0.014 c of the oil flow at every angle.",0.014,results/cfd/e387/comparison.csv,max(abs(r['separation_fluent']-r['separation_measured']) for r in rows)
+results/cfd/README.md,"- **Where the bubble closes,** XFOIL's transition point is within 0.034 c of the measured reattachment.",0.034,results/cfd/e387/comparison.csv,max(abs(r['transition_xfoil']-r['reattachment_measured']) for r in rows)
+results/cfd/README.md,  In Fluent the bubble closes 0.05 to 0.08 c too far aft at 4° and 6°. At 0° and 2° it sheds vortices: the,0.05,results/cfd/e387/comparison.csv,one(alpha=6)['reattachment_fluent']-one(alpha=6)['reattachment_measured']
+results/cfd/README.md,  In Fluent the bubble closes 0.05 to 0.08 c too far aft at 4° and 6°. At 0° and 2° it sheds vortices: the,0.08,results/cfd/e387/comparison.csv,one(alpha=4)['reattachment_fluent']-one(alpha=4)['reattachment_measured']
+README.md,"  laminar separation bubbles, Fluent's lift is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's",1.4,results/cfd/e387/comparison.csv,max(abs(r['CL_fluent_error_percent']) for r in rows)
+README.md,"  laminar separation bubbles, Fluent's lift is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's",1.0,results/cfd/e387/comparison.csv,min(abs(r['CD_fluent_error_percent']) for r in rows)
+README.md,"  laminar separation bubbles, Fluent's lift is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's",7.7,results/cfd/e387/comparison.csv,max(abs(r['CD_fluent_error_percent']) for r in rows)
+README.md,  lift is 2.6 to 9.8 % high and its drag 9.4 to 10.1 % low at every angle. Fluent places laminar,2.6,results/cfd/e387/comparison.csv,min(abs(r['CL_xfoil_error_percent']) for r in rows)
+README.md,  lift is 2.6 to 9.8 % high and its drag 9.4 to 10.1 % low at every angle. Fluent places laminar,9.8,results/cfd/e387/comparison.csv,max(abs(r['CL_xfoil_error_percent']) for r in rows)
+README.md,  lift is 2.6 to 9.8 % high and its drag 9.4 to 10.1 % low at every angle. Fluent places laminar,9.4,results/cfd/e387/comparison.csv,min(abs(r['CD_xfoil_error_percent']) for r in rows)
+README.md,  lift is 2.6 to 9.8 % high and its drag 9.4 to 10.1 % low at every angle. Fluent places laminar,10.1,results/cfd/e387/comparison.csv,max(abs(r['CD_xfoil_error_percent']) for r in rows)
+README.md,"  separation within 0.014 c of the oil flow, and XFOIL places transition within 0.034 c of the measured",0.014,results/cfd/e387/comparison.csv,max(abs(r['separation_fluent']-r['separation_measured']) for r in rows)
+README.md,"  separation within 0.014 c of the oil flow, and XFOIL places transition within 0.034 c of the measured",0.034,results/cfd/e387/comparison.csv,max(abs(r['transition_xfoil']-r['reattachment_measured']) for r in rows)
+docs/literature.md,     is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's lift is 2.6 to 9.8 % high and its drag,1.4,results/cfd/e387/comparison.csv,max(abs(r['CL_fluent_error_percent']) for r in rows)
+docs/literature.md,     is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's lift is 2.6 to 9.8 % high and its drag,1.0,results/cfd/e387/comparison.csv,min(abs(r['CD_fluent_error_percent']) for r in rows)
+docs/literature.md,     is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's lift is 2.6 to 9.8 % high and its drag,7.7,results/cfd/e387/comparison.csv,max(abs(r['CD_fluent_error_percent']) for r in rows)
+docs/literature.md,     is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's lift is 2.6 to 9.8 % high and its drag,2.6,results/cfd/e387/comparison.csv,min(abs(r['CL_xfoil_error_percent']) for r in rows)
+docs/literature.md,     is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's lift is 2.6 to 9.8 % high and its drag,9.8,results/cfd/e387/comparison.csv,max(abs(r['CL_xfoil_error_percent']) for r in rows)
+docs/literature.md,     9.4 to 10.1 % low at every angle. XFOIL's transition point lies within 0.034 c of the measured,9.4,results/cfd/e387/comparison.csv,min(abs(r['CD_xfoil_error_percent']) for r in rows)
+docs/literature.md,     9.4 to 10.1 % low at every angle. XFOIL's transition point lies within 0.034 c of the measured,10.1,results/cfd/e387/comparison.csv,max(abs(r['CD_xfoil_error_percent']) for r in rows)
+docs/literature.md,     9.4 to 10.1 % low at every angle. XFOIL's transition point lies within 0.034 c of the measured,0.034,results/cfd/e387/comparison.csv,max(abs(r['transition_xfoil']-r['reattachment_measured']) for r in rows)
+docs/literature.md,"     reattachment; Fluent's laminar separation within 0.014 c of the oil flow, but at 0° and 2° its bubble",0.014,results/cfd/e387/comparison.csv,max(abs(r['separation_fluent']-r['separation_measured']) for r in rows)
 docs/literature.md,| Q1 | 232 |,232,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q1_')][0]['hits']
 docs/literature.md,| Q2 | 145 |,145,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q2_')][0]['hits']
 docs/literature.md,| Q3 | 21 |,21,docs/literature/semanticscholar_queries.csv,[r for r in rows if r['query_id'].startswith('Q3_')][0]['hits']
