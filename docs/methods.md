@@ -185,7 +185,9 @@ Summary:
   - NACA 2412 is also optimised for the mean of the peak CL/CD at Ncrit = 5 and 9 (seeds 1 to 3) and for
     the lower of the two (seed 1), and in the same way for free transition (Ncrit 9) together with
     transition fixed at 5 % chord on both surfaces. The mean of free and fixed transition is also the
-    objective of one run (seed 1) for each of the other 29 airfoils.
+    objective of one run (seed 1) for each of the other 29 airfoils. The mean over two transition conditions
+    follows Caboni et al. (2018), who use Ncrit = 0.5 and 9.5; here the second condition is transition
+    fixed at 5 % chord.
   - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
     against the seed at the same condition.
