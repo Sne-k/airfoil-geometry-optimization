@@ -58,6 +58,8 @@ the question, the approach and the contributions.
 - XFOIL against NACA 0012 wind-tunnel data (Ladson 1988): `results/validation`.
 - Fluent against the NASA NACA 0012 case: forces, pressure and skin friction against CFL3D; mesh
   convergence (grid convergence index); domain size; the pseudo-time step finding: `results/cfd`.
+- Fluent and XFOIL against wind-tunnel measurements with laminar separation bubbles (Eppler 387,
+  Re = 300 000, NASA TM-4062): forces, laminar separation and reattachment: `results/cfd/e387`.
 
 **5. Results.**
 - 5.1 One problem taken apart (NACA 2412). Report metric +142.6 % at 0° against +71 % at the peak;
