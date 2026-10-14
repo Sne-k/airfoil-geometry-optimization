@@ -82,7 +82,9 @@ designs at every angle.
 
 ## Robust formulations for NACA 2412
 
-Four formulations, each maximising the peak CL/CD under two conditions at once:
+Four formulations, each maximising the peak CL/CD under two conditions at once. The mean over two
+transition conditions is the construction of Caboni et al. (2018), who use Ncrit 0.5 and 9.5
+(`docs/literature.md`, section 7):
 
 | Formulation | Conditions | Combined by | Runs |
 |---|---|---|---|

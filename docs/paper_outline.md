@@ -26,7 +26,7 @@ checklist.
 | 1 | One reported gain taken apart into metric, numerical artefacts, shape artefacts and transition assumption | NACA 2412: `results/paper`, `results/README.md`, `results/cfd/designs/xfoil.csv` | available |
 | 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (217 runs, 80 done); first tables for the peak and fixed-angle formulations |
 | 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | available (six airfoils, 84 runs, and one time-accurate run) |
-| 4 | A formulation that keeps its gain: optimise for free and tripped flow together | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; the other 29 airfoils are run at the end of the batch |
+| 4 | A formulation that keeps its gain: optimise for free and tripped flow together (the two-condition mean of Caboni et al. 2018, with tripped flow as the second condition; the formulation itself is not new) | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; the other 29 airfoils are run at the end of the batch |
 | 5 | Audit of how such results are reported, and a checklist | `docs/literature.md`, sections 8–13 | first version done |
 | 6 | Open, checked tools: optimiser with curvature limits, verified Fluent set-up, provenance of every number | repository, `tools/check_numbers.py` | available |
 
@@ -58,6 +58,8 @@ the question, the approach and the contributions.
 - XFOIL against NACA 0012 wind-tunnel data (Ladson 1988): `results/validation`.
 - Fluent against the NASA NACA 0012 case: forces, pressure and skin friction against CFL3D; mesh
   convergence (grid convergence index); domain size; the pseudo-time step finding: `results/cfd`.
+- Fluent and XFOIL against wind-tunnel measurements with laminar separation bubbles (Eppler 387,
+  Re = 300 000, NASA TM-4062): forces, laminar separation and reattachment: `results/cfd/e387`.
 
 **5. Results.**
 - 5.1 One problem taken apart (NACA 2412). Report metric +142.6 % at 0° against +71 % at the peak;
@@ -110,7 +112,9 @@ the Transition SST runs do not all settle).
    of AI tools; the code, the analysis and this documentation were produced with an AI assistant, and
    that has to be disclosed in the form the journal requires.
 4. **Data.** A release of the repository with a DOI (Zenodo) when the paper is submitted.
-5. **Searches still missing.** Scopus and Web of Science with the six strings of `docs/literature.md`.
+5. **Databases.** Scopus and Web of Science are not available to the team (the VTU consortium does not
+   include them). The search uses OpenAlex and Semantic Scholar, and the paper must name them as the
+   databases searched.
 
 ## What must be true before submission
 

@@ -1,17 +1,18 @@
 # CFD results (ANSYS Fluent)
 
-The RANS runs check the XFOIL results with an independent method. This folder has five parts:
+The RANS runs check the XFOIL results with an independent method. This folder has six parts:
 
 | Folder | Contents | State |
 |---|---|---|
 | [timestep_study](timestep_study) | which solver settings give a steady solution | done |
 | [verification](verification) | the set-up against NASA's NACA 0012 case | done |
+| [e387](e387) | Fluent and XFOIL against wind-tunnel measurements with laminar separation bubbles | done |
 | [designs](designs) | the NACA 2412 designs with Transition SST and SST | done |
 | [transition_tests](transition_tests) | solver settings tried for the Transition SST runs | done |
 | [time_accurate](time_accurate) | NACA 2412 at 4° with the transition model in physical time | done |
 
 All files are written by `MATLAB/CFD/collect_cfd_results.m` from the outputs of `timestep_study.m`,
-`verify_naca0012.m`, `run_design_study.m`, `transition_tests.m` and `run_time_accurate.m`. The Fluent transcripts are not
+`verify_naca0012.m`, `validate_e387.m`, `run_design_study.m`, `transition_tests.m` and `run_time_accurate.m`. The Fluent transcripts are not
 published, because they contain local paths.
 
 ## Verification on NASA's NACA 0012 case
@@ -71,6 +72,56 @@ about 0.3 % at 500 chords. It grows with lift, so a small domain would penalise 
 carry more lift.
 
 ![Drag against the distance of the far field](verification/farfield.png)
+
+## Validation against measurements: Eppler 387 at Re = 300 000
+
+The NACA 0012 case checks the fully turbulent set-up. The designs, however, owe their gain to laminar
+flow, so both tools are also compared with a measurement in which laminar separation bubbles decide the
+drag: the Eppler 387 in the Langley Low-Turbulence Pressure Tunnel (McGhee, Walker & Millard 1988, NASA
+TM-4062), Re = 300 000, M = 0.09. The report gives the forces (lift from surface pressures, drag from wake
+surveys, drag uncertainty about 2 counts) and, from oil flow, where the laminar layer separates and where
+the turbulent layer reattaches ([reference_ltpt.csv](e387/reference_ltpt.csv),
+[source](e387/README_source.txt)).
+
+**Set-up** (`validate_e387.m`). Fluent with Transition SST and exactly the settings of the design study:
+the same C-grid generator (100,240 cells, far field 500 chords away), 400 first-order and 5000
+second-order iterations, means over the last 2400. The free-stream turbulence decays to 0.060 % at the
+airfoil, the level of the tunnel. XFOIL with free transition at Ncrit 9 (Mack's relation gives 9.4 for
+0.06 %), M = 0.09, 160 panel nodes.
+
+| α | CL measured | CL Fluent | CL XFOIL | CD measured | CD Fluent (lowest to highest) | CD XFOIL |
+|---|---:|---:|---:|---:|---:|---:|
+| 0° | 0.352 | 0.353 (+0.4 %) | 0.386 (+9.8 %) | 0.00883 | 0.00840 (0.00726 to 0.01063), −4.9 % | 0.00800 (−9.4 %) |
+| 2° | 0.573 | 0.579 (+1.0 %) | 0.607 (+5.9 %) | 0.00990 | 0.00980 (0.00853 to 0.01314), −1.0 % | 0.00891 (−10.0 %) |
+| 4° | 0.792 | 0.803 (+1.4 %) | 0.826 (+4.2 %) | 0.01090 | 0.01006 (0.00951 to 0.01057), −7.7 % | 0.00980 (−10.1 %) |
+| 6° | 1.009 | 1.015 (+0.6 %) | 1.035 (+2.6 %) | 0.01170 | 0.01131 (0.01127 to 0.01136), −3.3 % | 0.01057 (−9.7 %) |
+
+Upper surface, x/c ([comparison.csv](e387/comparison.csv)):
+
+| α | Separation, oil flow | Separation, Fluent | Reattachment, oil flow | Reattachment, Fluent | Transition, XFOIL |
+|---|---:|---:|---:|---:|---:|
+| 0° | 0.48 | 0.486 | 0.69 | none (reversed flow to 0.95) | 0.684 |
+| 2° | 0.45 | 0.456 | 0.62 | none (reversed flow to 0.91) | 0.636 |
+| 4° | 0.40 | 0.411 | 0.58 | 0.656 | 0.580 |
+| 6° | 0.38 | 0.366 | 0.50 | 0.554 | 0.466 |
+
+![Eppler 387: forces and bubble against the measurements](e387/e387_validation.png)
+
+- **Lift.** Fluent is within 1.4 % of the measurement at all four angles; XFOIL is 2.6 to 9.8 % high, most
+  at small angles.
+- **Drag.** XFOIL is 9.4 to 10.1 % low at every angle, a nearly constant offset. Fluent's mean is 1.0 to
+  7.7 % low.
+- **Where the laminar layer separates,** Fluent is within 0.014 c of the oil flow at every angle.
+- **Where the bubble closes,** XFOIL's transition point is within 0.034 c of the measured reattachment.
+  In Fluent the bubble closes 0.05 to 0.08 c too far aft at 4° and 6°. At 0° and 2° it sheds vortices: the
+  forces do not settle (CL varies by 0.08 over the last 2400 iterations, hence the wide drag range), and
+  the mean skin friction changes sign several times aft of 0.5 c without staying positive over 0.05 c
+  before the trailing edge. Reattachment is taken as the first point after separation from which the
+  mean skin friction stays positive over 0.05 c.
+- **What this means for the results.** Both tools predict too little drag for a flow with laminar
+  separation bubbles, XFOIL by a nearly constant 10 %. A constant offset largely cancels in a gain taken
+  against the original airfoil at the same condition, but a design with a different bubble can be
+  affected differently, which is why the gains are checked with Fluent.
 
 ## Which solver settings give a steady solution
 
