@@ -1,0 +1,7 @@
+query_id,database,field,query,published_from,date_searched,hits,retrieved
+Q1_xfoil_optimisation,Semantic Scholar,title and abstract,(airfoil | aerofoil) + xfoil + (optimization | optimisation),2010,2026-10-14,232,232
+Q2_stochastic_optimisers,Semantic Scholar,title and abstract,"(airfoil | aerofoil) + (""shape optimization"" | ""shape optimisation"") + (""genetic algorithm"" | ""particle swarm"" | ""Bayesian optimization"")",2010,2026-10-14,145,145
+Q3_morphing,Semantic Scholar,title and abstract,morphing + (airfoil | aerofoil) + (optimization | optimisation) + xfoil,2010,2026-10-14,21,21
+Q4_curvature,Semantic Scholar,title and abstract,"(airfoil | aerofoil) + (optimization | optimisation) + (""curvature constraint"" | ""curvature constraints"" | ""surface waviness"" | ""smoothness constraint"")",2010,2026-10-14,2,2
+Q5_xfoil_vs_rans,Semantic Scholar,title and abstract,"(airfoil | aerofoil) + xfoil + (RANS | ""Navier-Stokes"") + transition + (optimization | optimisation)",2010,2026-10-14,3,3
+Q6_robust_transition,Semantic Scholar,title and abstract,"(airfoil | aerofoil) + (robust | uncertainty) + (""laminar flow"" | transition) + (optimization | optimisation)",2010,2026-10-14,73,73

@@ -47,6 +47,11 @@ function collect_cfd_results(runDir, outDir, only)
 %                       the design-study run), surface.csv
 %                       (time-mean pressure and skin friction), meshes.csv,
 %                       run_info.json, run_info_half.json, time_accurate.png
+%     e387/             comparison.csv (Fluent and XFOIL against the
+%                       measurements of NASA TM-4062 in reference_ltpt.csv
+%                       of that folder), history.csv, surface.csv,
+%                       xfoil.csv, meshes.csv, run_info.json,
+%                       e387_validation.png (validate_e387.m)
 %   A run counts as steady if, over its last force reports (500 iterations
 %   in the NACA 0012 runs; 1000 with SST and 2400 with Transition SST in
 %   the design study), CL varies by less than 1e-4 and CD by less than
@@ -80,6 +85,9 @@ if wanted('designs') && isfile(fullfile(runDir, 'designs', 'forces.csv'))
 end
 if wanted('transition_tests') && isfile(fullfile(runDir, 'transition_tests', 'forces.csv'))
     transitionTests(fullfile(runDir, 'transition_tests'), fullfile(outDir, 'transition_tests'), tol);
+end
+if wanted('e387') && isfile(fullfile(runDir, 'e387', 'forces.csv'))
+    e387Validation(fullfile(runDir, 'e387'), fullfile(outDir, 'e387'), tol);
 end
 if wanted('time_accurate') && isfile(fullfile(runDir, 'time_accurate', 'ta_run.out'))
     timeAccurate(fullfile(runDir, 'time_accurate'), fullfile(outDir, 'time_accurate'), fullfile(outDir, 'designs'), ...
@@ -990,6 +998,100 @@ exportgraphics(f, fullfile(out, 'time_accurate.png'), 'Resolution', 130);
 close(f);
 fprintf('[TIME-ACCURATE] CD %.6f, CL %.5f, CL/CD %.1f over %g chord passages; largest line %.2f per chord passage\n', ...
     mean(A.CD), mean(A.CL), mean(A.CL) / mean(A.CD), nAvg * dt, frequency);
+end
+
+%% ------------------------------------------------------------------ Eppler 387 validation
+function e387Validation(in, out, tol)
+% Fluent (Transition SST) and XFOIL against the measurements of NASA TM-4062 at Re = 300 000 (validate_e387.m);
+% the measured values are in out/reference_ltpt.csv
+if ~exist(out, 'dir'), mkdir(out); end
+for f = {'meshes.csv', 'run_info.json', 'xfoil.csv'}
+    if isfile(fullfile(in, f{1})), copyfile(fullfile(in, f{1}), fullfile(out, f{1})); end
+end
+R = readtable(fullfile(out, 'reference_ltpt.csv'), 'Delimiter', ',');
+Rf = R(strcmp(R.kind, 'forces'), :);  Ro = R(strcmp(R.kind, 'oil_flow'), :);
+X = readtable(fullfile(in, 'xfoil.csv'), 'Delimiter', ',');
+T = readtable(fullfile(in, 'forces.csv'), 'Delimiter', ',');
+T = sortrows(T, 'alpha');
+wall = readmatrix(fullfile(in, 'e387_wall.csv'));
+T0 = 288.15;  Rgas = 8314.47 / 28.966;                 % as in fluentJournal
+qInf = 0.5 * (101325 / (Rgas * T0)) * (0.09 * sqrt(1.4 * Rgas * T0))^2;
+rows = cell(0, 22);  Hall = cell(0, 1);  S = cell(0, 1);
+for i = 1:height(T)
+    a = T.alpha(i);
+    [cd, cl, it, parts] = fluentForces(fullfile(in, T.transcript{i}));
+    n = numel(cd);
+    if n < 3, continue; end
+    Hall{end+1, 1} = table(repmat(a, n, 1), it, [1; 2 * ones(n - 1, 1)], cl, cd, parts.CD_pressure, parts.CD_viscous, ...
+        'VariableNames', {'alpha', 'iteration', 'order', 'CL', 'CD', 'CD_pressure', 'CD_viscous'}); %#ok<AGROW>
+    k = (2:n).';
+    st = cycleStatistics(it(k), cl(k), cd(k), 'Window', 2400, 'Tol', [tol.CL tol.CD]);
+    % mean wall data over the profiles of the last 2400 iterations
+    tag = strrep(T.transcript{i}, '.out', '');
+    d = dir(fullfile(in, [tag '_it*.prof']));
+    files = [{fullfile(in, [tag '.prof'])}, arrayfun(@(e) fullfile(in, e.name), d(:).', 'UniformOutput', false)];
+    cf = [];  cp = [];
+    for kk = 1:numel(files)
+        q = fluentSurface(files{kk}, wall, qInf);
+        cf(:, kk) = q.cf;  cp(:, kk) = q.cp; %#ok<AGROW>
+    end
+    q.cf = mean(cf, 2);  q.cp = mean(cp, 2);
+    q.alpha = repmat(a, height(q), 1);
+    S{end+1, 1} = q(:, {'alpha', 'surface', 'x', 'y', 'cp', 'cf'}); %#ok<AGROW>
+    u = q(strcmp(q.surface, 'upper'), :);
+    [xtr, xsep] = transitionFromCf(u.x, u.cf);
+    u = sortrows(u, 'x');                                 % reattachment: mean cf positive over 0.05 c after separation;
+    xreat = NaN;  xrev = NaN;                             % end of reversed flow: last negative cf (includes shed vortices)
+    for k = find(u.x > xsep & u.cf >= 0).'               % positive over at least 0.05 c
+        if all(u.cf(u.x >= u.x(k) & u.x <= u.x(k) + 0.05) >= 0), xreat = u.x(k);  break; end
+    end
+    rev = u.x(u.cf < 0 & u.x >= 0.03 & u.x <= 0.95);  if ~isempty(rev), xrev = max(rev); end
+    e = Rf(abs(Rf.alpha - a) < 0.05, :);               % measured rows at this angle
+    o = Ro(abs(Ro.alpha - a) < 0.05, :);
+    x = X(abs(X.alpha - a) < 1e-9, :);
+    clE = mean(e.CL);  cdE = mean(e.CD);
+    clX = NaN;  cdX = NaN;  trX = NaN;
+    if ~isempty(x), clX = x.CL(1);  cdX = x.CD(1);  trX = x.xtrTop(1); end
+    lsE = NaN;  trE = NaN;
+    if ~isempty(o), lsE = o.laminar_separation(1);  trE = o.turbulent_reattachment(1); end
+    rows(end+1, :) = {a, clE, st.CL, clX, cdE, st.CD, st.CD_min, st.CD_max, cdX, ...
+        100 * (st.CL / clE - 1), 100 * (clX / clE - 1), 100 * (st.CD / cdE - 1), 100 * (cdX / cdE - 1), ...
+        lsE, xsep, trE, xreat, xrev, xtr, trX, st.steady, st.period}; %#ok<AGROW>
+end
+if isempty(rows), return; end
+C = cell2table(rows, 'VariableNames', {'alpha', 'CL_measured', 'CL_fluent', 'CL_xfoil', 'CD_measured', 'CD_fluent', ...
+    'CD_fluent_min', 'CD_fluent_max', 'CD_xfoil', 'CL_fluent_error_percent', 'CL_xfoil_error_percent', ...
+    'CD_fluent_error_percent', 'CD_xfoil_error_percent', 'separation_measured', 'separation_fluent', ...
+    'reattachment_measured', 'reattachment_fluent', 'reversed_flow_end_fluent', 'transition_fluent', 'transition_xfoil', 'fluent_steady', ...
+    'fluent_period_iterations'});
+writetable(C, fullfile(out, 'comparison.csv'));
+writetable(vertcat(Hall{:}), fullfile(out, 'history.csv'));
+writetable(vertcat(S{:}), fullfile(out, 'surface.csv'));
+
+f = figure('Color', 'w', 'Position', [80 80 1500 430], 'Visible', 'off');
+tiledlayout(1, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
+nexttile;  hold on;  box on;  grid on;
+plot(Rf.alpha, Rf.CL, 'ko', 'DisplayName', 'measured (NASA TM-4062)');
+plot(X.alpha, X.CL, 'b-', 'LineWidth', 1.2, 'DisplayName', 'XFOIL, Ncrit 9');
+plot(C.alpha, C.CL_fluent, 'rs', 'MarkerFaceColor', 'r', 'DisplayName', 'Fluent, Transition SST');
+xlabel('\alpha (deg)');  ylabel('C_L');  legend('Location', 'southeast');  title('Eppler 387, Re = 300 000');
+nexttile;  hold on;  box on;  grid on;
+plot(Rf.CD, Rf.CL, 'ko', 'DisplayName', 'measured');
+plot(X.CD, X.CL, 'b-', 'LineWidth', 1.2, 'DisplayName', 'XFOIL');
+errorbar(C.CD_fluent, C.CL_fluent, [], [], C.CD_fluent - C.CD_fluent_min, C.CD_fluent_max - C.CD_fluent, 'rs', ...
+    'MarkerFaceColor', 'r', 'DisplayName', 'Fluent (mean, lowest and highest)');
+xlim([0.006 0.016]);  ylim([0 1.3]);  xlabel('C_D');  ylabel('C_L');  legend('Location', 'southeast');
+plainTicks(gca, '%.1f');
+nexttile;  hold on;  box on;  grid on;
+plot(Ro.alpha, Ro.laminar_separation, 'ko', 'DisplayName', 'separation, oil flow');
+plot(Ro.alpha, Ro.turbulent_reattachment, 'k^', 'DisplayName', 'reattachment, oil flow');
+plot(C.alpha, C.separation_fluent, 'rs', 'MarkerFaceColor', 'r', 'DisplayName', 'separation, Fluent');
+plot(C.alpha, C.reattachment_fluent, 'r^', 'MarkerFaceColor', 'r', 'DisplayName', 'reattachment, Fluent');
+plot(C.alpha, C.reversed_flow_end_fluent, 'rv', 'DisplayName', 'last reversed flow, Fluent');
+plot(X.alpha, X.xtrTop, 'b-', 'LineWidth', 1.2, 'DisplayName', 'transition, XFOIL');
+xlim([-3 9]);  ylim([0 1]);  xlabel('\alpha (deg)');  ylabel('x / c, upper surface');  legend('Location', 'southwest');
+exportgraphics(f, fullfile(out, 'e387_validation.png'), 'Resolution', 130);
+close(f);
 end
 
 %% ------------------------------------------------------------------ helpers

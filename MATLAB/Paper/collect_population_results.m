@@ -9,7 +9,9 @@ function collect_population_results(runDir, outDir, airfoilDir, workers, only)
 %     conditions.csv  one row per run and condition: peak CL/CD, CL/CD at
 %                     2 deg and CL/CD at the design lift coefficient of the
 %                     airfoil, for the original and the design, and the
-%                     gains; the number of converged angles of both polars.
+%                     gains; the pitching moment at 0 deg (the quantity the
+%                     optimiser limits) and at the angle of the peak CL/CD;
+%                     the number of converged angles of both polars.
 %                     Conditions (Re 1e6 and Ncrit 9 unless stated):
 %                     design, Ncrit 5, Ncrit 7, Ncrit 11, Re 0.5e6, Re 2e6,
 %                     tripped (transition fixed at x/c = 0.05 on both
@@ -23,6 +25,12 @@ function collect_population_results(runDir, outDir, airfoilDir, workers, only)
 %                     every angle of attack (design condition): the size of
 %                     a gain depends on the angle at which it is reported
 %     seeds.csv       spread of the peak CL/CD over the three seeds
+%     robustness.csv  one row per run: mean, standard deviation and lowest
+%                     value of the peak CL/CD over the seven conditions, for
+%                     the original and the design, and the mean and lowest
+%                     gain (only where all seven conditions give a value)
+%     robustness_summary.csv  medians of these over the airfoils for every
+%                     formulation (seed 1)
 %     airfoils/       the optimised .dat files
 %   and the figures gains_by_condition.png and gain_by_angle.png.
 %   The analysis uses XFOIL with 160 panel nodes, alpha from -2 to 18 deg in
@@ -135,11 +143,11 @@ for k = 1:height(R)
         late = cut(index(['original:' R.airfoil{k}], c)) || cut(index(R.tag{k}, c));
         C{end+1, 1} = table(R.tag(k), R.airfoil(k), R.formulation(k), R.seed(k), cond(c, 1), v(1, 1), v(2, 1), g(1), ...
             v(1, 2), v(2, 2), g(2), v(1, 3), v(2, 3), g(3), v(1, 4), v(2, 4), v(1, 5), v(2, 5), numel(po.alpha), ...
-            numel(pd.alpha), late, 'VariableNames', ...
+            numel(pd.alpha), late, v(1, 6), v(2, 6), v(1, 7), v(2, 7), 'VariableNames', ...
             {'tag', 'airfoil', 'formulation', 'seed', 'condition', 'LDmax_original', 'LDmax', 'LDmax_gain_percent', ...
             'LD_2deg_original', 'LD_2deg', 'LD_2deg_gain_percent', 'LD_designCL_original', 'LD_designCL', ...
             'LD_designCL_gain_percent', 'alpha_LDmax_original', 'alpha_LDmax', 'CLmax_original', 'CLmax', ...
-            'angles_original', 'angles', 'no_stable_polar'}); %#ok<AGROW>
+            'angles_original', 'angles', 'no_stable_polar', 'CM0_original', 'CM0', 'CM_LDmax_original', 'CM_LDmax'}); %#ok<AGROW>
     end
     if strcmp(R.formulation{k}, 'peak') && R.seed(k) == 1
         po = pol(['original:' R.airfoil{k}], 1);
@@ -165,13 +173,46 @@ for f = 1:numel(forms)
         missing = sum(isnan(g));
         g = g(~isnan(g));
         if isempty(g), continue; end
+        sel = strcmp(C.formulation, forms{f}) & C.seed == 1 & strcmp(C.condition, cond{c, 1});
+        dcm = C.CM0(sel) - C.CM0_original(sel);
         S{end+1, 1} = table(forms(f), cond(c, 1), numel(g), median(g), quantile(g, 0.25), quantile(g, 0.75), min(g), max(g), ...
-            sum(g < 0), missing, 'VariableNames', {'formulation', 'condition', 'airfoils', 'median_gain_percent', 'q25', ...
-            'q75', 'min', 'max', 'designs_worse_than_original', 'airfoils_without_value'}); %#ok<AGROW>
+            sum(g < 0), missing, median(dcm, 'omitnan'), min(dcm), max(dcm), 'VariableNames', {'formulation', 'condition', ...
+            'airfoils', 'median_gain_percent', 'q25', 'q75', 'min', 'max', 'designs_worse_than_original', ...
+            'airfoils_without_value', 'CM0_change_median', 'CM0_change_min', 'CM0_change_max'}); %#ok<AGROW>
     end
 end
 S = vertcat(S{:});
 writetable(S, fullfile(outDir, 'summary.csv'));
+
+%% Robustness over the seven conditions (one row per run)
+W = cell(height(R), 1);
+for k = 1:height(R)
+    c = C(strcmp(C.tag, R.tag{k}), :);
+    full = all(~isnan(c.LDmax) & ~isnan(c.LDmax_original));
+    lo = nan(1, 3);  ld = nan(1, 3);  g = nan(1, 2);
+    if full
+        lo = [mean(c.LDmax_original), std(c.LDmax_original), min(c.LDmax_original)];
+        ld = [mean(c.LDmax), std(c.LDmax), min(c.LDmax)];
+        g = [mean(c.LDmax_gain_percent), min(c.LDmax_gain_percent)];
+    end
+    W{k} = table(R.tag(k), R.airfoil(k), R.formulation(k), R.seed(k), sum(~isnan(c.LDmax_gain_percent)), lo(1), lo(2), ...
+        lo(3), ld(1), ld(2), ld(3), g(1), g(2), 'VariableNames', {'tag', 'airfoil', 'formulation', 'seed', 'conditions', ...
+        'LDmax_mean_original', 'LDmax_std_original', 'LDmax_min_original', 'LDmax_mean', 'LDmax_std', 'LDmax_min', ...
+        'mean_gain_percent', 'lowest_gain_percent'});
+end
+W = vertcat(W{:});
+writetable(W, fullfile(outDir, 'robustness.csv'));
+V = cell(0, 1);
+for f = 1:numel(forms)
+    w = W(strcmp(W.formulation, forms{f}) & W.seed == 1 & ~isnan(W.mean_gain_percent), :);
+    if isempty(w), continue; end
+    V{end+1, 1} = table(forms(f), height(w), median(w.mean_gain_percent), median(w.lowest_gain_percent), ...
+        sum(w.lowest_gain_percent < 0), median(100 * (w.LDmax_std ./ w.LDmax_std_original - 1)), ...
+        sum(strcmp(W.formulation, forms{f}) & W.seed == 1 & isnan(W.mean_gain_percent)), 'VariableNames', ...
+        {'formulation', 'airfoils', 'median_mean_gain_percent', 'median_lowest_gain_percent', ...
+        'designs_below_original_somewhere', 'median_std_change_percent', 'airfoils_without_all_conditions'}); %#ok<AGROW>
+end
+if ~isempty(V), writetable(vertcat(V{:}), fullfile(outDir, 'robustness_summary.csv')); end
 
 %% Spread over the seeds (peak formulation, design condition)
 D = C(strcmp(C.formulation, 'peak') & strcmp(C.condition, 'design'), :);
@@ -237,11 +278,13 @@ p = struct('alpha', [], 'CL', [], 'CD', [], 'CM', [], 'xtrTop', [], 'xtrBot', []
 end
 
 function v = metrics(p, designCL)
-% [peak CL/CD, CL/CD at 2 deg, CL/CD at the design CL, angle of the peak, CL max]; NaN where XFOIL gave no value
-v = nan(1, 5);
+% [peak CL/CD, CL/CD at 2 deg, CL/CD at the design CL, angle of the peak, CL max, CM at 0 deg, CM at the angle
+% of the peak]; NaN where XFOIL gave no value
+v = nan(1, 7);
 if numel(p.alpha) < 12 || p.alpha(1) > 0 || p.alpha(end) < 0, return; end    % no usable polar
 m = efficiencyMetrics(p);
-v([1 4 5]) = [m.LDmax, m.alphaLD, m.CLmax];
+v([1 4 5 6]) = [m.LDmax, m.alphaLD, m.CLmax, m.CM0];
+v(7) = interp1(p.alpha, p.CM, m.alphaLD);
 e = efficiencyValue(p, 'LDatAlpha', 2);
 if e > 0, v(2) = e; end
 if ~isnan(designCL)

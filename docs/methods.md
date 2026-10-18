@@ -185,7 +185,9 @@ Summary:
   - NACA 2412 is also optimised for the mean of the peak CL/CD at Ncrit = 5 and 9 (seeds 1 to 3) and for
     the lower of the two (seed 1), and in the same way for free transition (Ncrit 9) together with
     transition fixed at 5 % chord on both surfaces. The mean of free and fixed transition is also the
-    objective of one run (seed 1) for each of the other 29 airfoils.
+    objective of one run (seed 1) for each of the other 29 airfoils. The mean over two transition conditions
+    follows Caboni et al. (2018), who use Ncrit = 0.5 and 9.5; here the second condition is transition
+    fixed at 5 % chord.
   - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
     against the seed at the same condition.
@@ -200,6 +202,15 @@ Summary:
     standard limit, and a polar whose sweep was still stopped is computed again and accepted only when
     the same angles converge twice in a row; otherwise the table has no value for it
     (`collect_population_results.m`).
+  - The batch ran on a laptop that at times went into standby. The time limit runs on the wall clock,
+    so a sweep that was under way when the machine went to sleep can be stopped on waking and return
+    fewer angles. During the search this can only make a candidate look worse, never better: a peak
+    taken from fewer angles is not higher, and a polar with too few angles is rejected. It cannot reach
+    the tables, because every value in them comes from the analysis above. Standby on battery also
+    suspends the runs, so the run times in `runs.csv` include hours of sleep; the median time per
+    evaluation is the measure of effort.
+  - At times Windows did not let MATLAB delete a temporary XFOIL folder at the end of a sweep (a file was
+    still open). MATLAB logs this as a warning and the run continues; the result is not affected.
 
 ## 7. Morphing analyses (`Morphing/`)
 
@@ -275,6 +286,14 @@ Results: [results/cfd](../results/cfd/README.md).
   - Discretisation uncertainty of the drag by the grid convergence index (Celik et al. 2008): 0.67 % on
     the fine and 1.61 % on the medium mesh at 10°.
   - A far field 20 chords away raises the drag at 10° by 9.4 %; 100 chords still by 1.5 %.
+- **Validation with laminar separation bubbles** (`validate_e387.m`). Eppler 387 at Re = 300 000 and
+  M = 0.09 against the Langley Low-Turbulence Pressure Tunnel (McGhee, Walker & Millard 1988): forces
+  at 0°, 2°, 4° and 6° and the oil-flow positions of laminar separation and turbulent reattachment.
+  Fluent uses the settings of the design study (Transition SST, the same mesh generator, 100,240 cells,
+  means over the last 2400 iterations) with the free-stream turbulence set so that 0.060 % reaches the
+  airfoil, the level of the tunnel; XFOIL uses Ncrit 9 (Mack's relation gives 9.4 for 0.06 %) and
+  M = 0.09. Reattachment in Fluent is the first point after separation from which the mean skin
+  friction stays positive over 0.05 c.
 - **Design study** (`run_design_study.m`, `designStudyAirfoils.m`, `design_study_xfoil.m`). Six
   airfoils at Re = 10⁶ and M = 0.15: NACA 2412; the smooth and the wavy design optimised for the peak
   CL/CD with free transition and the earlier PARSEC design; and two designs optimised for free and
@@ -307,4 +326,6 @@ made on Windows 11, AMD Ryzen 7 7435HS (8 cores, 16 threads), with 6 parallel MA
   parallelized computational fluid dynamics codes. *AIAA Journal* 47(12), 2894–2906.
 - Ladson, C. L. (1988). *Effects of independent variation of Mach and Reynolds numbers on the low-speed
   aerodynamic characteristics of the NACA 0012 airfoil section*. NASA TM-4074.
+- McGhee, R. J., Walker, B. S. & Millard, B. F. (1988). *Experimental results for the Eppler 387
+  airfoil at low Reynolds numbers in the Langley Low-Turbulence Pressure Tunnel*. NASA TM-4062.
 - Xoptfoil2: J. Guenzel, <https://github.com/jxjo/Xoptfoil2> (version 2.0.0).

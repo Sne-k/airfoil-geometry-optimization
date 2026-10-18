@@ -136,7 +136,11 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   tripped (NACA 2412; [results/population](results/population/README.md)).
 - **CFD.** The Fluent set-up is verified on NASA's NACA 0012 case: lift within 1.2 % and drag within
   6.4 % of each of NASA's three reference codes, skin friction within 1.2 % of CFL3D
-  ([results/cfd](results/cfd/README.md)).
+  ([results/cfd](results/cfd/README.md)). Against wind-tunnel measurements of the Eppler 387 at Re = 300 000 (NASA TM-4062), with
+  laminar separation bubbles, Fluent's lift is within 1.4 % and its mean drag 1.0 to 7.7 % low; XFOIL's
+  lift is 2.6 to 9.8 % high and its drag 9.4 to 10.1 % low at every angle. Fluent places laminar
+  separation within 0.014 c of the oil flow, and XFOIL places transition within 0.034 c of the measured
+  reattachment.
 - **Fully turbulent RANS agrees with the tripped XFOIL result.** Without laminar flow the three designs
   optimised for free transition alone are 0.4 to 15.6 % below NACA 2412 in best CL/CD, and the design
   optimised for free and tripped flow together is 3.3 % above it.
@@ -221,8 +225,8 @@ results/
   morphing/       morphing envelope and nose/trailing-edge morphing
   validation/     XFOIL against wind-tunnel data (experimental data, polars, comparison)
   paper/          smooth-shape results with three random seeds (basis of the planned paper)
-  cfd/            Fluent: verification on NASA's NACA 0012 case, time-step study, design study,
-                  one case in physical time
+  cfd/            Fluent: verification on NASA's NACA 0012 case, validation on the Eppler 387,
+                  time-step study, design study, one case in physical time
   population/     the same optimisation for 30 airfoils (in progress); robust formulations for NACA 2412
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
