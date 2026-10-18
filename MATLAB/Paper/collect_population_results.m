@@ -34,7 +34,13 @@ function collect_population_results(runDir, outDir, airfoilDir, workers, only)
 %     airfoils/       the optimised .dat files
 %   and the figures gains_by_condition.png and gain_by_angle.png.
 %   The analysis uses XFOIL with 160 panel nodes, alpha from -2 to 18 deg in
-%   0.5 deg steps. A gain is taken against the original airfoil at the same
+%   0.5 deg steps, with the friction floor of xfoilPolar. Every polar is
+%   computed twice: at the exact coordinates of the design and at the
+%   coordinates rounded to 6 decimals (as in the published .dat files). XFOIL
+%   occasionally converges to a false low-drag solution that exists only at
+%   one of them; such a solution is always too high, so the polar with the
+%   lower peak CL/CD is used, and conditions.csv gives the difference of the
+%   two peaks (sensitivity_percent, also for the original). A gain is taken against the original airfoil at the same
 %   condition. airfoilDir holds the UIUC coordinate files (default
 %   MATLAB/airfoils/uiuc).
 %
@@ -122,11 +128,21 @@ nG = numel(G);  nC = size(cond, 1);
 jobs = [repelem((1:nG)', nC), repmat((1:nC)', nG, 1)];
 P = cell(size(jobs, 1), 1);
 cut = false(size(jobs, 1), 1);                       % no polar that is independent of the machine load
+sens = nan(size(jobs, 1), 1);                        % exact against rounded coordinates, peak CL/CD, per cent
 if workers > 0 && isempty(gcp('nocreate')), parpool('Processes', workers); end
 parfor (j = 1:size(jobs, 1), workers)
     g = G(jobs(j, 1));
     if iscell(g.x), xu = g.x{1};  xl = g.x{2}; else, xu = g.x;  xl = g.x; end
-    [P{j}, cut(j)] = stablePolar(xu, g.yu, xl, g.yl, cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3});
+    [pE, cE] = stablePolar(xu, g.yu, xl, g.yl, cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3});
+    [pR, cR] = stablePolar(round(xu, 6), round(g.yu, 6), round(xl, 6), round(g.yl, 6), cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3});
+    vE = metrics(pE, NaN);  vR = metrics(pR, NaN);
+    if isnan(vE(1)) || vR(1) < vE(1)                 % the lower value: a false XFOIL solution is always too high
+        P{j} = pR;  cut(j) = cR;
+    else
+        P{j} = pE;  cut(j) = cE;
+    end
+    sens(j) = 100 * (max(vE(1), vR(1)) / min(vE(1), vR(1)) - 1);
+    if xor(isnan(vE(1)), isnan(vR(1))), sens(j) = Inf; end            % only one of the two gives a value
 end
 index = @(tag, c) find(strcmp({G(jobs(:, 1)).tag}', tag) & jobs(:, 2) == c, 1);
 pol = @(tag, c) P{index(tag, c)};
@@ -141,13 +157,15 @@ for k = 1:height(R)
         v = [metrics(po, R.design_CL(k)); metrics(pd, R.design_CL(k))];
         g = 100 * (v(2, 1:3) ./ v(1, 1:3) - 1);
         late = cut(index(['original:' R.airfoil{k}], c)) || cut(index(R.tag{k}, c));
+        se = [sens(index(['original:' R.airfoil{k}], c)), sens(index(R.tag{k}, c))];
         C{end+1, 1} = table(R.tag(k), R.airfoil(k), R.formulation(k), R.seed(k), cond(c, 1), v(1, 1), v(2, 1), g(1), ...
             v(1, 2), v(2, 2), g(2), v(1, 3), v(2, 3), g(3), v(1, 4), v(2, 4), v(1, 5), v(2, 5), numel(po.alpha), ...
-            numel(pd.alpha), late, v(1, 6), v(2, 6), v(1, 7), v(2, 7), 'VariableNames', ...
+            numel(pd.alpha), late, v(1, 6), v(2, 6), v(1, 7), v(2, 7), se(1), se(2), 'VariableNames', ...
             {'tag', 'airfoil', 'formulation', 'seed', 'condition', 'LDmax_original', 'LDmax', 'LDmax_gain_percent', ...
             'LD_2deg_original', 'LD_2deg', 'LD_2deg_gain_percent', 'LD_designCL_original', 'LD_designCL', ...
             'LD_designCL_gain_percent', 'alpha_LDmax_original', 'alpha_LDmax', 'CLmax_original', 'CLmax', ...
-            'angles_original', 'angles', 'no_stable_polar', 'CM0_original', 'CM0', 'CM_LDmax_original', 'CM_LDmax'}); %#ok<AGROW>
+            'angles_original', 'angles', 'no_stable_polar', 'CM0_original', 'CM0', 'CM_LDmax_original', 'CM_LDmax', ...
+            'sensitivity_percent_original', 'sensitivity_percent'}); %#ok<AGROW>
     end
     if strcmp(R.formulation{k}, 'peak') && R.seed(k) == 1
         po = pol(['original:' R.airfoil{k}], 1);
