@@ -58,7 +58,7 @@ for k = 1:numel(d)
     if isfinite(o.CmIncrease) && isfinite(r.original.CM0), S.cmMax = abs(r.original.CM0) + o.CmIncrease; end
     if o.KeepCLmax, S.clMaxMin = r.original.CLmax; end
     S.flows = arrayfun(@(n) struct('Ncrit', n), o.Ncrit(:).', 'UniformOutput', false);
-    if ~isempty(o.Conditions), S.flows = o.Conditions(:).'; end
+    if isfield(o, 'Conditions') && ~isempty(o.Conditions), S.flows = o.Conditions(:).'; end   % older runs lack it
     R(end+1) = struct('tag', tag, 'form', tok{1}, 'x', r.x, 'yu', yu, 'yl', yl, 'S', S, ...
         'objective', r.runInfo.objectiveFinal, 'cst', {{r.AuOpt(:).', r.AlOpt(:).', r.dte}}); %#ok<AGROW>
 end
