@@ -231,7 +231,7 @@ Summary:
     nodes, with and without the friction floor. Without the floor this reproduces every recorded
     objective. A run is repeated if its recorded objective is more than 1 % above the median of the
     usable values with the floor; three runs were (`results/population/README.md`). The repetition uses
-    the same code with the friction floor (version `8868ad4`), which reproduces the original code
+    the same code with the friction floor (version `741da83`), which reproduces the original code
     exactly when the floor is switched off. `test_false_solutions.m` reproduces six of the false
     solutions and one control design from their exact CST coefficients
     (`results/population/false_solution_cases.csv`).

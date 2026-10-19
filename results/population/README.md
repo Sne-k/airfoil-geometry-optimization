@@ -190,7 +190,7 @@ the median difference between the four values of a design is 0.18 %. In three ru
 was more than 1 % above the median of the four values with the floor, so the optimiser had been steered
 by a false solution: `NACA_4409_robusttrip_s1` (161.5 against 121.4), `FX63137_robusttrip_s1` (143.9
 against 126.7) and `GOE398_nocurv_s1` (270.9 against 233). These three runs were repeated with the floor
-(code version `8868ad4` in `runs.csv`); they reach 132.6, 129.5 and 168.4. In three further runs a false
+(code version `741da83` in `runs.csv`); they reach 132.6, 129.5 and 168.4. In three further runs a false
 value at one panelling had not been used, because the optimiser takes the lower of the 160- and 200-node
 values.
 
