@@ -308,20 +308,27 @@ Web of Science must still be checked.
      loses it only with tripped boundary layers. A design optimised for the mean of free and tripped
      flow keeps 25 to 32 % with free transition and is 2 to 4 % better than the original when tripped
      (`results/population/README.md`).
-   - Over 30 airfoils the picture is the same (population study, 80 of 217 runs). The designs optimised
-     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.3 and 37.8 % at other
+   - Over 30 airfoils the picture is the same (population study, 217 runs). The designs optimised
+     for peak CL/CD gain a median of 38.2 % at the design condition and between 29.2 and 37.4 % at other
      Ncrit and Reynolds numbers. With tripped boundary layers the median is −1.6 %, and 19 of the 30
      designs are worse than their original.
+   - Optimised for free and tripped flow together, the 30 airfoils gain a median of 34.7 % at the design
+     condition and +3.6 % when tripped; 9 of 30 designs are worse than their original when tripped,
+     against 19 of 30 single-point designs.
+   - XFOIL's false low-drag solutions are a hazard in their own right: in this study they existed only at
+     one panelling or only at the exact design coordinates, and steered 3 of 217 optimisations
+     (`results/population/README.md`, False XFOIL solutions).
 
 ## 12. Tasks that follow from the gaps
 
-| Task | Fills gap | State on 13 October 2026 |
+| Task | Fills gap | State on 20 October 2026 |
 |---|---|---|
-| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | batch of 217 runs running (`MATLAB/Paper/run_population_study.m`); 80 done: peak and fixed angle for all 30 airfoils, fixed lift for 12 |
-| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | done for the 80 finished runs (`results/population/README.md`): the gain of the peak designs survives other Ncrit and Reynolds numbers and is gone with tripped boundary layers (median −1.6 %) |
-| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | done for the peak and fixed-angle designs: a design optimised at 2° gains a median of 49.1 % at 2° and 24.8 % in peak CL/CD; the fixed-lift designs wait for the batch |
+| Population study: 30 baseline airfoils, three formulations (peak, fixed angle, fixed lift), with and without curvature limits, three seeds for the peak formulation | 1, 2, 3, 5 | done: 217 runs (`MATLAB/Paper/run_population_study.m`, `results/population/README.md`) |
+| Re-analyse every design of the population at Ncrit 5, 7, 11, at Re 0.5 and 2 million, and with tripped boundary layers; give the share of the gain that survives | 1, 5 | done for all 217 runs (`results/population/README.md`): the gain of the peak designs survives other Ncrit and Reynolds numbers and is gone with tripped boundary layers (median −1.6 %) |
+| Metric translation: the gain of every design under all three metrics, and the gain as a function of the angle at which it is reported | 2 | done: a design optimised at 2° gains a median of 49.1 % at 2°, 24.8 % in peak CL/CD and 2.4 % at the design lift coefficient |
 | Robust formulation: optimise the mean or the worst case over Ncrit 5 and 9, and show what survives | 5 | done for NACA 2412 (four runs): the single-point design was not sensitive to Ncrit in the first place (`results/population/README.md`) |
-| Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped; the same formulation is run for the other 29 airfoils at the end of the batch |
+| Robust formulation against tripping: optimise the mean or the worst case of free transition and transition fixed at 5 % chord. Added because the gains of the single-point designs vanish with tripped boundary layers, while they survive a lower Ncrit | 1, 5 | done for NACA 2412 (four runs): the mean keeps 25 to 32 % with free transition and loses nothing when tripped; over all 30 airfoils the design is better than the single-point design with tripped flow for 29, at a median cost of 2.4 points at the design condition |
+| Guard against false XFOIL solutions: a friction floor with XFOIL's transition points, every analysis polar at exact and rounded coordinates, and a sensitivity test of every final design. Added because false solutions were found in the analysis and had steered optimisations | 1 | done (`results/population/README.md`): floor validated on 462 polars; 3 of 217 runs steered and repeated with the floor |
 | RANS check of the NACA 2412 designs with the free-stream turbulence matched to Ncrit, transition locations compared with XFOIL, and a fully turbulent bound | 1 | done for six airfoils (`results/cfd/README.md`) |
 | Describe the behaviour of the Transition SST runs, which cycle instead of settling: cause, solver settings tried, how the forces are averaged. Added because reducing the iterative error is a known difficulty of transition-model runs (Eça et al. 2022) and the comparison with XFOIL depends on it | 1 | done: cause, five solver settings, refined mesh, means over whole cycles, and one case in physical time, whose mean forces agree with the cycle means within 0.5 % (`results/cfd/README.md`) |
 | Validate both tools against measurements with laminar separation bubbles (Eppler 387, Re = 300 000, NASA TM-4062). Added because He et al. (2019) and Morgado et al. (2016) show that neither XFOIL nor RANS can be taken as the reference by default | 1 | done (`results/cfd/README.md`): Fluent closer in lift and drag, XFOIL closer in where the bubble ends; XFOIL's drag 10 % low at every angle |

@@ -129,7 +129,7 @@ function cd = frictionFloor(Re, xtrTop, xtrBot)
 % occasionally converges to solutions far below it, for some shapes only at
 % one panelling or only at coordinates that differ in the sixth decimal;
 % with forced transition at 5 % chord it reported CD = 0.0027 where the
-% floor is 0.0085. With laminar flow to the trailing edge on both sides the
+% floor is 0.0091. With laminar flow to the trailing edge on both sides the
 % floor is the laminar value 2.656/sqrt(Re).
 f = @(xt) 1.328 / sqrt(Re) * sqrt(xt) + 0.074 * Re^-0.2 * (1 - xt.^0.8);
 cd = f(min(max(xtrTop, 0), 1)) + f(min(max(xtrBot, 0), 1));

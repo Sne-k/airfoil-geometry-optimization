@@ -73,7 +73,7 @@ parfor (j = 1:size(jobs, 1), workers)
     r = R(jobs(j, 1));  v = variants(jobs(j, 2), :);
     x = r.x;  yu = r.yu;  yl = r.yl;
     if v{2}, x = round(x, 6);  yu = round(yu, 6);  yl = round(yl, 6); end
-    E(j) = objectiveValue(x, yu, yl, r.S, v{3}, jobs(j, 3) == 1, exe);
+    E(j) = designObjective(x, yu, yl, r.S, v{3}, jobs(j, 3) == 1, exe);
 end
 
 %% Table
@@ -97,23 +97,6 @@ for k = 1:numel(R)
 end
 fclose(fid);
 fprintf('[SENSITIVITY DONE] %d runs, %d reproduce the recorded objective\n', height(T), sum(T.reproduced));
-end
-
-function e = objectiveValue(x, yu, yl, S, panels, useFloor, exe)
-% The objective of airfoilObjective.m for one panelling: 0 for an unusable polar
-ec = zeros(1, numel(S.flows));
-for c = 1:numel(S.flows)
-    flow = S.flows{c};  flow.FrictionFloor = useFloor;
-    pol = xfoilPolar(x, yu, x, yl, S.Re, [-2 12 0.5], exe, panels, false, flow);
-    if numel(pol.alpha) < 12 || pol.alpha(1) > 0 || pol.alpha(end) < 0 || ...
-            abs(interp1(pol.alpha, pol.CM, 0)) > S.cmMax || max(pol.CL) < S.clMaxMin
-        e = 0;
-        return;
-    end
-    ec(c) = efficiencyValue(pol, S.objective, S.design, S.weights, S.aggregate);
-end
-if strcmp(S.aggregate, 'worst'), e = min(ec); else, e = mean(ec); end
-if ~isfinite(e) || e < 0, e = 0; end
 end
 
 function s = spread(v)

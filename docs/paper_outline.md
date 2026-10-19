@@ -24,9 +24,9 @@ checklist.
 | # | Contribution | Evidence | State |
 |---|---|---|---|
 | 1 | One reported gain taken apart into metric, numerical artefacts, shape artefacts and transition assumption | NACA 2412: `results/paper`, `results/README.md`, `results/cfd/designs/xfoil.csv` | available |
-| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | batch running (217 runs, 80 done); first tables for the peak and fixed-angle formulations |
+| 2 | The same over 30 airfoils and three formulations, with seeds and with and without curvature limits | `results/population` | available (217 runs) |
 | 3 | Check with RANS: Transition SST with the free-stream turbulence matched to Ncrit, and fully turbulent SST | `results/cfd/designs` | available (six airfoils, 84 runs, and one time-accurate run) |
-| 4 | A formulation that keeps its gain: optimise for free and tripped flow together (the two-condition mean of Caboni et al. 2018, with tripped flow as the second condition; the formulation itself is not new) | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available for NACA 2412; the other 29 airfoils are run at the end of the batch |
+| 4 | A formulation that keeps its gain: optimise for free and tripped flow together (the two-condition mean of Caboni et al. 2018, with tripped flow as the second condition; the formulation itself is not new) | `results/population/README.md` (eight runs for NACA 2412), `results/cfd/README.md` | available (NACA 2412 and all 30 airfoils) |
 | 5 | Audit of how such results are reported, and a checklist | `docs/literature.md`, sections 8–13 | first version done |
 | 6 | Open, checked tools: optimiser with curvature limits, verified Fluent set-up, provenance of every number | repository, `tools/check_numbers.py` | available |
 
@@ -60,19 +60,23 @@ the question, the approach and the contributions.
   convergence (grid convergence index); domain size; the pseudo-time step finding: `results/cfd`.
 - Fluent and XFOIL against wind-tunnel measurements with laminar separation bubbles (Eppler 387,
   Re = 300 000, NASA TM-4062): forces, laminar separation and reattachment: `results/cfd/e387`.
+- False XFOIL solutions: the friction floor (validated on 462 polars), exact against rounded
+  coordinates in the analysis, and the sensitivity test of every final design; the three steered runs
+  and their repetition: `results/population`.
 
 **5. Results.**
 - 5.1 One problem taken apart (NACA 2412). Report metric +142.6 % at 0° against +71 % at the peak;
   smooth against wavy designs (3.8 %); spurious optima removed by the checks; Ncrit and tripped flow.
 - 5.2 The population: distribution of the gains by formulation; what survives at Ncrit 5 and with
   tripped flow; spread over seeds; effect of the curvature limits; gain as a function of the angle at
-  which it is reported. First result (80 of 217 runs): the designs optimised for peak CL/CD gain a
-  median of 38.2 %, keep 29.3 to 37.8 % at other Ncrit and Reynolds numbers and have −1.6 % when
+  which it is reported. Result (217 runs): the designs optimised for peak CL/CD gain a
+  median of 38.2 %, keep 29.2 to 37.4 % at other Ncrit and Reynolds numbers and have −1.6 % when
   tripped; the designs optimised at 2° gain 49.1 % at 2° and 24.8 % at the peak.
 - 5.3 The robust formulations. First result (NACA 2412): the single-point design keeps its gain between
   Ncrit 5 and 11 and loses it only when tripped; the mean of free and tripped flow as objective keeps
   25 to 32 % with free transition and loses nothing when tripped; the worst case of the two gives up the
-  laminar gain for about 7 % in tripped flow.
+  laminar gain for about 7 % in tripped flow. Over all 30 airfoils the mean of free and tripped flow
+  gains a median of 34.7 % and is better than the single-point design with tripped flow for 29.
 - 5.4 RANS: do the designs keep their ranking and their gain; transition locations against XFOIL; the
   behaviour of the Transition SST runs (force cycle from drifting separation cells in the laminar
   bubble, means over whole cycles); one case in physical time, whose mean forces agree with the cycle
@@ -92,14 +96,14 @@ the Transition SST runs do not all settle).
 |---|---|---|---|
 | Fig. 1 | Original and optimised NACA 2412 shapes, with curvature | `results/paper` | available |
 | Fig. 2 | The decomposition of the NACA 2412 gain (bar chart) | `results/paper/gain_decomposition.png` (`MATLAB/Paper/gain_decomposition.m`) | available |
-| Fig. 3 | Population: gain by condition for each formulation | `results/population/gains_by_condition.png` | first version (80 runs); final after the batch |
-| Fig. 4 | Population: gain by reporting angle | `results/population/gain_by_angle.png` | first version (80 runs); final after the batch |
+| Fig. 3 | Population: gain by condition for each formulation | `results/population/gains_by_condition.png` | available |
+| Fig. 4 | Population: gain by reporting angle | `results/population/gain_by_angle.png` | available |
 | Fig. 5 | Fluent verification: forces, pressure and skin friction | `results/cfd/verification` | available |
 | Fig. 6 | RANS and XFOIL polars of the six airfoils | `results/cfd/designs/design_polars.png` | available |
 | Fig. 7 | The force cycle of a Transition SST run and the mean skin friction | `results/cfd/designs/transition_cycle.png` | available |
 | Tab. 1 | Audit of reporting practice | `docs/literature/screening_summary.csv` | available |
 | Tab. 2 | Mesh convergence and domain size | `results/cfd/verification` | available |
-| Tab. 3 | Seeds: spread of the result | `results/paper/cases.csv`, `results/population/seeds.csv` | partly |
+| Tab. 3 | Seeds: spread of the result | `results/paper/cases.csv`, `results/population/seeds.csv` | available |
 
 ## Open decisions (for the team)
 
