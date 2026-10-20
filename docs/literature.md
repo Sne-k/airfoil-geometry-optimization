@@ -75,7 +75,7 @@ most for the positioning of this project:
 | Reference | What it does | Content |
 |---|---|---|
 | Pangas, G. F. S. & Gamboa, P. V. (2025). Low-speed airfoil optimization for improved off-design performance. *Aerospace* 12(8), 685. doi:10.3390/aerospace12080685 | XOPTFOIL (particle swarm, XFOIL 6.97), B-splines, objective over 17 operating points plus a mission score. **Before the analysis, shapes are checked for surface smoothness ("wavy surfaces are not desired"), and a drag that is too low is compared with a laminar bound.** One run per weighting; no check beyond XFOIL | read |
-| Michael, L. W., Abagero, A., Tullu, A. & Abebe, Y. (2026). Accelerated airfoil optimization via a geometry-based discriminator within particle swarm optimization. *IEEE Access* 14, 59022–59034. doi:10.1109/access.2026.3683048 | particle swarm with XFOIL at Re = 3 × 10⁵; candidates are rejected before the analysis by **the number of surface curvature peaks** and a deviation from the UIUC airfoils; 61 % fewer solver calls and a higher peak L/D (85.2 → 99.6) than plain particle swarm | abstract |
+| Michael, L. W., Abagero, A., Tullu, A., Abebe, Y. M. & Jung, S. (2026). Accelerated airfoil optimization via a geometry-based discriminator within particle swarm optimization. *IEEE Access* 14, 59022–59034. doi:10.1109/access.2026.3683048 | particle swarm (50 particles) with NURBS (28 control points, 24 free ordinates within ±0.05 c) and XFOIL; S1223 at Re = 3 × 10⁵, also NACA 2412 at Re = 5 × 10⁵. The objective is the worst CL/CD over 0° to 8°, but the peak CL/CD is reported. Candidates are rejected before the analysis if a surface changes slope direction more than 4 times or a slope jump exceeds 0.06, both limits taken from the UIUC database; the authors note that local oscillations cause convergence problems in the viscous solver. The filter cuts XFOIL calls from 1000 to 390 (61 %) and raises the peak CL/CD of the result from 85.2 to 99.6 (+16.85 %) against plain particle swarm; elsewhere in the paper the same 16.85 % is described as the gain over the original S1223. One run per configuration, no transition sensitivity | read (full text) |
 | Abouzoul, W., Tayane, S., Gaber, J. & Ennaji, M. (2026). Surrogate-based constrained optimization of camber-morphing airfoils: onset location as a design variable and quantification of adaptive versus robust morphing strategies. *Aerospace Science and Technology* 178, 113128. doi:10.1016/j.ast.2026.113128 | camber morphing of NACA 2412 and others; L/D 40.6 → 101.5 in the best case, **percentages given together with absolute values; Transition SST at Re = 10⁶ confirms the optima within 6 %** | abstract |
 | Abouzoul, W., Tayane, S., Gaber, J. & Ennaji, M. (2026). Reinterpreting aerodynamic optimality for morphing airfoils under continuous shape evolution. *Aerospace Science and Technology* 176, 112630. doi:10.1016/j.ast.2026.112630 | performance along the deformation path from the baseline to the optimum (XFOIL, then RANS), not only at the end point | abstract |
 | Mar Aye, C. et al. (2023). Airfoil shape optimisation using a multi-fidelity surrogate-assisted metaheuristic with a new multi-objective infill sampling technique. *Computer Modeling in Engineering & Sciences* 137(3), 2111–2128. doi:10.32604/cmes.2023.028632 | XFOIL as low and Fluent as high fidelity; **20 independent optimisation runs per method** | read |
@@ -200,7 +200,7 @@ The matches of the last two rules were read one by one:
 - **Curvature or smoothness:** of the 13 matches, 7 concern the smoothness or curvature of the
   optimised shape. Six obtain it from the parameterisation, limit it for manufacturing, or name it as
   a problem. One limits it with a rule: Michael et al. (2026), who reject candidates by the number of
-  curvature peaks.
+  changes of slope direction on each surface (at most 4) and by the largest slope jump.
 
 ## 10. Full-text audit of how results are reported
 
@@ -237,8 +237,8 @@ PDF, so those works were judged from their abstracts. The table with every work 
 - **Check of the optimum:** 8 of the 18 works check it with RANS and 2 with a wind tunnel (one
   announced). 3 of the 8 works read in full have no check with another flow solver or an experiment.
 - **Smoothness:** none of the 8 works read in full limits the smoothness or curvature of the shape
-  explicitly; they rely on the parameterisation or on thickness bounds. Pangas & Gamboa (2025), outside
-  the sample, do.
+  explicitly; they rely on the parameterisation or on thickness bounds. Pangas & Gamboa (2025) and
+  Michael et al. (2026), outside the sample, do.
 - **Transition setting:** in the full texts read, no work re-evaluates its optimum at another Ncrit or
   with tripped boundary layers. This rests on the sentences extracted with keyword filters, so it has
   to be confirmed when the papers are cited.
@@ -288,7 +288,8 @@ Web of Science must still be checked.
    more lift.
    *This project:* the report's +142.6 % at α = 0° corresponds to +71 % in peak CL/CD for the same airfoil.
 3. **Variability of stochastic optimisers.** One of 8 works read in full reports repeated runs, and no
-   abstract of 238 mentions them.
+   abstract of 238 mentions them. Michael et al. (2026), read in full outside the audit sample, also show
+   one particle-swarm run per configuration.
    *This project:* the spread over three seeds is ±1.2 to ±9.1 in peak CL/CD (NACA 4412: 158.6–176.9).
    For gradient-based RANS optimisation He et al. (2019) reach the same optimum from many starting shapes;
    with XFOIL and a stochastic optimiser the seeds end at different designs, so one run is not enough.
