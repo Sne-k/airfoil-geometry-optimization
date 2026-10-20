@@ -43,7 +43,16 @@ function result = optimize_airfoil(airfoil, varargin)
 %                     counted                                    (0.01)
 %     'Algorithm'     'ga' (GA -> fmincon) | 'pso' (particle swarm ->
 %                     pattern search) | 'bayesopt' (Bayesian optimisation
-%                     -> fmincon)                                ('ga')
+%                     -> fmincon) | 'surrogate' (GA on a neural-network
+%                     surrogate, the best candidates evaluated with XFOIL,
+%                     then fmincon with XFOIL)                   ('ga')
+%     'SurrogateModel'  model file of surrogateModel.m (needed by
+%                     'surrogate'; it must predict the objective that is
+%                     optimised, and Order must be 6)            ('')
+%     'SurrogateCandidates'  candidates evaluated with XFOIL      (20)
+%     'WarmStart'     absolute CST shapes [Au Al] (one per row), for
+%                     example the optima of similar airfoils, added to
+%                     the starting population where they meet the limits ([])
 %     'LocalSearch'   refine the global result locally           (true)
 %     'Seed'          random number seed                          (1)
 %     'Order'         CST order per surface (Order+1 coefficients) (6)
@@ -97,10 +106,13 @@ ip.addParameter('Generations', 25);
 ip.addParameter('NLPIterations', 15);
 ip.addParameter('UseParallel', true);
 ip.addParameter('OutputDir', '');
+ip.addParameter('SurrogateModel', '');
+ip.addParameter('SurrogateCandidates', 20);
+ip.addParameter('WarmStart', []);
 ip.parse(varargin{:});
 o = ip.Results;
 o.Algorithm = lower(o.Algorithm);
-if ~any(strcmp(o.Algorithm, {'ga', 'pso', 'bayesopt'}))
+if ~any(strcmp(o.Algorithm, {'ga', 'pso', 'bayesopt', 'surrogate'}))
     error('optimize_airfoil:algorithm', 'Unknown algorithm ''%s''.', o.Algorithm);
 end
 if ~any(strcmp(o.Aggregate, {'mean', 'worst'}))
@@ -198,6 +210,13 @@ rng(o.Seed);
 % Start from the fitted original and random designs that meet the
 % geometric limits (with curvature limits, only ~0.1 % of the box does)
 X0 = [zeros(1, nv); feasibleSamples(o.Population - 1, lb, ub, isValid)];
+if ~isempty(o.WarmStart)                     % optima of similar airfoils, as changes of this fit
+    Dw = min(max(o.WarmStart - [Au Al], lb), ub);
+    Dw = Dw(arrayfun(@(i) isValid(Dw(i, :)), 1:size(Dw, 1)), :);
+    X0 = [X0(1, :); Dw; X0(2:end, :)];
+    X0 = X0(1:max(o.Population, 1 + size(Dw, 1)), :);
+    fprintf('Warm start: %d of %d shapes meet the limits\n', size(Dw, 1), size(o.WarmStart, 1));
+end
 S.stage = 'global';
 objective = @(d) airfoilObjective(d, S);
 switch o.Algorithm
@@ -221,6 +240,31 @@ switch o.Algorithm
         dG = table2array(res.XAtMinObjective);
         flagG = NaN;
         outG = struct('funccount', res.NumObjectiveEvaluations, 'elapsedSeconds', res.TotalElapsedTime);
+    case 'surrogate'
+        % GA on the surrogate (no XFOIL), then the best distinct candidates with XFOIL
+        if isempty(o.SurrogateModel) || n1 ~= 7
+            error('optimize_airfoil:surrogate', 'Algorithm ''surrogate'' needs SurrogateModel and Order 6.');
+        end
+        model = surrogateModel(o.SurrogateModel);
+        fSur = @(D) surrogateFitness(D, model, [Au Al], S, o.Curvature);
+        gaOpts = optimoptions('ga', 'PopulationSize', 4 * o.Population, 'MaxGenerations', 4 * o.Generations, ...
+            'FunctionTolerance', 1e-4, 'Vectorized', 'on', 'Display', 'off', ...
+            'InitialPopulationMatrix', [X0; feasibleSamples(3 * o.Population, lb, ub, isValid)]);
+        [~, ~, ~, outS, popS, scoreS] = ga(fSur, nv, [], [], [], [], lb, ub, [], gaOpts);
+        C = distinctCandidates(popS, scoreS, o.SurrogateCandidates, 0.02 * o.MaxChange);
+        fC = zeros(size(C, 1), 1);
+        if o.UseParallel
+            parfor k = 1:size(C, 1), fC(k) = airfoilObjective(C(k, :), S); end
+        else
+            for k = 1:size(C, 1), fC(k) = airfoilObjective(C(k, :), S); end
+        end
+        [~, kBest] = min(fC);
+        dG = C(kBest, :);
+        flagG = NaN;
+        outG = struct('funccount', size(C, 1), 'surrogateEvaluations', outS.funccount, ...
+            'surrogateBest', -min(scoreS), 'xfoilOfCandidates', -fC(:).');
+        fprintf('Surrogate: %d surrogate evaluations, %d candidates with XFOIL, best %.2f (surrogate %.2f)\n', ...
+            outS.funccount, size(C, 1), -fC(kBest), -scoreS(find(all(popS == dG, 2), 1)));
     otherwise
         % Genetic algorithm -> fmincon, the method of the project report
         gaOpts = optimoptions('ga', 'PopulationSize', o.Population, 'MaxGenerations', o.Generations, ...
@@ -408,6 +452,29 @@ if size(X, 1) < n
     X = [X; lb + (ub - lb) .* rand(n - size(X, 1), nv)];
 end
 X = X(1:n, :);
+end
+
+function f = surrogateFitness(D, model, A0, S, curv)
+% Surrogate objective for a population (rows of D): minus the ensemble mean; designs outside the limits get
+% their violation, as airfoilObjective does
+f = -model.predict(A0 + D);
+for i = 1:size(D, 1)
+    v = designViolation(D(i, :), S, curv);
+    if v > 0, f(i) = v; end
+end
+end
+
+function C = distinctCandidates(P, score, k, minDist)
+% The best rows of P by score whose distance from every row already taken is at least minDist
+[~, order] = sort(score);
+C = zeros(0, size(P, 2));
+for i = order(:).'
+    if score(i) >= 0, break; end                     % only designs within the limits
+    if isempty(C) || min(vecnorm(C - P(i, :), 2, 2)) >= minDist
+        C(end+1, :) = P(i, :); %#ok<AGROW>
+        if size(C, 1) == k, break; end
+    end
+end
 end
 
 function ok = validRows(X, isValid)
