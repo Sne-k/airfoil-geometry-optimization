@@ -124,6 +124,12 @@ Upper surface, x/c ([comparison.csv](e387/comparison.csv)):
   separation bubbles, XFOIL by a nearly constant 10 %. A constant offset largely cancels in a gain taken
   against the original airfoil at the same condition, but a design with a different bubble can be
   affected differently, which is why the gains are checked with Fluent.
+- **How far the Fluent result can be trusted.** In the NATO AVT-313 workshops several RANS codes ran the
+  same γ–Re_θ model on this airfoil at this Reynolds number; their force coefficients did not agree within
+  their numerical uncertainty (Eça et al. 2022). The agreement here is that of one implementation. The
+  same study found a bubble at 7° that the experiment does not show and attributed it to a very low
+  turbulence intensity at the leading edge; here the tunnel's 0.06 % is set at the airfoil, and the
+  comparison stays at 0° to 6°, where the oil flow shows a bubble.
 
 ## Which solver settings give a steady solution
 
