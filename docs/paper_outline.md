@@ -109,8 +109,9 @@ the Transition SST runs do not all settle).
 
 ## Open decisions (for the team)
 
-1. **Scope.** Keep the morphing studies in this paper or leave them for a second one. They are a
-   different question; leaving them out makes the paper tighter.
+1. **Scope.** Decided on 20 October 2026: the morphing studies are left out of this paper and kept for a
+   second one, which can apply this paper's checks (tripped flow, the safeguards against false XFOIL
+   solutions, seeds, RANS) to morphing.
 2. **Journal.** Candidates to compare by scope and review time: *Aerospace Science and Technology*,
    *Journal of Aircraft*, *The Aeronautical Journal*, *CEAS Aeronautical Journal*, *Aerospace* (MDPI). The
    choice sets the length and the reference style.
