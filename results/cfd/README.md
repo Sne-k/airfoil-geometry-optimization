@@ -172,8 +172,8 @@ the earlier PARSEC design); and two designs optimised for free and tripped flow 
 gives the same forces as the
 verification (CL 1.0757, CD 0.01284).
 
-**How the batch ran.** In two parts with identical Fluent journals: the first 22 runs from commit 5120ea6,
-the others from commit b4da378 ([designs/run_info.json](designs/run_info.json)). The restart was forced by
+**How the batch ran.** In two parts with identical Fluent journals: the first 22 runs from commit 3642e57,
+the others from commit 2101fb6 ([designs/run_info.json](designs/run_info.json)). The restart was forced by
 the machine running out of memory during one Transition SST run; that run was repeated in full.
 
 ### Fully turbulent flow (SST)

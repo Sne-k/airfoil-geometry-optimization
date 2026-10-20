@@ -18,8 +18,9 @@ function [pol, info] = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, r
 %   angle (up to three times per part). If it does not converge at the
 %   first angle of a part, the part is started afresh from the next angle
 %   (up to four angles further), because otherwise all its angles are lost. Points with a drag below the
-%   laminar flat-plate value, or on a spurious low-drag branch outside the
-%   drag bucket, are removed.
+%   laminar flat-plate value, below the friction of a flat plate with the
+%   transition points XFOIL reports, or on a spurious low-drag branch outside
+%   the drag bucket, are removed.
 %
 %   pol = XFOILPOLAR(..., exe, panels) re-panels with the given number of
 %   panel nodes instead of XFOIL's default (160). pol = XFOILPOLAR(..., exe,
@@ -31,7 +32,9 @@ function [pol, info] = xfoilPolar(xu, yu, xl, yl, Re, alphaRange, exe, panels, r
 %   a struct with any of the fields Mach (default 0; XFOIL applies the
 %   Karman-Tsien correction), Ncrit (default 9, the e^n transition
 %   criterion), Xtr ([top bottom] forced transition x/c, default [1 1] =
-%   free transition) and TimeFactor (default 1), which multiplies the time
+%   free transition), FrictionFloor (default true; false gives the polars of
+%   the code before 18 October 2026, see frictionFloor below) and
+%   TimeFactor (default 1), which multiplies the time
 %   limit of every sweep (see runSweep below). An analysis whose result must
 %   not depend on how busy the machine is should use a larger factor: on a
 %   loaded machine the standard limit can end a sweep while XFOIL is still
@@ -105,6 +108,10 @@ d = d(iu, :);
 % XFOIL occasionally "converges" to such solutions over several angles.
 d = d(d(:, 3) >= 0.9 * 2.656 / sqrt(Re), :);
 if isempty(d), return; end
+if ~isfield(flow, 'FrictionFloor') || flow.FrictionFloor
+    d = d(d(:, 3) >= 0.9 * frictionFloor(Re, d(:, 6), d(:, 7)), :);
+    if isempty(d), return; end
+end
 d = dragRiseFilter(d);
 pol.alpha = d(:, 1);
 pol.CL = d(:, 2);
@@ -112,6 +119,20 @@ pol.CD = d(:, 3);
 pol.CM = d(:, 5);
 pol.xtrTop = d(:, 6);
 pol.xtrBot = d(:, 7);
+end
+
+function cd = frictionFloor(Re, xtrTop, xtrBot)
+% Skin friction of a flat plate on both sides that is laminar up to the
+% transition point XFOIL reports for that side and turbulent behind it
+% (Blasius, and 0.074 Re^-0.2 for the turbulent part). Profile drag
+% includes this friction and a pressure drag, so it is not lower. XFOIL
+% occasionally converges to solutions far below it, for some shapes only at
+% one panelling or only at coordinates that differ in the sixth decimal;
+% with forced transition at 5 % chord it reported CD = 0.0027 where the
+% floor is 0.0091. With laminar flow to the trailing edge on both sides the
+% floor is the laminar value 2.656/sqrt(Re).
+f = @(xt) 1.328 / sqrt(Re) * sqrt(xt) + 0.074 * Re^-0.2 * (1 - xt.^0.8);
+cd = f(min(max(xtrTop, 0), 1)) + f(min(max(xtrBot, 0), 1));
 end
 
 function d = dragRiseFilter(d)

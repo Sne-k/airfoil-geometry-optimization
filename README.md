@@ -128,12 +128,18 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   optimised NACA 2412 designs below the original ([results/cfd](results/cfd/README.md)). A lower Ncrit
   alone does not remove the gain of the smooth design.
 - **The same holds over 30 airfoils.** Optimised for peak CL/CD, 30 baseline airfoils gain a median of
-  38.2 %. The median stays between 29.3 and 37.8 % at other Ncrit and Reynolds numbers and is −1.6 %
+  38.2 %. The median stays between 29.2 and 37.4 % at other Ncrit and Reynolds numbers and is −1.6 %
   with tripped boundary layers, where 19 of the 30 designs are worse than their original
-  ([results/population](results/population/README.md); 80 of 217 runs, the batch is still running).
+  ([results/population](results/population/README.md); 217 runs).
 - **A formulation that keeps the gain.** Optimising the mean of the peak CL/CD with free transition and
-  with tripped boundary layers keeps a gain of 25 to 32 % with free transition and loses nothing when
-  tripped (NACA 2412; [results/population](results/population/README.md)).
+  with tripped boundary layers gives a median gain of 34.7 % over the 30 airfoils, and the design is
+  better than the single-point design with tripped flow for 29 of them. For NACA 2412 it keeps 25 to
+  32 % with free transition and loses nothing when tripped
+  ([results/population](results/population/README.md)).
+- **False XFOIL solutions.** XFOIL occasionally converges to false low-drag solutions that exist only at
+  one panelling or only at the exact design coordinates. They steered 3 of the 217 optimisations, which
+  were repeated with a friction floor; every value of the analysis is checked at exact and rounded
+  coordinates ([results/population](results/population/README.md#false-xfoil-solutions)).
 - **CFD.** The Fluent set-up is verified on NASA's NACA 0012 case: lift within 1.2 % and drag within
   6.4 % of each of NASA's three reference codes, skin friction within 1.2 % of CFL3D
   ([results/cfd](results/cfd/README.md)). Against wind-tunnel measurements of the Eppler 387 at Re = 300 000 (NASA TM-4062), with
@@ -212,7 +218,8 @@ MATLAB/
   Morphing/       morph_airfoil.m (report morph), morph_to_design.m (morph to any .dat, with L/D per step)
   Validation/     validate_xfoil.m: XFOIL against NACA 0012 wind-tunnel data
   Paper/          run_paper_batch.m (the 37 runs), collect_paper_results.m, benchmark and sensitivity,
-                  run_population_study.m (the same optimisation for 30 airfoils)
+                  run_population_study.m (the same optimisation for 30 airfoils),
+                  xfoil_sensitivity_check.m and test_false_solutions.m (false XFOIL solutions)
   CFD/            C-grid generator, Fluent journals and batch runner, verification on NASA's
                   NACA 0012 case, design study, post-processing
   airfoils/       seed airfoils as .dat files (Clark Y)
@@ -227,7 +234,7 @@ results/
   paper/          smooth-shape results with three random seeds (basis of the planned paper)
   cfd/            Fluent: verification on NASA's NACA 0012 case, validation on the Eppler 387,
                   time-step study, design study, one case in physical time
-  population/     the same optimisation for 30 airfoils (in progress); robust formulations for NACA 2412
+  population/     the same optimisation for 30 airfoils; robust formulations; false XFOIL solutions
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method
@@ -285,6 +292,8 @@ sensitivity_designs          % the designs at other Ncrit and Reynolds numbers
 run_population_study         % 217 optimisations for 30 airfoils; 11 of them need coordinate files
                              % from the UIUC database (see the help text of the script)
 collect_population_results   % tables and figures in results/population
+xfoil_sensitivity_check      % the objective of every final design at exact and rounded coordinates
+test_false_solutions         % reproduces the known false XFOIL solutions and the friction floor
 % in MATLAB/CFD: needs ANSYS Fluent, see MATLAB/CFD/README.md
 timestep_study               % about 4 hours
 verify_naca0012              % about 4 hours

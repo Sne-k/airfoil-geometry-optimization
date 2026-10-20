@@ -34,7 +34,17 @@ function collect_population_results(runDir, outDir, airfoilDir, workers, only)
 %     airfoils/       the optimised .dat files
 %   and the figures gains_by_condition.png and gain_by_angle.png.
 %   The analysis uses XFOIL with 160 panel nodes, alpha from -2 to 18 deg in
-%   0.5 deg steps. A gain is taken against the original airfoil at the same
+%   0.5 deg steps, with the friction floor of xfoilPolar. Every polar is
+%   computed twice: at the exact coordinates of the design and at the
+%   coordinates rounded to 6 decimals (as in the published .dat files). XFOIL
+%   occasionally converges to a false low-drag solution that exists only at
+%   one of them (too high), or misses the angle of the peak at one of them
+%   (too low). If the two peaks agree within 1 %, the exact polar is used. If
+%   they disagree, both are also computed with 200 panel nodes, and the
+%   160-node polar whose peak is closer to the median of the four is used.
+%   conditions.csv gives the difference of the two 160-node peaks
+%   (sensitivity_percent) and the polar used (polar_used: 1 exact, 2
+%   rounded), also for the original. A gain is taken against the original airfoil at the same
 %   condition. airfoilDir holds the UIUC coordinate files (default
 %   MATLAB/airfoils/uiuc).
 %
@@ -122,11 +132,29 @@ nG = numel(G);  nC = size(cond, 1);
 jobs = [repelem((1:nG)', nC), repmat((1:nC)', nG, 1)];
 P = cell(size(jobs, 1), 1);
 cut = false(size(jobs, 1), 1);                       % no polar that is independent of the machine load
+sens = nan(size(jobs, 1), 1);                        % exact against rounded coordinates, peak CL/CD, per cent
+used = zeros(size(jobs, 1), 1);                      % 1 exact, 2 rounded coordinates (160 panel nodes)
 if workers > 0 && isempty(gcp('nocreate')), parpool('Processes', workers); end
 parfor (j = 1:size(jobs, 1), workers)
     g = G(jobs(j, 1));
     if iscell(g.x), xu = g.x{1};  xl = g.x{2}; else, xu = g.x;  xl = g.x; end
-    [P{j}, cut(j)] = stablePolar(xu, g.yu, xl, g.yl, cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3});
+    [pE, cE] = stablePolar(xu, g.yu, xl, g.yl, cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3});
+    [pR, cR] = stablePolar(round(xu, 6), round(g.yu, 6), round(xl, 6), round(g.yl, 6), cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3});
+    vE = metrics(pE, NaN);  vR = metrics(pR, NaN);
+    sens(j) = 100 * (max(vE(1), vR(1)) / min(vE(1), vR(1)) - 1);
+    if xor(isnan(vE(1)), isnan(vR(1))), sens(j) = Inf; end            % only one of the two gives a value
+    pick = 1;                                        % they agree within 1 %, or only the exact one gives a value
+    if isnan(vE(1)) && ~isnan(vR(1))
+        pick = 2;
+    elseif sens(j) > 1 && isfinite(sens(j))          % they disagree: the 200-node polars decide
+        v2 = [vE(1), vR(1), peakLD(stablePolar(xu, g.yu, xl, g.yl, cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3}, 200)), ...
+            peakLD(stablePolar(round(xu, 6), round(g.yu, 6), round(xl, 6), round(g.yl, 6), cond{jobs(j, 2), 2}, exe, cond{jobs(j, 2), 3}, 200))];
+        v2 = sort(v2(~isnan(v2)));
+        m = v2(ceil(numel(v2) / 2));                 % median; the lower middle value for an even number
+        if abs(vR(1) - m) < abs(vE(1) - m), pick = 2; end
+    end
+    used(j) = pick;
+    if pick == 1, P{j} = pE;  cut(j) = cE; else, P{j} = pR;  cut(j) = cR; end
 end
 index = @(tag, c) find(strcmp({G(jobs(:, 1)).tag}', tag) & jobs(:, 2) == c, 1);
 pol = @(tag, c) P{index(tag, c)};
@@ -141,13 +169,15 @@ for k = 1:height(R)
         v = [metrics(po, R.design_CL(k)); metrics(pd, R.design_CL(k))];
         g = 100 * (v(2, 1:3) ./ v(1, 1:3) - 1);
         late = cut(index(['original:' R.airfoil{k}], c)) || cut(index(R.tag{k}, c));
+        se = [sens(index(['original:' R.airfoil{k}], c)), sens(index(R.tag{k}, c)), used(index(['original:' R.airfoil{k}], c)), used(index(R.tag{k}, c))];
         C{end+1, 1} = table(R.tag(k), R.airfoil(k), R.formulation(k), R.seed(k), cond(c, 1), v(1, 1), v(2, 1), g(1), ...
             v(1, 2), v(2, 2), g(2), v(1, 3), v(2, 3), g(3), v(1, 4), v(2, 4), v(1, 5), v(2, 5), numel(po.alpha), ...
-            numel(pd.alpha), late, v(1, 6), v(2, 6), v(1, 7), v(2, 7), 'VariableNames', ...
+            numel(pd.alpha), late, v(1, 6), v(2, 6), v(1, 7), v(2, 7), se(1), se(2), se(3), se(4), 'VariableNames', ...
             {'tag', 'airfoil', 'formulation', 'seed', 'condition', 'LDmax_original', 'LDmax', 'LDmax_gain_percent', ...
             'LD_2deg_original', 'LD_2deg', 'LD_2deg_gain_percent', 'LD_designCL_original', 'LD_designCL', ...
             'LD_designCL_gain_percent', 'alpha_LDmax_original', 'alpha_LDmax', 'CLmax_original', 'CLmax', ...
-            'angles_original', 'angles', 'no_stable_polar', 'CM0_original', 'CM0', 'CM_LDmax_original', 'CM_LDmax'}); %#ok<AGROW>
+            'angles_original', 'angles', 'no_stable_polar', 'CM0_original', 'CM0', 'CM_LDmax_original', 'CM_LDmax', ...
+            'sensitivity_percent_original', 'sensitivity_percent', 'polar_used_original', 'polar_used'}); %#ok<AGROW>
     end
     if strcmp(R.formulation{k}, 'peak') && R.seed(k) == 1
         po = pol(['original:' R.airfoil{k}], 1);
@@ -261,20 +291,27 @@ end
 fprintf('%d runs, %d airfoils, %d XFOIL polars\n', height(R), numel(names), numel(P));
 end
 
-function [p, unstable] = stablePolar(xu, yu, xl, yl, Re, exe, flow)
+function [p, unstable] = stablePolar(xu, yu, xl, yl, Re, exe, flow, panels)
 % XFOIL polar that does not depend on the load of the machine (see the header)
 unstable = false;
 flow.TimeFactor = 3;
-[p, info] = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe, [], true, flow);
+if nargin < 8, panels = []; end
+[p, info] = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe, panels, true, flow);
 if ~info.timedOut, return; end
 for attempt = 2:4
-    [q, info] = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe, [], true, flow);
+    [q, info] = xfoilPolar(xu, yu, xl, yl, Re, [-2 18 0.5], exe, panels, true, flow);
     same = isequal(q.alpha, p.alpha);
     p = q;
     if ~info.timedOut || same, return; end
 end
 unstable = true;
 p = struct('alpha', [], 'CL', [], 'CD', [], 'CM', [], 'xtrTop', [], 'xtrBot', []);
+end
+
+function v = peakLD(p)
+% peak CL/CD of a polar by the rule of metrics; NaN if the polar is not usable
+v = metrics(p, NaN);
+v = v(1);
 end
 
 function v = metrics(p, designCL)

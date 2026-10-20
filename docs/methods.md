@@ -64,6 +64,16 @@ results depend on machine speed.
 **Filters against spurious solutions.**
 - **Drag floor.** Points with CD < 0.9 × 2.656/√Re, below the laminar skin friction of a flat plate on
   both sides, are discarded.
+- **Friction floor** (added on 18 October 2026, option `FrictionFloor`). Points with CD below 0.9 times
+  the skin friction of a flat plate that is laminar up to the transition point XFOIL reports for each
+  side and turbulent behind it, 1.328/√Re·√x_t + 0.074·Re^−0.2·(1 − x_t^0.8) per side, are discarded.
+  With laminar flow to the trailing edge it equals the drag floor above; with transition fixed at 5 %
+  chord it is 0.0091 at Re = 10⁶. XFOIL occasionally converges to false solutions far below it, for some
+  shapes only at one panelling or only at the exact coordinates. On 462 polars
+  (`results/population/friction_floor_validation.csv`) every polar without a point below 0.9 times the
+  floor has its lowest point at or above 0.97 times it, and every polar with false points has its lowest
+  point at or below 0.60 times it. The optimisations of the population study ran without it; see
+  section 6 for how they were checked.
 - **Drag-rise filter.** Outside the drag bucket, a point whose CD is below 80 % of the highest CD
   between it and the drag minimum is discarded.
 - **Supported peak.** A peak of CL/CD or CL^1.5/CD counts only if a converged neighbouring angle within
@@ -211,6 +221,22 @@ Summary:
     evaluation is the measure of effort.
   - At times Windows did not let MATLAB delete a temporary XFOIL folder at the end of a sweep (a file was
     still open). MATLAB logs this as a warning and the run continues; the result is not affected.
+  - **False XFOIL solutions in the analysis.** The analysis uses the friction floor, and every polar is
+    computed at the exact coordinates of the design and at the coordinates rounded to 6 decimals (as in
+    the published `.dat` files). If the two peaks agree within 1 %, the exact polar is used; otherwise both
+    are also computed with 200 panel nodes and the 160-node polar closer to the median of the four is
+    used. A false solution is too high and a missed peak angle too low, so neither decides the value.
+  - **False XFOIL solutions in the optimisations** (`xfoil_sensitivity_check.m`). The objective of every
+    final design is evaluated as the optimiser does, at exact and rounded coordinates with 160 and 200
+    nodes, with and without the friction floor. Without the floor this reproduces every recorded
+    objective. A run is repeated if its recorded objective is more than 1 % above the median of the
+    usable values with the floor; three runs were (`results/population/README.md`). The repetition uses
+    the same code with the friction floor (version `741da83`), which reproduces the original code
+    exactly when the floor is switched off. `test_false_solutions.m` reproduces six of the false
+    solutions and one control design from their exact CST coefficients
+    (`results/population/false_solution_cases.csv`).
+  - Two `peak` runs that had run while the computer was short of memory (NACA 2418 and NACA 4409, seed
+    1) were repeated and reached the same objectives.
 
 ## 7. Morphing analyses (`Morphing/`)
 
