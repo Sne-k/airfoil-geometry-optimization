@@ -1,5 +1,8 @@
 # Airfoil Geometry Optimization (NACA 2412)
 
+> **The paper in one page:** [PAPER.md](PAPER.md) explains the study behind this repository (question, method,
+> findings, limits) and how to present it.
+
 MATLAB code and results of a 4th-semester aeronautical engineering mini project (2024–25):
 optimisation of the NACA 2412 airfoil with a hybrid **Genetic Algorithm + Nonlinear Programming
 (fmincon)** search, a **morphing** sequence from the baseline to the optimised shape, and `.dat` export
