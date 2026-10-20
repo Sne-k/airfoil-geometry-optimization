@@ -81,6 +81,28 @@ the gain of the peak-optimised designs at every angle.
 
 ![Gain by reporting angle](gain_by_angle.png)
 
+## At the design lift coefficient
+
+The tables above give the peak CL/CD, whose angle can move. At the design lift coefficient of each airfoil
+(the lift at which the original has its peak; `conditions.csv`, column `LD_designCL_gain_percent`), median
+gain in CL/CD and the number of designs worse than their original (seed 1):
+
+| Designs optimised for | design condition | Ncrit 5 | tripped |
+|---|---:|---:|---:|
+| peak CL/CD | +24.9 % (4 of 30) | +24.7 % (4 of 30) | −3.1 % (22 of 28) |
+| CL/CD at the design lift | +31.0 % (0 of 30) | +15.0 % (8 of 30) | −2.4 % (22 of 28) |
+| CL/CD at 2° | +2.4 % (14 of 30) | −6.3 % (18 of 30) | −7.3 % (25 of 27) |
+| free and tripped flow (mean) | +19.2 % (1 of 30) | +20.3 % (2 of 30) | −0.7 % (16 of 29) |
+
+- **Whether a single-point design is sensitive to Ncrit depends on its formulation.** The designs optimised
+  for peak CL/CD keep their gain at the design lift when Ncrit falls to 5; the designs optimised at that
+  lift lose half of it. This agrees with Hollom & Qin (2018), who minimise drag at fixed lift coefficients
+  with XFOIL and find that the minimum-drag designs lose laminar flow fastest when Ncrit falls from 9 to 5.
+- **At the design lift every formulation loses with tripped boundary layers**, even the one whose
+  objective includes tripped flow: its advantage with tripped flow is in the peak CL/CD, which it reaches
+  at another angle. Fewer than 30 airfoils have a value there because some tripped polars do not reach the
+  design lift coefficient.
+
 ## Free and tripped flow together, for every airfoil
 
 The `robusttrip` formulation maximises the mean of the peak CL/CD with free transition and with the

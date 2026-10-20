@@ -71,7 +71,9 @@ the question, the approach and the contributions.
   tripped flow; spread over seeds; effect of the curvature limits; gain as a function of the angle at
   which it is reported. Result (217 runs): the designs optimised for peak CL/CD gain a
   median of 38.2 %, keep 29.2 to 37.4 % at other Ncrit and Reynolds numbers and have −1.6 % when
-  tripped; the designs optimised at 2° gain 49.1 % at 2° and 24.8 % at the peak.
+  tripped; the designs optimised at 2° gain 49.1 % at 2° and 24.8 % at the peak. At the design lift the
+  peak designs keep their gain at Ncrit 5 and the fixed-lift designs lose half of it, as Hollom & Qin
+  (2018) find for drag minimisation at fixed lift.
 - 5.3 The robust formulations. First result (NACA 2412): the single-point design keeps its gain between
   Ncrit 5 and 11 and loses it only when tripped; the mean of free and tripped flow as objective keeps
   25 to 32 % with free transition and loses nothing when tripped; the worst case of the two gives up the
