@@ -200,7 +200,9 @@ Summary:
     fixed at 5 % chord.
   - Every seed and design is then analysed at the design condition, at Ncrit = 5, 7 and 11, at
     Re = 0.5 and 2 × 10⁶, and with transition fixed at 5 % chord on both surfaces. Gains are taken
-    against the seed at the same condition.
+    against the seed at the same condition. Ncrit 5 is the degraded condition of Hollom & Qin (2018),
+    9 minus two standard deviations of 2; like theirs, it is a discrete value, and Hollom & Qin show that
+    two discrete Ncrit values can misrepresent how fast laminar flow is lost in between.
   - A polar of this analysis gives values only if at least 12 angles converged, on both sides of 0° or
     at it (the rule of the optimiser). The rule was added after one design gave a wrong peak: XFOIL did
     not converge at the first angle of the sweep (0°) and then at none of the following ones, because
@@ -346,6 +348,8 @@ made on Windows 11, AMD Ryzen 7 7435HS (8 cores, 16 threads), with 6 parallel MA
   Applied Mechanics and Engineering* 186, 311–338.
 - Drela, M. (1989). XFOIL: an analysis and design system for low Reynolds number airfoils. In *Low
   Reynolds Number Aerodynamics*, Lecture Notes in Engineering 54, Springer, 1–12.
+- Hollom, J. & Qin, N. (2018). Quantification and multi-point optimization of natural laminar flow
+  airfoil robustness to transition amplification factor. AIAA SciTech Forum, AIAA paper 2018-1161.
 - Kulfan, B. M. (2008). Universal parametric geometry representation method. *Journal of Aircraft*
   45(1), 142–158.
 - Langtry, R. B. & Menter, F. R. (2009). Correlation-based transition modeling for unstructured

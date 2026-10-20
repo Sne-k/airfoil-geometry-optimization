@@ -117,7 +117,9 @@ Upper surface, x/c ([comparison.csv](e387/comparison.csv)):
   forces do not settle (CL varies by 0.08 over the last 2400 iterations, hence the wide drag range), and
   the mean skin friction changes sign several times aft of 0.5 c without staying positive over 0.05 c
   before the trailing edge. Reattachment is taken as the first point after separation from which the
-  mean skin friction stays positive over 0.05 c.
+  mean skin friction stays positive over 0.05 c. Counsil & Goni Boulama (2012) find the same with this
+  model on the NACA 0012 at Re = 10⁵: shedding from the bubble moves transition and reattachment strongly,
+  while the separation point stays nearly fixed.
 - **What this means for the results.** Both tools predict too little drag for a flow with laminar
   separation bubbles, XFOIL by a nearly constant 10 %. A constant offset largely cancels in a gain taken
   against the original airfoil at the same condition, but a design with a different bubble can be
