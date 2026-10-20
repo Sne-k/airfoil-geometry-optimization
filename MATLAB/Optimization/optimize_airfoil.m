@@ -50,6 +50,15 @@ function result = optimize_airfoil(airfoil, varargin)
 %                     'surrogate'; it must predict the objective that is
 %                     optimised, and Order must be 6)            ('')
 %     'SurrogateCandidates'  candidates evaluated with XFOIL      (20)
+%     'SurrogateFallback'  check the surrogate on its candidates and fall
+%                     back to the genetic algorithm with XFOIL, started
+%                     from the best candidates, when it is not trusted:
+%                     the airfoil is further from the training airfoils
+%                     than they are from each other, fewer than half of
+%                     the candidates give a usable polar, or the median
+%                     error of the predictions exceeds the 90th percentile
+%                     of the cross-validation (limits in the model's
+%                     _domain.json file)                          (true)
 %     'WarmStart'     absolute CST shapes [Au Al] (one per row), for
 %                     example the optima of similar airfoils, added to
 %                     the starting population where they meet the limits ([])
@@ -108,6 +117,7 @@ ip.addParameter('UseParallel', true);
 ip.addParameter('OutputDir', '');
 ip.addParameter('SurrogateModel', '');
 ip.addParameter('SurrogateCandidates', 20);
+ip.addParameter('SurrogateFallback', true);
 ip.addParameter('WarmStart', []);
 ip.parse(varargin{:});
 o = ip.Results;
@@ -263,6 +273,36 @@ switch o.Algorithm
         flagG = NaN;
         outG = struct('funccount', size(C, 1), 'surrogateEvaluations', outS.funccount, ...
             'surrogateBest', -min(scoreS), 'xfoilOfCandidates', -fC(:).');
+        % Trust check on the candidates, against limits taken from the training airfoils only
+        trust = struct('trusted', true, 'distance', NaN, 'usableFraction', mean(fC < 0), 'medianError', NaN);
+        if isfield(model, 'domain')
+            dom = model.domain;
+            trust.distance = min(vecnorm((dom.training_seeds - [Au Al]) ./ model.sd, 2, 2));
+            u = fC < 0;
+            pC = model.predict([Au Al] + C);
+            if any(u), trust.medianError = median(abs(pC(u) + fC(u)) ./ -fC(u)); end
+            trust.trusted = trust.distance <= dom.max_distance && trust.usableFraction >= dom.min_usable_fraction && ...
+                ~(trust.medianError > dom.max_median_error);
+        end
+        outG.trust = trust;
+        fprintf('Surrogate trust: distance %.2f, usable %.0f %%, median error %.1f %% -> %s\n', trust.distance, ...
+            100 * trust.usableFraction, 100 * trust.medianError, string(trust.trusted));
+        if ~trust.trusted && o.SurrogateFallback
+            % Fall back to the genetic algorithm with XFOIL, started from the best verified candidates
+            [~, ord] = sort(fC);
+            Cs = C(ord(fC(ord) < 0), :);
+            X0f = [X0(1, :); Cs; X0(2:end, :)];
+            X0f = X0f(1:o.Population, :);
+            gaOpts = optimoptions('ga', 'PopulationSize', o.Population, 'MaxGenerations', o.Generations, ...
+                'FunctionTolerance', 1e-3, 'UseParallel', o.UseParallel, 'Display', 'iter', 'InitialPopulationMatrix', X0f);
+            [dF, ~, flagG, outF] = ga(objective, nv, [], [], [], [], lb, ub, [], gaOpts);
+            if airfoilObjective(dF, S) < fC(kBest), dG = dF; end
+            outG.fallback = true;
+            outG.fallbackOutput = cleanOutput(outF);
+            outG.funccount = size(C, 1) + outF.funccount;
+        else
+            outG.fallback = false;
+        end
         fprintf('Surrogate: %d surrogate evaluations, %d candidates with XFOIL, best %.2f (surrogate %.2f)\n', ...
             outS.funccount, size(C, 1), -fC(kBest), -scoreS(find(all(popS == dG, 2), 1)));
     otherwise

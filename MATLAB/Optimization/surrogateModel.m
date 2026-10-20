@@ -8,7 +8,8 @@ function model = surrogateModel(file)
 %   with the stored mean and scale.
 %
 %   [m, s] = model.predict(X) returns the ensemble mean m and standard
-%   deviation s for every row of X (n x 14).
+%   deviation s for every row of X (n x 14). If <file>_domain.json exists,
+%   model.domain holds the trust limits used by optimize_airfoil.
 %
 %   The surrogate only ranks candidates; every design the optimiser keeps is
 %   evaluated with XFOIL (see optimize_airfoil, 'Algorithm', 'surrogate').
@@ -24,6 +25,10 @@ for k = 1:numel(raw.networks)
     W = n.weights;  b = n.biases;
     if ~iscell(W), W = num2cell(W, [2 3]); end      % jsondecode returns arrays when the layers have equal size
     model.nets{k} = struct('W', {cellfun(@double, W, 'UniformOutput', false)}, 'b', {cellfun(@(v) double(v(:).'), b, 'UniformOutput', false)});
+end
+domainFile = regexprep(file, '\.json$', '_domain.json');
+if isfile(domainFile)                               % trust limits from the training airfoils (domain_limits.py)
+    model.domain = jsondecode(fileread(domainFile));
 end
 model.predict = @(X) predictEnsemble(model, X);
 end
