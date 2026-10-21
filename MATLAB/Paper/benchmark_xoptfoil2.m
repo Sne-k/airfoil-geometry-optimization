@@ -7,13 +7,18 @@ function T = benchmark_xoptfoil2(x2exe, nRuns, outDir)
 %   (weight 0.8), t/c >= 12 %. Its designs, the three optimize_airfoil
 %   designs of the same task in the paper batch (NACA_2412_weighted_s1..s3)
 %   and NACA 2412 are then analysed with one protocol: XFOIL, Re = 10^6,
-%   alpha from -2 to 18 deg in 0.5 deg steps, 160 and 200 panel nodes, the
-%   lower value of each efficiency measure. The curvature of every design is
+%   alpha from -2 to 18 deg in 0.5 deg steps, 160 panel nodes, the friction
+%   floor and the rule against false solutions of the population study
+%   (consensusPolar: exact and rounded coordinates, 200 nodes where they
+%   disagree); the optimize_airfoil designs at their exact CST coordinates.
+%   The curvature of every design is
 %   measured like the curvature limits (12th-order CST fit of the
 %   coordinates; reversals counted with thresholds 0.01 and 0.1).
 %   T = BENCHMARK_XOPTFOIL2(x2exe, nRuns, outDir) sets the number of
 %   Xoptfoil2 runs and the output folder (default results/paper); the table
-%   is written to xoptfoil2_benchmark.csv there.
+%   is written to xoptfoil2_benchmark.csv there. With x2exe empty, the
+%   Xoptfoil2 designs of an earlier call (MATLAB/output/xoptfoil2_benchmark)
+%   are analysed again, with the run times of the table in outDir.
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
@@ -27,7 +32,15 @@ x2dir = fullfile(root, '..', 'results', 'xoptfoil2');
 work = fullfile(root, 'output', 'xoptfoil2_benchmark');
 
 designs = {'NACA 2412', 'NACA 2412', NaN};
-for k = 1:nRuns
+if isempty(x2exe)                                    % analyse the designs of an earlier call again
+    old = readtable(fullfile(outDir, 'xoptfoil2_benchmark.csv'), 'TextType', 'char');
+    for k = 1:nRuns
+        name = sprintf('Xoptfoil2 run %d', k);
+        designs(end+1, :) = {name, fullfile(work, sprintf('run%d', k), sprintf('X2_run%d.dat', k)), ...
+            old.run_time_min(strcmp(old.design, name))}; %#ok<AGROW>
+    end
+end
+for k = 1:nRuns * ~isempty(x2exe)
     w = fullfile(work, sprintf('run%d', k));
     if ~exist(w, 'dir'), mkdir(w); end
     copyfile(fullfile(x2dir, 'naca2412_weighted.xo2'), w);
@@ -53,32 +66,34 @@ for s = 1:3
     f = fullfile(folder, 'NACA_2412_optimized.dat');
     if isfile(f)
         info = jsondecode(fileread(fullfile(folder, 'run_info.json')));
-        designs(end+1, :) = {sprintf('optimize_airfoil seed %d', s), f, info.runTimeSeconds / 60}; %#ok<AGROW>
+        r = load(fullfile(folder, 'result.mat'));      % exact CST coordinates
+        r = r.result;
+        if iscell(r.x), xs = r.x; else, xs = {r.x, r.x}; end
+        designs(end+1, :) = {sprintf('optimize_airfoil seed %d', s), {xs{1}, r.yu, xs{2}, r.yl}, info.runTimeSeconds / 60}; %#ok<AGROW>
     end
 end
 
 rows = cell(size(designs, 1), 1);
 for k = 1:size(designs, 1)
-    [xu, yu, xl, yl] = readAirfoil(designs{k, 2});
-    v = nan(2, 7);
-    for n = 1:2
-        panels = [];
-        if n == 2, panels = 200; end
-        p = xfoilPolar(xu, yu, xl, yl, 1e6, [-2 18 0.5], exe, panels);
-        m = efficiencyMetrics(p);
-        v(n, :) = [efficiencyValue(p, 'LDatCL', 0.4), efficiencyValue(p, 'LDatCL', 1.0), ...
-                   efficiencyValue(p, 'LDatCL', [0.4 1.0], [0.2 0.8]), m.LDmax, m.E15max, m.CLmax, m.CM0];
+    if iscell(designs{k, 2})
+        [xu, yu, xl, yl] = designs{k, 2}{:};
+    else
+        [xu, yu, xl, yl] = readAirfoil(designs{k, 2});
     end
+    [p, pinfo] = consensusPolar(xu, yu, xl, yl, 1e6, exe);
+    m = efficiencyMetrics(p);
+    v = [efficiencyValue(p, 'LDatCL', 0.4), efficiencyValue(p, 'LDatCL', 1.0), ...
+         efficiencyValue(p, 'LDatCL', [0.4 1.0], [0.2 0.8]), m.LDmax, m.E15max, m.CLmax, m.CM0];
     c1 = curvatureOfCoordinates(xu, yu, xl, yl, 0.01);
     c2 = curvatureOfCoordinates(xu, yu, xl, yl, 0.1);
-    rows{k} = {designs{k, 1}, designs{k, 3}, min(v(:, 1)), min(v(:, 2)), min(v(:, 3)), min(v(:, 4)), ...
-        min(v(:, 5)), v(1, 6), v(1, 7), maxThickness(xu, yu, xl, yl), c1.top, c1.bot, c2.top, c2.bot, ...
-        c1.teTop, c1.teBot, c1.fitError};
+    rows{k} = {designs{k, 1}, designs{k, 3}, v(1), v(2), v(3), v(4), v(5), v(6), v(7), ...
+        maxThickness(xu, yu, xl, yl), c1.top, c1.bot, c2.top, c2.bot, c1.teTop, c1.teBot, c1.fitError, ...
+        pinfo.sensitivityPercent, pinfo.used};
 end
 T = cell2table(vertcat(rows{:}), 'VariableNames', {'design', 'run_time_min', 'LD_at_CL_0p4', ...
     'LD_at_CL_1p0', 'weighted_objective', 'LDmax', 'E15max', 'CLmax_160', 'CM0_160', 'tc', ...
     'reversals_top_0p01', 'reversals_bottom_0p01', 'reversals_top_0p1', 'reversals_bottom_0p1', ...
-    'te_curvature_top', 'te_curvature_bottom', 'cst12_fit_error'});
+    'te_curvature_top', 'te_curvature_bottom', 'cst12_fit_error', 'sensitivity_percent', 'polar_used'});
 writetable(T, fullfile(outDir, 'xoptfoil2_benchmark.csv'));
 disp(T);
 end
