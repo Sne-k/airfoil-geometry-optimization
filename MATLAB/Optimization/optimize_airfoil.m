@@ -61,7 +61,9 @@ function result = optimize_airfoil(airfoil, varargin)
 %     'SurrogateRoundCandidates'  candidates per round           (10)
 %     'SurrogateFallback'  check the surrogate on its candidates and fall
 %                     back to the genetic algorithm with XFOIL, started
-%                     from the best candidates, when it is not trusted:
+%                     from the best candidates of the first search (not
+%                     of the loop, which cluster near one design) and the
+%                     usual starting population, when it is not trusted:
 %                     the airfoil is further from the training airfoils
 %                     than they are from each other, fewer than half of
 %                     the candidates give a usable polar, or the median
@@ -328,8 +330,10 @@ switch o.Algorithm
         fprintf('Surrogate trust: distance %.2f, usable %.0f %%, median error %.1f %% -> %s\n', trust.distance, ...
             100 * trust.usableFraction, 100 * trust.medianError, string(trust.trusted));
         if ~trust.trusted && o.SurrogateFallback
-            % Fall back to the genetic algorithm with XFOIL, started from the best verified candidates
-            [~, ord] = sort(fC);
+            % Fall back to the genetic algorithm with XFOIL, started from the best verified candidates of the
+            % first search; the loop candidates cluster near one design and would fill the population
+            n0 = rounds(1).candidates;
+            [~, ord] = sort(fC(1:n0));
             Cs = C(ord(fC(ord) < 0), :);
             X0f = [X0(1, :); Cs; X0(2:end, :)];
             X0f = X0f(1:o.Population, :);
