@@ -7,7 +7,9 @@ analysis throughout.
 
 The optimisation runs below were made before the curvature limits. The results with the limits and three
 random seeds, the optimiser comparison, the updated Xoptfoil2 benchmark and the sensitivity study are in
-[paper/](paper/README.md). The RANS checks with Fluent are in [cfd/](cfd/README.md).
+[paper/](paper/README.md). The RANS checks with Fluent are in [cfd/](cfd/README.md). The same
+optimisation for 30 airfoils is in [population/](population/README.md), and the surrogate-assisted
+optimiser in [surrogate/](surrogate/README.md).
 
 ## XFOIL comparison of all approaches (`xfoil/`)
 
@@ -200,7 +202,8 @@ already fails it. Both results were re-analysed with the settings used here (low
 | Xoptfoil2 (Bezier, particle swarm) | 69.6 | 130.8 | 118.5 | 130.9 | 0.131 | −0.052 | 1.5 min |
 
 `optimize_airfoil` scores 9 % higher but takes 25 times longer. **Update:** with curvature limits the
-two reach the same result ([paper/](paper/README.md#benchmark-against-xoptfoil2)), so this advantage came
+two reach the same result ([paper/](paper/README.md#benchmark-against-xoptfoil2), re-analysed there with
+the friction floor and the rule against false XFOIL solutions), so this advantage came
 from the waviness of our designs. It also has no curvature constraints,
 which Xoptfoil2 enforces; the next section shows what that means.
 

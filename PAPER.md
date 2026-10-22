@@ -75,15 +75,27 @@ optimisations. Two safeguards were added and validated: a friction floor using X
 points, and every analysis at exact and rounded coordinates
 ([False XFOIL solutions](results/population/README.md#false-xfoil-solutions)).
 
+**9. A cheaper optimiser that knows when not to trust itself (preliminary).** A neural-network
+surrogate of XFOIL, trained on the population study, ranks the candidates; every kept design is analysed
+with XFOIL. A trust check with limits from the training airfoils only decides whether the surrogate may
+be used; if not, a closed-loop correction and then the usual XFOIL search take over. On six airfoils it
+never saw, for the robust objective, it was trusted in 14 of 18 runs and then needed 4 to 22 times fewer
+XFOIL analyses than the current optimiser for a similar or higher result; on S1223, outside the training
+airfoils, it rejected itself and the fallback gave 128.3 against 125.7
+([results/surrogate](results/surrogate/README.md)). The comparison at equal budget, ten seeds with a
+rank test, a comparison with Xoptfoil2 and the re-analysis of the final designs are still running.
+
 ## What is new, and what is not
 
 - **New:** one reported gain taken apart step by step; the same analysis over 30 airfoils with seeds,
   formulations and seven conditions; a RANS check of the gains with a transition model whose free-stream
   turbulence is matched to Ncrit, together with a fully turbulent bound (Adler et al. 2022 compare with
   fully turbulent RANS; Abouzoul et al. 2026 check morphing optima with Transition SST); the false-solution finding with two validated
-  safeguards; a reporting checklist; open code in which every number is traceable.
-- **Not new:** the optimiser, CST shapes, XFOIL, Transition SST, and the two-condition robust objective
-  (Caboni et al. 2018). Robust laminar-flow design is studied by Hollom & Qin and others
+  safeguards; a surrogate-assisted optimiser that verifies every kept design with XFOIL and checks
+  whether its surrogate can be trusted for the airfoil, tested on airfoils it never saw (the literature
+  check of this point is still open); a reporting checklist; open code in which every number is traceable.
+- **Not new:** the GA → fmincon optimiser, surrogate-assisted optimisation as such (for example Khan et
+  al. 2025), CST shapes, XFOIL, Transition SST, and the two-condition robust objective (Caboni et al. 2018). Robust laminar-flow design is studied by Hollom & Qin and others
   ([docs/literature.md](docs/literature.md)).
 
 ## Limits to state openly
@@ -103,7 +115,7 @@ points, and every analysis at exact and rounded coordinates
 | Folder | Content |
 |---|---|
 | [MATLAB/](MATLAB/README.md) | all code: optimiser (`Optimization`), XFOIL interface (`Aerodynamics`), studies of the paper (`Paper`), CFD mesh, journals and post-processing (`CFD`), morphing, validation |
-| [results/](results/README.md) | every result with its README: `paper` (NACA 2412 taken apart), `population` (30 airfoils), `cfd` (Fluent), `validation` (XFOIL against wind-tunnel data), earlier studies |
+| [results/](results/README.md) | every result with its README: `paper` (NACA 2412 taken apart), `population` (30 airfoils), `cfd` (Fluent), `surrogate` (surrogate-assisted optimiser), `validation` (XFOIL against wind-tunnel data), earlier studies |
 | [docs/](docs/) | `methods.md` (how everything was done), `literature.md` (search, audit, research gaps, checklist), `paper_outline.md` (structure of the manuscript, figures and tables) |
 | [tools/](tools/) | `check_numbers.py` and its manifest: every number in the documents against its source file |
 | [README.md](README.md) | the project from the mini project onwards, and how to run the code |
@@ -125,6 +137,8 @@ points, and every analysis at exact and rounded coordinates
 5. "RANS with a transition model confirms the gains but makes them smaller, and both tools are checked
    against NASA measurements. Along the way we found that XFOIL sometimes gives false low-drag solutions
    that an optimiser exploits, and we added two checks against them."
+6. "Finally, the optimiser itself: a surrogate trained on these runs gets the same result with far fewer
+   XFOIL analyses, and it detects the airfoils for which it cannot be trusted."
 
 ### In ten minutes: the order of the figures
 
@@ -140,7 +154,8 @@ points, and every analysis at exact and rounded coordinates
 7. **Validation:** `results/cfd/e387/e387_validation.png` and the NACA 0012 verification in
    `results/cfd/verification`.
 8. **False XFOIL solutions:** the table in the population README; one example (369 against 89.2).
-9. **The checklist:** section 13 of `docs/literature.md`.
+9. **The surrogate optimiser:** the result table in `results/surrogate/README.md`; trusted runs, then S1223.
+10. **The checklist:** section 13 of `docs/literature.md`.
 
 ### Questions to expect
 
