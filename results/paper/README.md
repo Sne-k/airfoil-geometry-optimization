@@ -81,21 +81,24 @@ limits are counted but need no XFOIL analysis).
 Same task as the "cruise + loiter" case: CL/CD at CL = 0.4 (weight 0.2) and 1.0 (weight 0.8), t/c ≥ 12 %.
 Xoptfoil2 2.0.0 ran three times with [naca2412_weighted.xo2](../xoptfoil2/naca2412_weighted.xo2) and the
 seed [NACA2412.dat](../xoptfoil2/NACA2412.dat). Every design was then analysed with the same protocol
-([benchmark_xoptfoil2.m](../../MATLAB/Paper/benchmark_xoptfoil2.m): XFOIL, α = −2° to 18°, lower value
-of 160 and 200 panel nodes). Curvature reversals are counted on a 12th-order CST fit with thresholds
-0.01 and 0.1. These counts are only indicative: the fit itself adds small waves, so it reports a
+([benchmark_xoptfoil2.m](../../MATLAB/Paper/benchmark_xoptfoil2.m): XFOIL, α = −2° to 18°, 160 panel
+nodes, the friction floor and the rule against false solutions of the population study
+([consensusPolar.m](../../MATLAB/Paper/consensusPolar.m); the optimize_airfoil designs at their exact
+CST coordinates). For the six optimised designs, exact and rounded coordinates agree within 0.2 %;
+for NACA 2412 they differ by 3.6 %, and the 200-node polars select the exact one. Curvature
+reversals are counted on a 12th-order CST fit with thresholds 0.01 and 0.1. These counts are only indicative: the fit itself adds small waves, so it reports a
 reversal on the lower surface of NACA 2412, whose exact lower surface is convex everywhere. The
 optimize_airfoil designs are CST shapes of lower order, which the fit reproduces exactly.
 
 | Design | Weighted objective | CL/CD at CL 0.4 | at CL 1.0 | Peak CL/CD | t/c | CM at 0° | Reversals upper/lower (0.01; 0.1) | Run time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| NACA 2412 | 86.4 | 71.5 | 90.2 | 104.6 | 0.120 | −0.048 | 0/1; 0/1 | – |
-| Xoptfoil2 run 1 | 121.1 | 69.1 | 134.0 | 134.2 | 0.138 | −0.074 | 1/2; 1/0 | 1.9 min |
-| Xoptfoil2 run 2 | 119.9 | 70.7 | 132.1 | 132.8 | 0.128 | −0.066 | 1/2; 1/0 | 1.2 min |
-| Xoptfoil2 run 3 | 125.6 | 72.8 | 138.8 | 139.7 | 0.138 | −0.083 | 1/1; 1/1 | 1.1 min |
-| optimize_airfoil seed 1 | 122.0 | 67.1 | 135.7 | 135.7 | 0.123 | −0.048 | 0/0; 0/0 | 36.1 min |
-| optimize_airfoil seed 2 | 120.1 | 68.6 | 132.9 | 133.9 | 0.128 | −0.059 | 0/0; 0/0 | 29.6 min |
-| optimize_airfoil seed 3 | 123.6 | 71.9 | 136.4 | 136.9 | 0.124 | −0.069 | 0/0; 0/0 | 31.3 min |
+| NACA 2412 | 86.6 | 71.5 | 90.4 | 104.6 | 0.120 | −0.048 | 0/1; 0/1 | – |
+| Xoptfoil2 run 1 | 121.1 | 69.3 | 134.0 | 134.2 | 0.138 | −0.074 | 1/2; 1/0 | 1.9 min |
+| Xoptfoil2 run 2 | 120.0 | 70.7 | 132.3 | 133.2 | 0.128 | −0.066 | 1/2; 1/0 | 1.2 min |
+| Xoptfoil2 run 3 | 125.6 | 72.9 | 138.8 | 139.7 | 0.138 | −0.083 | 1/1; 1/1 | 1.1 min |
+| optimize_airfoil seed 1 | 122.0 | 67.1 | 135.8 | 135.8 | 0.123 | −0.048 | 0/0; 0/0 | 36.1 min |
+| optimize_airfoil seed 2 | 120.3 | 68.5 | 133.2 | 133.9 | 0.128 | −0.059 | 0/0; 0/0 | 29.6 min |
+| optimize_airfoil seed 3 | 123.8 | 72.0 | 136.7 | 137.3 | 0.124 | −0.069 | 0/0; 0/0 | 31.3 min |
 
 ## Sensitivity to transition and Reynolds number
 
