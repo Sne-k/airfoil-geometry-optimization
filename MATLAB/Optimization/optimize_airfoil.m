@@ -56,7 +56,8 @@ function result = optimize_airfoil(airfoil, varargin)
 %                     searched again around the best verified design, and
 %                     'SurrogateRoundCandidates' new candidates are
 %                     evaluated; the loop stops when the predictions of a
-%                     round agree with XFOIL within the limit. 0 gives the
+%                     round agree with XFOIL within the limit (never for
+%                     an airfoil beyond the distance limit). 0 gives the
 %                     search without the loop                      (3)
 %     'SurrogateRoundCandidates'  candidates per round           (10)
 %     'SurrogateFallback'  check the surrogate on its candidates and fall
@@ -286,7 +287,7 @@ switch o.Algorithm
             'surrogateBest', -min(scoreS), 'xfoilOfCandidates', -fC(:).');
         % Trust check on the candidates, against limits taken from the training airfoils only
         pB = model.predict([Au Al] + C);  fB = fC;            % predictions and XFOIL values of the latest batch
-        trust = batchTrust(model, [Au Al], pB, fB, true);
+        trust = batchTrust(model, [Au Al], pB, fB);
         rounds = struct('round', 0, 'candidates', size(C, 1), 'usableFraction', trust.usableFraction, ...
             'medianError', trust.medianError, 'best', -min(fC));
         % Closed loop: correct the surrogate with the XFOIL values and search again near the best design
@@ -316,7 +317,7 @@ switch o.Algorithm
             end
             pB = corrected([Au Al] + Cn);  fB = fn;
             C = [C; Cn];  fC = [fC; fn]; %#ok<AGROW>
-            trust = batchTrust(model, [Au Al], pB, fB, false);
+            trust = batchTrust(model, [Au Al], pB, fB);
             rounds(end+1) = struct('round', rd, 'candidates', size(Cn, 1), 'usableFraction', trust.usableFraction, ...
                 'medianError', trust.medianError, 'best', -min(fC)); %#ok<AGROW>
             fprintf('Surrogate round %d: %d candidates, usable %.0f %%, median error %.1f %%, best %.2f\n', rd, size(Cn, 1), ...
@@ -553,9 +554,11 @@ for i = 1:size(D, 1)
 end
 end
 
-function t = batchTrust(model, A0, p, f, withDistance)
+function t = batchTrust(model, A0, p, f)
 % Trust in the surrogate from one batch of candidates: predictions p, XFOIL values -f (f >= 0: no usable
-% value). Limits from the training airfoils (model.domain); the distance limit applies to the first batch only
+% value). Limits from the training airfoils (model.domain). The distance limit applies to every batch: a
+% corrected surrogate can agree with XFOIL near one design of an airfoil outside the training airfoils
+% and still miss the optimum (S1223 seed 4: 111.0 instead of about 128 with the fallback)
 t = struct('trusted', true, 'distance', NaN, 'usableFraction', mean(f < 0), 'medianError', NaN);
 if ~isfield(model, 'domain'), return; end
 dom = model.domain;
@@ -563,7 +566,7 @@ t.distance = min(vecnorm((dom.training_seeds - A0) ./ model.sd, 2, 2));
 u = f < 0;
 if any(u), t.medianError = median(abs(p(u) + f(u)) ./ -f(u)); end
 t.trusted = t.usableFraction >= dom.min_usable_fraction && ~(t.medianError > dom.max_median_error);
-if withDistance, t.trusted = t.trusted && t.distance <= dom.max_distance; end
+t.trusted = t.trusted && t.distance <= dom.max_distance;
 end
 
 function C = distinctCandidates(P, score, k, minDist)
