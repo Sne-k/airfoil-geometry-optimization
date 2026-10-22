@@ -5,7 +5,7 @@
 | [NACA2412](NACA2412) | NACA 4- and 5-digit geometry (`naca4.m`, `naca5.m`), XFLR5 `.dat` export (`writeAirfoilDat.m`), baseline script |
 | [PARSEC](PARSEC) | PARSEC parameterisation and a least-squares PARSEC fit of NACA 2412 |
 | [Aerodynamics](Aerodynamics) | XFOIL wrapper, efficiency metrics, airfoil reader, comparison of all approaches |
-| [Optimization](Optimization) | `optimize_airfoil` (any airfoil), XFOIL-in-the-loop optimisations, the report method and the PARSEC genetic algorithm |
+| [Optimization](Optimization) | `optimize_airfoil` (any airfoil; GA, particle swarm, Bayesian or surrogate-assisted search), XFOIL-in-the-loop optimisations, the report method and the PARSEC genetic algorithm |
 | [Morphing](Morphing) | Morphing sequences, morphing envelope, nose and trailing-edge morphing |
 | [Validation](Validation) | XFOIL compared with NACA 0012 wind-tunnel data (`validate_xfoil.m`) |
 | [Paper](Paper) | The 37 optimisation runs behind `results/paper` and the scripts that turn them into tables and figures; the population study (the same optimisation for 30 airfoils) |
@@ -21,4 +21,4 @@ Requirements: MATLAB R2021a or newer (tested with R2024b), Optimization Toolbox 
 `lsqnonlin`), Global Optimization Toolbox (`ga`, `particleswarm`, `patternsearch`), and XFOIL for the
 aerodynamic steps (see [Aerodynamics](Aerodynamics)). Parallel Computing Toolbox is optional; the
 Statistics and Machine Learning Toolbox is needed only for `optimize_airfoil(..., 'Algorithm',
-'bayesopt')`.
+'bayesopt')` and for the closed loop of `'Algorithm', 'surrogate'` (`fitrgp`).

@@ -1,0 +1,77 @@
+optimiser,airfoil,seed,objective_original_fit,objective,xfoil_analysed_designs,run_seconds,surrogate_trusted,distance,usable_percent,median_error_percent,git_commit
+GA -> fmincon,NACA_2412,1,88.74,105.51,1023,3236,,,,,d9f9e25
+GA -> fmincon,NACA_2412,2,88.74,103.31,866,2210,,,,,d9f9e25
+GA -> fmincon,NACA_2412,3,88.74,106.82,856,1896,,,,,d9f9e25
+GA -> fmincon,NACA_0012,1,69.85,84.75,1053,2551,,,,,d9f9e25
+GA -> fmincon,NACA_0012,2,69.85,94.19,755,2479,,,,,d9f9e25
+GA -> fmincon,NACA_0012,3,69.85,97.91,863,2367,,,,,d9f9e25
+GA -> fmincon,NACA_4415,1,89.83,108.77,1103,2540,,,,,d9f9e25
+GA -> fmincon,NACA_4415,2,89.83,106.09,879,2146,,,,,d9f9e25
+GA -> fmincon,NACA_4415,3,89.83,108.48,964,2751,,,,,d9f9e25
+GA -> fmincon,CLARK_Y,1,96.81,124.07,1053,4078,,,,,d9f9e25
+GA -> fmincon,CLARK_Y,2,96.81,123.93,898,2445,,,,,d9f9e25
+GA -> fmincon,CLARK_Y,3,96.81,122.34,1102,2707,,,,,d9f9e25
+GA -> fmincon,SD7062,1,99.66,120.29,1097,2716,,,,,d9f9e25
+GA -> fmincon,SD7062,2,99.66,119.49,1191,3288,,,,,d9f9e25
+GA -> fmincon,SD7062,3,99.66,120.36,900,2545,,,,,d9f9e25
+GA -> fmincon,S1223,1,102.43,126.83,1163,2648,,,,,d9f9e25
+GA -> fmincon,S1223,2,102.43,126.91,1161,3779,,,,,d9f9e25
+GA -> fmincon,S1223,3,102.43,123.43,1043,2716,,,,,d9f9e25
+surrogate v1,NACA_2412,1,88.74,107.56,118,906,,,,,d9f9e25
+surrogate v1,NACA_2412,2,88.74,106.8,42,468,,,,,d9f9e25
+surrogate v1,NACA_2412,3,88.74,108.16,92,893,,,,,d9f9e25
+surrogate v1,NACA_0012,1,69.85,98.74,152,1188,,,,,d9f9e25
+surrogate v1,NACA_0012,2,69.85,98.42,74,582,,,,,d9f9e25
+surrogate v1,NACA_0012,3,69.85,97.77,62,546,,,,,d9f9e25
+surrogate v1,NACA_4415,1,89.83,108.44,61,222,,,,,d9f9e25
+surrogate v1,NACA_4415,2,89.83,108.92,56,279,,,,,d9f9e25
+surrogate v1,NACA_4415,3,89.83,108.17,57,263,,,,,d9f9e25
+surrogate v1,CLARK_Y,1,96.81,125.15,92,541,,,,,d9f9e25
+surrogate v1,CLARK_Y,2,96.81,124.97,216,990,,,,,d9f9e25
+surrogate v1,CLARK_Y,3,96.81,125.39,108,458,,,,,d9f9e25
+surrogate v1,SD7062,1,99.66,119.92,43,330,,,,,d9f9e25
+surrogate v1,SD7062,2,99.66,118.43,48,324,,,,,d9f9e25
+surrogate v1,SD7062,3,99.66,120.27,44,318,,,,,d9f9e25
+surrogate v1,S1223,1,102.43,110.03,35,181,,,,,d9f9e25
+surrogate v1,S1223,2,102.43,112.92,116,565,,,,,d9f9e25
+surrogate v1,S1223,3,102.43,107.69,76,628,,,,,d9f9e25
+surrogate v2,NACA_2412,1,88.74,107.56,118,918,true,1.17,100,3.7,b709ef0
+surrogate v2,NACA_2412,2,88.74,106.8,42,537,true,1.17,100,3.1,b709ef0
+surrogate v2,NACA_2412,3,88.74,108.16,92,922,true,1.17,100,3.4,b709ef0
+surrogate v2,NACA_0012,1,69.85,98.74,152,1116,true,1.18,100,1.1,b709ef0
+surrogate v2,NACA_0012,2,69.85,98.42,74,629,true,1.18,85,1.4,b709ef0
+surrogate v2,NACA_0012,3,69.85,98.67,789,2243,false,1.18,25,1.4,b709ef0
+surrogate v2,NACA_4415,1,89.83,108.44,61,223,true,1.93,100,2.8,b709ef0
+surrogate v2,NACA_4415,2,89.83,108.92,56,297,true,1.93,100,2.2,b709ef0
+surrogate v2,NACA_4415,3,89.83,108.17,57,289,true,1.93,100,2.2,b709ef0
+surrogate v2,CLARK_Y,1,96.81,125.15,92,526,true,2.78,100,1.4,b709ef0
+surrogate v2,CLARK_Y,2,96.81,124.97,216,1044,true,2.78,100,2.5,b709ef0
+surrogate v2,CLARK_Y,3,96.81,125.39,108,509,true,2.78,100,1.4,b709ef0
+surrogate v2,SD7062,1,99.66,120.08,992,2410,false,2.78,100,6.4,b709ef0
+surrogate v2,SD7062,2,99.66,118.76,1044,2348,false,2.78,100,8.4,b709ef0
+surrogate v2,SD7062,3,99.66,120.96,895,2124,false,2.78,100,6.8,b709ef0
+surrogate v2,S1223,1,102.43,126.83,1071,3518,false,7.48,30,44.6,b709ef0
+surrogate v2,S1223,2,102.43,125.19,1044,2914,false,7.48,55,47.6,b709ef0
+surrogate v2,S1223,3,102.43,126.16,1212,4493,false,7.48,50,48.7,b709ef0
+surrogate v3,NACA_2412,1,88.74,107.56,118,815,true,1.17,100,3.7,23285ba
+surrogate v3,NACA_2412,2,88.74,106.8,42,513,true,1.17,100,3.1,23285ba
+surrogate v3,NACA_2412,3,88.74,108.16,92,868,true,1.17,100,3.4,23285ba
+surrogate v3,NACA_0012,1,69.85,98.74,152,1191,true,1.18,100,1.1,23285ba
+surrogate v3,NACA_0012,2,69.85,98.42,74,599,true,1.18,85,1.4,23285ba
+surrogate v3,NACA_0012,3,69.85,98.7,725,2144,false,1.18,33,75.2,23285ba
+surrogate v3,NACA_4415,1,89.83,108.44,61,240,true,1.93,100,2.8,23285ba
+surrogate v3,NACA_4415,2,89.83,108.92,56,287,true,1.93,100,2.2,23285ba
+surrogate v3,NACA_4415,3,89.83,108.17,57,277,true,1.93,100,2.2,23285ba
+surrogate v3,CLARK_Y,1,96.81,125.15,92,559,true,2.78,100,1.4,23285ba
+surrogate v3,CLARK_Y,2,96.81,124.97,216,1001,true,2.78,100,2.5,23285ba
+surrogate v3,CLARK_Y,3,96.81,125.39,108,475,true,2.78,100,1.4,23285ba
+surrogate v3,SD7062,1,99.66,119.92,51,368,true,2.78,100,2.9,23285ba
+surrogate v3,SD7062,2,99.66,118.44,58,362,true,2.78,100,0.1,23285ba
+surrogate v3,SD7062,3,99.66,120.35,53,376,true,2.78,100,0.4,23285ba
+surrogate v3,S1223,1,102.43,125.46,1117,2844,false,7.48,100,22.2,23285ba
+surrogate v3,S1223,2,102.43,111.86,1175,3173,false,7.48,100,14.6,23285ba
+surrogate v3,S1223,3,102.43,118.18,1166,4186,false,7.48,100,17.5,23285ba
+surrogate v4,NACA_0012,3,69.85,99.17,758,2226,false,1.18,33,75.2,021a63d
+surrogate v4,S1223,1,102.43,128.31,1058,2630,false,7.48,100,22.2,021a63d
+surrogate v4,S1223,2,102.43,130.14,1099,2913,false,7.48,100,14.6,021a63d
+surrogate v4,S1223,3,102.43,126.47,1131,3904,false,7.48,100,17.5,021a63d

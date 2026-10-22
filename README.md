@@ -34,7 +34,8 @@ order in which to read it. Every row names the document with the results and the
 | 6 | Does the gain hold for other airfoils and away from the design condition, and can a formulation keep it? | [results/population](results/population/README.md) | `MATLAB/Paper/run_population_study.m` |
 | 7 | Does an independent method confirm it? RANS, fully turbulent and with a transition model | [results/cfd](results/cfd/README.md) | `MATLAB/CFD` |
 | 8 | What does morphing add? | [results/README.md](results/README.md) | `MATLAB/Morphing` |
-| 9 | How was everything done, what has been published on it, and what would a paper claim? | [docs/methods.md](docs/methods.md), [docs/literature.md](docs/literature.md), [docs/paper_outline.md](docs/paper_outline.md) | |
+| 9 | Can the optimiser get the same result with far fewer XFOIL analyses, and know when it cannot? | [results/surrogate](results/surrogate/README.md) | `MATLAB/Optimization/optimize_airfoil.m` (`'Algorithm', 'surrogate'`), `MATLAB/Optimization/surrogateModel.m` |
+| 10 | How was everything done, what has been published on it, and what would a paper claim? | [docs/methods.md](docs/methods.md), [docs/literature.md](docs/literature.md), [docs/paper_outline.md](docs/paper_outline.md) | |
 
 The short answers are in [Results](#results) and [Further results](#further-results) below. To run the
 steps yourself, see [Running the code](#running-the-code). `tools/check_numbers.py` checks the numbers
@@ -120,7 +121,7 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   gives the same result as GA → fmincon. The tool also optimises for cruise, loiter, a weighted
   combination, or with maximum lift kept.
 - **Benchmark.** With smooth shapes on both sides, `optimize_airfoil` and Xoptfoil2 reach the same
-  result on the same task (mean weighted objective 121.9 against 122.2 over three runs each), and
+  result on the same task (mean weighted objective 122.0 against 122.2 over three runs each), and
   Xoptfoil2 is about 20 times faster. An earlier comparison, in which our designs were wavy, had shown a
   9 % advantage for `optimize_airfoil`; that advantage came from the waviness.
 - **Smooth shapes.** The designs in the tables above have slightly wavy surfaces. `optimize_airfoil` now
@@ -143,6 +144,14 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   one panelling or only at the exact design coordinates. They steered 3 of the 217 optimisations, which
   were repeated with a friction floor; every value of the analysis is checked at exact and rounded
   coordinates ([results/population](results/population/README.md#false-xfoil-solutions)).
+- **A cheaper optimiser that checks itself.** `'Algorithm', 'surrogate'` searches a neural-network
+  surrogate of XFOIL, trained on the population study, and analyses only the best candidates with XFOIL.
+  A trust check, from the training airfoils only, decides whether the surrogate can be used for the
+  airfoil; if not, a closed-loop correction and then the usual XFOIL search take over. On six airfoils
+  the surrogate never saw, optimised for free and tripped flow, it was trusted in 14 of 18 runs and then
+  needed 4 to 22 times fewer XFOIL analyses than the current optimiser for a similar or higher result.
+  It rejected itself on S1223, which lies outside the training airfoils
+  ([results/surrogate](results/surrogate/README.md)).
 - **CFD.** The Fluent set-up is verified on NASA's NACA 0012 case: lift within 1.2 % and drag within
   6.4 % of each of NASA's three reference codes, skin friction within 1.2 % of CFL3D
   ([results/cfd](results/cfd/README.md)). Against wind-tunnel measurements of the Eppler 387 at Re = 300 000 (NASA TM-4062), with
@@ -216,13 +225,15 @@ MATLAB/
   PARSEC/         PARSEC parameterisation (parsec.m, parsecSurfaces.m ...), fit_parsec_naca2412.m
   Aerodynamics/   XFOIL wrapper (xfoilPolar.m), efficiency metrics, readAirfoil.m,
                   compare_approaches.m, plot_polars.m
-  Optimization/   optimize_airfoil.m (any airfoil, CST + XFOIL), optimize_xfoil_parsec.m,
+  Optimization/   optimize_airfoil.m (any airfoil, CST + XFOIL; GA, particle swarm, Bayesian or
+                  surrogate-assisted search), surrogateModel.m, optimize_xfoil_parsec.m,
                   optimize_xfoil_naca.m, optimize_naca_ga_nlp.m (report method), run_parsec_ga.m
   Morphing/       morph_airfoil.m (report morph), morph_to_design.m (morph to any .dat, with L/D per step)
   Validation/     validate_xfoil.m: XFOIL against NACA 0012 wind-tunnel data
   Paper/          run_paper_batch.m (the 37 runs), collect_paper_results.m, benchmark and sensitivity,
                   run_population_study.m (the same optimisation for 30 airfoils),
-                  xfoil_sensitivity_check.m and test_false_solutions.m (false XFOIL solutions)
+                  xfoil_sensitivity_check.m and test_false_solutions.m (false XFOIL solutions),
+                  consensusPolar.m (the rule against false solutions, as a function)
   CFD/            C-grid generator, Fluent journals and batch runner, verification on NASA's
                   NACA 0012 case, design study, post-processing
   airfoils/       seed airfoils as .dat files (Clark Y)
@@ -238,6 +249,7 @@ results/
   cfd/            Fluent: verification on NASA's NACA 0012 case, validation on the Eppler 387,
                   time-step study, design study, one case in physical time
   population/     the same optimisation for 30 airfoils; robust formulations; false XFOIL solutions
+  surrogate/      surrogate-assisted optimiser against the current one on six unseen airfoils
   morph_sequence/ the 21 .dat files analysed in XFLR5 for the report
   airfoils/       baseline and report airfoil (.dat)
   figures/        figures of the report method
@@ -328,6 +340,7 @@ narrowed down over several attempts:
 | GA + PSO + fmincon on NACA parameters | dropped: a sign error made it minimise camber (symmetric airfoils) |
 | **NACA [m p t] + GA → fmincon + morphing** | **method of the report** |
 | PARSEC / CST + GA → fmincon with XFOIL in the loop | added in this repository; best results |
+| CST + surrogate-assisted search, trust check, closed loop, fallback to XFOIL | added for the paper: same results with far fewer XFOIL analyses where the surrogate is trusted |
 
 Many early `.dat` files would not load in XFLR5 because they had about 400 points; XFLR5 allows at
 most 300.

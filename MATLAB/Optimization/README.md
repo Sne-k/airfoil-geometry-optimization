@@ -13,6 +13,8 @@ r = optimize_airfoil('NACA 2412', 'Objective', 'LDatCL', ...  % cruise at CL 0.4
 r = optimize_airfoil('NACA 2412', 'KeepCLmax', true);        % never lose maximum lift
 r = optimize_airfoil('NACA 2412', 'Algorithm', 'bayesopt');  % Bayesian optimisation -> fmincon
 r = optimize_airfoil('NACA 2412', 'Seed', 2);                % another random seed
+r = optimize_airfoil('NACA 2412', 'Algorithm', 'surrogate', ...  % surrogate-assisted search,
+      'SurrogateModel', 'model_B.json', 'WarmStart', W);       % every kept design checked with XFOIL
 ```
 
 1. Reads the airfoil and analyses it in XFOIL.
@@ -26,7 +28,8 @@ r = optimize_airfoil('NACA 2412', 'Seed', 2);                % another random se
    no gradients, which suits the noisy XFOIL results. With `'Algorithm', 'bayesopt'` it runs
    **Bayesian optimisation** (MATLAB `bayesopt`: Gaussian-process model, expected improvement)
    followed by fmincon. The global search starts from the fitted original and random designs that meet
-   all geometric limits.
+   all geometric limits. With `'Algorithm', 'surrogate'` the global stage is a genetic algorithm on a
+   **neural-network surrogate** of XFOIL (`surrogateModel.m`); see [Surrogate-assisted search](#surrogate-assisted-search).
 5. Checks the geometric limits (thickness, crossing surfaces, curvature) before any XFOIL analysis. A
    design that breaks them is not analysed; it gets the size of the violation as its score, so it ranks
    behind every valid design and smaller violations rank first (Deb's feasibility rule).
@@ -71,7 +74,12 @@ designs only. `'Curvature', false` switches the limits off.
 | `KeepCLmax` | false | Reject shapes whose maximum lift is below the original's (the sweep then runs to 18°) |
 | `Curvature` | true | Curvature limits from the original (see above) |
 | `CurvatureThreshold` | 0.01 | Curvature below which a sign change is not counted as a reversal |
-| `Algorithm` | `'ga'` | `'ga'` (GA → fmincon), `'pso'` (particle swarm → pattern search) or `'bayesopt'` (Bayesian optimisation → fmincon) |
+| `Algorithm` | `'ga'` | `'ga'` (GA → fmincon), `'pso'` (particle swarm → pattern search), `'bayesopt'` (Bayesian optimisation → fmincon) or `'surrogate'` (surrogate-assisted search → fmincon) |
+| `SurrogateModel` | `''` | Model file for `'surrogate'` (read by `surrogateModel.m`; trust limits from `<file>_domain.json` if present). It must predict the objective being optimised, and `Order` must be 6 |
+| `SurrogateCandidates` | 20 | Distinct best designs of the surrogate search that are analysed with XFOIL |
+| `SurrogateRounds`, `SurrogateRoundCandidates` | 3, 10 | Closed-loop correction rounds and the new candidates per round (0 rounds: no loop) |
+| `SurrogateFallback` | true | Fall back to the genetic algorithm with XFOIL when the surrogate is not trusted |
+| `WarmStart` | `[]` | Absolute CST shapes `[Au Al]` (one per row), e.g. the optima of similar airfoils, added to the starting population where they meet the limits |
 | `LocalSearch` | true | Run the local stage after the global search |
 | `Seed` | 1 | Random number seed; the results of GA, particle swarm and Bayesian optimisation depend on it |
 | `Re` | 1e6 | Reynolds number |
@@ -80,6 +88,29 @@ designs only. `'Curvature', false` switches the limits off.
 | `Order` | 6 | CST order (Order + 1 coefficients per surface) |
 | `MaxChange` | 0.08 | Bound on the change of each CST coefficient |
 | `Population`, `Generations`, `NLPIterations` | 50, 25, 15 | Search effort (swarm size and iterations for `'pso'`; Bayesian optimisation gets Population × (Generations + 1) evaluations; pattern search uses 20 evaluations per variable) |
+
+### Surrogate-assisted search
+
+`'Algorithm', 'surrogate'` replaces most XFOIL analyses of the global stage by a surrogate:
+
+1. A genetic algorithm searches the surrogate (an ensemble of five neural networks; the spread of the
+   five is not used). No XFOIL analysis is needed for this.
+2. The `SurrogateCandidates` best distinct designs are analysed with XFOIL.
+3. **Trust check.** The surrogate is trusted only if the airfoil is no further from the training airfoils
+   than they are from each other, at least half of the candidates give a usable polar, and the median
+   error of the predictions on the candidates is within the 90th percentile of the cross-validation.
+   The limits come from the training airfoils only.
+4. **Closed loop.** If it is not trusted, a Gaussian process is fitted to its errors on the designs
+   analysed so far, the corrected surrogate is searched again in a region around the best design that
+   halves every round, and new candidates are analysed. The loop stops when a round passes the check.
+5. **Fallback.** If no round passes, the genetic algorithm runs with XFOIL as usual, started from the
+   best candidates of the first search and the usual starting population. The better of its result and
+   the best candidate is kept.
+6. fmincon refines the result with XFOIL, as for `'ga'`.
+
+Every design that is kept was analysed with XFOIL; the surrogate only ranks candidates. Results on six
+airfoils that the surrogate never saw: [results/surrogate](../../results/surrogate/README.md). The trained
+models and the training scripts are not in the repository yet.
 
 Outputs, in `MATLAB/output/optimize_airfoil/<name>/`:
 - `<name>_optimized.dat` (199–299 points, loads in XFLR5)
@@ -133,6 +164,7 @@ Supporting functions:
 | `nacaMaxLD.m` | XFOIL objective for NACA parameters |
 | `parsecMaxLD.m` | XFOIL objective for PARSEC parameters |
 | `airfoilObjective.m` | XFOIL objective for `optimize_airfoil` (optionally logs every evaluation) |
+| `surrogateModel.m` | Loads a neural-network surrogate of XFOIL for `'Algorithm', 'surrogate'` (ensemble mean and spread; trust limits) |
 | `designViolation.m` | Geometric limits of a design (thickness, crossing surfaces, curvature), checked without XFOIL |
 | `curvatureLimits.m`, `curvatureViolation.m`, `curvatureSegments.m` | Curvature limits from the original, and how far a design is outside them |
 | `cstCurvature.m`, `cstCurvatureBasis.m` | Exact curvature of a CST surface |
