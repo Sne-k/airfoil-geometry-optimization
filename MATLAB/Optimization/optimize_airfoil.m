@@ -43,7 +43,36 @@ function result = optimize_airfoil(airfoil, varargin)
 %                     counted                                    (0.01)
 %     'Algorithm'     'ga' (GA -> fmincon) | 'pso' (particle swarm ->
 %                     pattern search) | 'bayesopt' (Bayesian optimisation
-%                     -> fmincon)                                ('ga')
+%                     -> fmincon) | 'surrogate' (GA on a neural-network
+%                     surrogate, the best candidates evaluated with XFOIL,
+%                     then fmincon with XFOIL)                   ('ga')
+%     'SurrogateModel'  model file of surrogateModel.m (needed by
+%                     'surrogate'; it must predict the objective that is
+%                     optimised, and Order must be 6)            ('')
+%     'SurrogateCandidates'  candidates evaluated with XFOIL      (20)
+%     'SurrogateRounds'  closed-loop rounds: the errors of the surrogate on
+%                     the designs evaluated with XFOIL are fitted with a
+%                     Gaussian process, the corrected surrogate is
+%                     searched again around the best verified design, and
+%                     'SurrogateRoundCandidates' new candidates are
+%                     evaluated; the loop stops when the predictions of a
+%                     round agree with XFOIL within the limit. 0 gives the
+%                     search without the loop                      (3)
+%     'SurrogateRoundCandidates'  candidates per round           (10)
+%     'SurrogateFallback'  check the surrogate on its candidates and fall
+%                     back to the genetic algorithm with XFOIL, started
+%                     from the best candidates of the first search (not
+%                     of the loop, which cluster near one design) and the
+%                     usual starting population, when it is not trusted:
+%                     the airfoil is further from the training airfoils
+%                     than they are from each other, fewer than half of
+%                     the candidates give a usable polar, or the median
+%                     error of the predictions exceeds the 90th percentile
+%                     of the cross-validation (limits in the model's
+%                     _domain.json file)                          (true)
+%     'WarmStart'     absolute CST shapes [Au Al] (one per row), for
+%                     example the optima of similar airfoils, added to
+%                     the starting population where they meet the limits ([])
 %     'LocalSearch'   refine the global result locally           (true)
 %     'Seed'          random number seed                          (1)
 %     'Order'         CST order per surface (Order+1 coefficients) (6)
@@ -97,10 +126,16 @@ ip.addParameter('Generations', 25);
 ip.addParameter('NLPIterations', 15);
 ip.addParameter('UseParallel', true);
 ip.addParameter('OutputDir', '');
+ip.addParameter('SurrogateModel', '');
+ip.addParameter('SurrogateCandidates', 20);
+ip.addParameter('SurrogateFallback', true);
+ip.addParameter('SurrogateRounds', 3);
+ip.addParameter('SurrogateRoundCandidates', 10);
+ip.addParameter('WarmStart', []);
 ip.parse(varargin{:});
 o = ip.Results;
 o.Algorithm = lower(o.Algorithm);
-if ~any(strcmp(o.Algorithm, {'ga', 'pso', 'bayesopt'}))
+if ~any(strcmp(o.Algorithm, {'ga', 'pso', 'bayesopt', 'surrogate'}))
     error('optimize_airfoil:algorithm', 'Unknown algorithm ''%s''.', o.Algorithm);
 end
 if ~any(strcmp(o.Aggregate, {'mean', 'worst'}))
@@ -198,6 +233,13 @@ rng(o.Seed);
 % Start from the fitted original and random designs that meet the
 % geometric limits (with curvature limits, only ~0.1 % of the box does)
 X0 = [zeros(1, nv); feasibleSamples(o.Population - 1, lb, ub, isValid)];
+if ~isempty(o.WarmStart)                     % optima of similar airfoils, as changes of this fit
+    Dw = min(max(o.WarmStart - [Au Al], lb), ub);
+    Dw = Dw(arrayfun(@(i) isValid(Dw(i, :)), 1:size(Dw, 1)), :);
+    X0 = [X0(1, :); Dw; X0(2:end, :)];
+    X0 = X0(1:max(o.Population, 1 + size(Dw, 1)), :);
+    fprintf('Warm start: %d of %d shapes meet the limits\n', size(Dw, 1), size(o.WarmStart, 1));
+end
 S.stage = 'global';
 objective = @(d) airfoilObjective(d, S);
 switch o.Algorithm
@@ -221,6 +263,92 @@ switch o.Algorithm
         dG = table2array(res.XAtMinObjective);
         flagG = NaN;
         outG = struct('funccount', res.NumObjectiveEvaluations, 'elapsedSeconds', res.TotalElapsedTime);
+    case 'surrogate'
+        % GA on the surrogate (no XFOIL), then the best distinct candidates with XFOIL
+        if isempty(o.SurrogateModel) || n1 ~= 7
+            error('optimize_airfoil:surrogate', 'Algorithm ''surrogate'' needs SurrogateModel and Order 6.');
+        end
+        model = surrogateModel(o.SurrogateModel);
+        fSur = @(D) surrogateFitness(D, @(X) model.predict(X), [Au Al], S, o.Curvature);
+        gaOpts = optimoptions('ga', 'PopulationSize', 4 * o.Population, 'MaxGenerations', 4 * o.Generations, ...
+            'FunctionTolerance', 1e-4, 'Vectorized', 'on', 'Display', 'off', ...
+            'InitialPopulationMatrix', [X0; feasibleSamples(3 * o.Population, lb, ub, isValid)]);
+        [~, ~, ~, outS, popS, scoreS] = ga(fSur, nv, [], [], [], [], lb, ub, [], gaOpts);
+        C = distinctCandidates(popS, scoreS, o.SurrogateCandidates, 0.02 * o.MaxChange);
+        fC = zeros(size(C, 1), 1);
+        if o.UseParallel
+            parfor k = 1:size(C, 1), fC(k) = airfoilObjective(C(k, :), S); end
+        else
+            for k = 1:size(C, 1), fC(k) = airfoilObjective(C(k, :), S); end
+        end
+        flagG = NaN;
+        outG = struct('funccount', size(C, 1), 'surrogateEvaluations', outS.funccount, ...
+            'surrogateBest', -min(scoreS), 'xfoilOfCandidates', -fC(:).');
+        % Trust check on the candidates, against limits taken from the training airfoils only
+        pB = model.predict([Au Al] + C);  fB = fC;            % predictions and XFOIL values of the latest batch
+        trust = batchTrust(model, [Au Al], pB, fB, true);
+        rounds = struct('round', 0, 'candidates', size(C, 1), 'usableFraction', trust.usableFraction, ...
+            'medianError', trust.medianError, 'best', -min(fC));
+        % Closed loop: correct the surrogate with the XFOIL values and search again near the best design
+        for rd = 1:o.SurrogateRounds
+            if trust.trusted, break; end
+            yv = max(-fC, 0);                                  % unusable or rejected designs count as 0
+            res = yv - model.predict([Au Al] + C);
+            gp = fitrgp(C ./ o.MaxChange, res, 'KernelFunction', 'squaredexponential', 'Standardize', true);
+            corrected = @(X) model.predict(X) + predict(gp, (X - [Au Al]) ./ o.MaxChange);
+            [~, kb] = min(fC);
+            w = o.MaxChange * 0.5^rd;
+            lbT = max(lb, C(kb, :) - w);  ubT = min(ub, C(kb, :) + w);
+            inT = all(C >= lbT & C <= ubT, 2) & fC < 0;
+            P0 = [C(inT, :); feasibleSamples(4 * o.Population - sum(inT), lbT, ubT, isValid)];
+            gaR = optimoptions('ga', 'PopulationSize', 4 * o.Population, 'MaxGenerations', 2 * o.Generations, ...
+                'FunctionTolerance', 1e-4, 'Vectorized', 'on', 'Display', 'off', 'InitialPopulationMatrix', P0);
+            [~, ~, ~, ~, popR, scoreR] = ga(@(D) surrogateFitness(D, corrected, [Au Al], S, o.Curvature), nv, ...
+                [], [], [], [], lbT, ubT, [], gaR);
+            keepNew = arrayfun(@(i) min(vecnorm(C - popR(i, :), 2, 2)) >= 0.02 * o.MaxChange, (1:size(popR, 1)).');
+            Cn = distinctCandidates(popR(keepNew, :), scoreR(keepNew), o.SurrogateRoundCandidates, 0.02 * o.MaxChange);
+            if isempty(Cn), break; end
+            fn = zeros(size(Cn, 1), 1);
+            if o.UseParallel
+                parfor k = 1:size(Cn, 1), fn(k) = airfoilObjective(Cn(k, :), S); end
+            else
+                for k = 1:size(Cn, 1), fn(k) = airfoilObjective(Cn(k, :), S); end
+            end
+            pB = corrected([Au Al] + Cn);  fB = fn;
+            C = [C; Cn];  fC = [fC; fn]; %#ok<AGROW>
+            trust = batchTrust(model, [Au Al], pB, fB, false);
+            rounds(end+1) = struct('round', rd, 'candidates', size(Cn, 1), 'usableFraction', trust.usableFraction, ...
+                'medianError', trust.medianError, 'best', -min(fC)); %#ok<AGROW>
+            fprintf('Surrogate round %d: %d candidates, usable %.0f %%, median error %.1f %%, best %.2f\n', rd, size(Cn, 1), ...
+                100 * trust.usableFraction, 100 * trust.medianError, -min(fC));
+        end
+        [~, kBest] = min(fC);
+        dG = C(kBest, :);
+        outG.funccount = size(C, 1);
+        outG.rounds = rounds;
+        outG.trust = trust;
+        fprintf('Surrogate trust: distance %.2f, usable %.0f %%, median error %.1f %% -> %s\n', trust.distance, ...
+            100 * trust.usableFraction, 100 * trust.medianError, string(trust.trusted));
+        if ~trust.trusted && o.SurrogateFallback
+            % Fall back to the genetic algorithm with XFOIL, started from the best verified candidates of the
+            % first search; the loop candidates cluster near one design and would fill the population
+            n0 = rounds(1).candidates;
+            [~, ord] = sort(fC(1:n0));
+            Cs = C(ord(fC(ord) < 0), :);
+            X0f = [X0(1, :); Cs; X0(2:end, :)];
+            X0f = X0f(1:o.Population, :);
+            gaOpts = optimoptions('ga', 'PopulationSize', o.Population, 'MaxGenerations', o.Generations, ...
+                'FunctionTolerance', 1e-3, 'UseParallel', o.UseParallel, 'Display', 'iter', 'InitialPopulationMatrix', X0f);
+            [dF, ~, flagG, outF] = ga(objective, nv, [], [], [], [], lb, ub, [], gaOpts);
+            if airfoilObjective(dF, S) < fC(kBest), dG = dF; end
+            outG.fallback = true;
+            outG.fallbackOutput = cleanOutput(outF);
+            outG.funccount = size(C, 1) + outF.funccount;
+        else
+            outG.fallback = false;
+        end
+        fprintf('Surrogate: %d surrogate evaluations, %d candidates with XFOIL, best %.2f (surrogate %.2f)\n', ...
+            outS.funccount, size(C, 1), -fC(kBest), -scoreS(find(all(popS == dG, 2), 1)));
     otherwise
         % Genetic algorithm -> fmincon, the method of the project report
         gaOpts = optimoptions('ga', 'PopulationSize', o.Population, 'MaxGenerations', o.Generations, ...
@@ -342,46 +470,51 @@ fid = fopen(fullfile(o.OutputDir, 'run_info.json'), 'w');
 fprintf(fid, '%s\n', jsonencode(info, 'PrettyPrint', true));
 fclose(fid);
 
-%% Figures
-f = figure('Color', 'w', 'Position', [100 100 1000 700]);
-subplot(2, 2, [1 2]);
-plot(xu0, yu0, 'k-', xl0, yl0, 'k-', 'LineWidth', 1.5); hold on;
-plot(x, yu, 'r-', x, yl, 'r-', 'LineWidth', 1.5);
-axis equal; grid on; xlim([0 1]);
-title(sprintf('%s (black) and optimised (red)', name), 'Interpreter', 'none');
-subplot(2, 2, 3);
-plot(polBase.alpha, polBase.CL ./ polBase.CD, 'k-', polOpt.alpha, polOpt.CL ./ polOpt.CD, 'r-', 'LineWidth', 1.5);
-grid on; xlabel('\alpha (deg)'); ylabel('C_L/C_D'); legend('original', 'optimised', 'Location', 'best');
-subplot(2, 2, 4);
-plot(polBase.alpha, polBase.CL, 'k-', polOpt.alpha, polOpt.CL, 'r-', 'LineWidth', 1.5);
-grid on; xlabel('\alpha (deg)'); ylabel('C_L'); legend('original', 'optimised', 'Location', 'best');
-exportgraphics(f, fullfile(o.OutputDir, 'comparison.png'), 'Resolution', 130);
-
-f2 = figure('Color', 'w', 'Position', [100 100 1000 420]);
-sides = {'upper', 'lower'};
-coefs = {{Au, AuOpt}, {Al, AlOpt}};
-for s = 1:2
-    subplot(1, 2, s);
-    plot(curvRef.x, cstCurvature(coefs{s}{1}, dte, curvRef.basis, sides{s}), 'k-', ...
-         curvRef.x, cstCurvature(coefs{s}{2}, dte, curvRef.basis, sides{s}), 'r-', 'LineWidth', 1.5);
-    hold on;
-    yline([-1 1] * curvRef.threshold, 'b:');
-    grid on; xlabel('x/c'); ylabel('curvature (convex > 0)');
-    title(sprintf('%s surface', sides{s}));
-    legend('original (CST fit)', 'optimised', 'reversal threshold', 'Location', 'best');
-end
-exportgraphics(f2, fullfile(o.OutputDir, 'curvature.png'), 'Resolution', 130);
-
-f3 = figure('Color', 'w', 'Position', [100 100 700 420]);
-plotConvergence(H);
-exportgraphics(f3, fullfile(o.OutputDir, 'convergence.png'), 'Resolution', 130);
-
 result = struct('name', name, 'options', o, 'fitError', fitErr, 'Au', Au, 'Al', Al, ...
     'AuOpt', AuOpt, 'AlOpt', AlOpt, 'dte', dte, 'x', x, 'yu', yu, 'yl', yl, ...
     'original', mBase, 'optimized', mOpt, 'polarOriginal', polBase, 'polarOptimized', polOpt, ...
     'curvatureOriginalFit', cFit, 'curvatureOptimized', cOpt, 'curvatureLimits', rmfield(curvRef, 'basis'), ...
     'summary', summary, 'history', H, 'runInfo', info, 'outputDir', o.OutputDir);
 save(fullfile(o.OutputDir, 'result.mat'), 'result');
+
+%% Figures (after the result is saved; a plotting problem must not lose a finished run)
+try
+    f = figure('Color', 'w', 'Position', [100 100 1000 700]);
+    subplot(2, 2, [1 2]);
+    plot(xu0, yu0, 'k-', xl0, yl0, 'k-', 'LineWidth', 1.5); hold on;
+    plot(x, yu, 'r-', x, yl, 'r-', 'LineWidth', 1.5);
+    axis equal; grid on; xlim([0 1]);
+    title(sprintf('%s (black) and optimised (red)', name), 'Interpreter', 'none');
+    subplot(2, 2, 3);
+    plot(polBase.alpha, polBase.CL ./ polBase.CD, 'k-', polOpt.alpha, polOpt.CL ./ polOpt.CD, 'r-', 'LineWidth', 1.5);
+    grid on; xlabel('\alpha (deg)'); ylabel('C_L/C_D'); legend('original', 'optimised', 'Location', 'best');
+    subplot(2, 2, 4);
+    plot(polBase.alpha, polBase.CL, 'k-', polOpt.alpha, polOpt.CL, 'r-', 'LineWidth', 1.5);
+    grid on; xlabel('\alpha (deg)'); ylabel('C_L'); legend('original', 'optimised', 'Location', 'best');
+    exportgraphics(f, fullfile(o.OutputDir, 'comparison.png'), 'Resolution', 130);
+
+    f2 = figure('Color', 'w', 'Position', [100 100 1000 420]);
+    sides = {'upper', 'lower'};
+    coefs = {{Au, AuOpt}, {Al, AlOpt}};
+    for s = 1:2
+        subplot(1, 2, s);
+        plot(curvRef.x, cstCurvature(coefs{s}{1}, dte, curvRef.basis, sides{s}), 'k-', ...
+             curvRef.x, cstCurvature(coefs{s}{2}, dte, curvRef.basis, sides{s}), 'r-', 'LineWidth', 1.5);
+        hold on;
+        yline([-1 1] * curvRef.threshold, 'b:');
+        grid on; xlabel('x/c'); ylabel('curvature (convex > 0)');
+        title(sprintf('%s surface', sides{s}));
+        legend('original (CST fit)', 'optimised', 'reversal threshold', 'Location', 'best');
+    end
+    exportgraphics(f2, fullfile(o.OutputDir, 'curvature.png'), 'Resolution', 130);
+
+    f3 = figure('Color', 'w', 'Position', [100 100 700 420]);
+    plotConvergence(H);
+    exportgraphics(f3, fullfile(o.OutputDir, 'convergence.png'), 'Resolution', 130);
+    close([f f2 f3]);
+catch err
+    warning('optimize_airfoil:figures', 'Figures not written: %s', err.message);
+end
 end
 
 function t = maxThickness(xu, yu, xl, yl)
@@ -408,6 +541,42 @@ if size(X, 1) < n
     X = [X; lb + (ub - lb) .* rand(n - size(X, 1), nv)];
 end
 X = X(1:n, :);
+end
+
+function f = surrogateFitness(D, predictFcn, A0, S, curv)
+% Surrogate objective for a population (rows of D): minus the prediction; designs outside the limits get
+% their violation, as airfoilObjective does
+f = -predictFcn(A0 + D);
+for i = 1:size(D, 1)
+    v = designViolation(D(i, :), S, curv);
+    if v > 0, f(i) = v; end
+end
+end
+
+function t = batchTrust(model, A0, p, f, withDistance)
+% Trust in the surrogate from one batch of candidates: predictions p, XFOIL values -f (f >= 0: no usable
+% value). Limits from the training airfoils (model.domain); the distance limit applies to the first batch only
+t = struct('trusted', true, 'distance', NaN, 'usableFraction', mean(f < 0), 'medianError', NaN);
+if ~isfield(model, 'domain'), return; end
+dom = model.domain;
+t.distance = min(vecnorm((dom.training_seeds - A0) ./ model.sd, 2, 2));
+u = f < 0;
+if any(u), t.medianError = median(abs(p(u) + f(u)) ./ -f(u)); end
+t.trusted = t.usableFraction >= dom.min_usable_fraction && ~(t.medianError > dom.max_median_error);
+if withDistance, t.trusted = t.trusted && t.distance <= dom.max_distance; end
+end
+
+function C = distinctCandidates(P, score, k, minDist)
+% The best rows of P by score whose distance from every row already taken is at least minDist
+[~, order] = sort(score);
+C = zeros(0, size(P, 2));
+for i = order(:).'
+    if score(i) >= 0, break; end                     % only designs within the limits
+    if isempty(C) || min(vecnorm(C - P(i, :), 2, 2)) >= minDist
+        C(end+1, :) = P(i, :); %#ok<AGROW>
+        if size(C, 1) == k, break; end
+    end
+end
 end
 
 function ok = validRows(X, isValid)
