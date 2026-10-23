@@ -230,6 +230,7 @@ MATLAB/
   Optimization/   optimize_airfoil.m (any airfoil, CST + XFOIL; GA, particle swarm, Bayesian or
                   surrogate-assisted search), surrogateModel.m, optimize_xfoil_parsec.m,
                   optimize_xfoil_naca.m, optimize_naca_ga_nlp.m (report method), run_parsec_ga.m
+  Surrogate/      the trained surrogates (models/) and the scripts of their training and benchmark
   Morphing/       morph_airfoil.m (report morph), morph_to_design.m (morph to any .dat, with L/D per step)
   Validation/     validate_xfoil.m: XFOIL against NACA 0012 wind-tunnel data
   Paper/          run_paper_batch.m (the 37 runs), collect_paper_results.m, benchmark and sensitivity,
@@ -258,6 +259,7 @@ results/
 docs/
   methods.md      the methods, with every setting as it is in the code
   literature.md   references, documented search, audit of reporting practice, research gaps
+  sources.md      every source (papers, repositories, data) and what the project learnt from it
   literature/     search and audit scripts and their tables
   paper_outline.md  working outline of the planned paper
 tools/

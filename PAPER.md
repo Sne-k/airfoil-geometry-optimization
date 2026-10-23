@@ -98,8 +98,9 @@ with all safeguards is still running.
   safeguards; a surrogate-assisted optimiser that verifies every kept design with XFOIL and checks
   whether its surrogate can be trusted for the airfoil, tested on airfoils it never saw (the literature
   check of this point is still open); a reporting checklist; open code in which every number is traceable.
-- **Not new:** the GA → fmincon optimiser, surrogate-assisted optimisation as such (for example Khan et
-  al. 2025), CST shapes, XFOIL, Transition SST, and the two-condition robust objective (Caboni et al. 2018). Robust laminar-flow design is studied by Hollom & Qin and others
+- **Not new:** the GA → fmincon optimiser, surrogate-assisted optimisation as such (a neural network with a
+  GA on RANS, Ribeiro et al. 2012; multi-fidelity surrogates with XFOIL and RANS, Meliani et al. 2019 and
+  Mar Aye et al. 2023; a network optimised for three of our airfoils, Khan et al. 2025), CST shapes, XFOIL, Transition SST, and the two-condition robust objective (Caboni et al. 2018). Robust laminar-flow design is studied by Hollom & Qin and others
   ([docs/literature.md](docs/literature.md)).
 
 ## Limits to state openly
@@ -110,7 +111,8 @@ with all safeguards is still running.
   cycles, and one time-accurate run confirms those means. Different RANS codes with the same transition
   model do not agree within their uncertainty (Eça et al. 2022), so the Fluent numbers are those of one
   implementation.
-- The Ncrit conditions are discrete values (5, 7, 11), and "tripped" means transition fixed at 5 % chord;
+- The Ncrit conditions are discrete values (5, 7, 11), which can misrepresent robustness (Hollom & Qin
+  2018), and "tripped" means transition fixed at 5 % chord;
   neither is a measured roughness.
 - No wind-tunnel test of an optimised design.
 
@@ -120,7 +122,7 @@ with all safeguards is still running.
 |---|---|
 | [MATLAB/](MATLAB/README.md) | all code: optimiser (`Optimization`), XFOIL interface (`Aerodynamics`), studies of the paper (`Paper`), CFD mesh, journals and post-processing (`CFD`), morphing, validation |
 | [results/](results/README.md) | every result with its README: `paper` (NACA 2412 taken apart), `population` (30 airfoils), `cfd` (Fluent), `surrogate` (surrogate-assisted optimiser), `validation` (XFOIL against wind-tunnel data), earlier studies |
-| [docs/](docs/) | `methods.md` (how everything was done), `literature.md` (search, audit, research gaps, checklist), `paper_outline.md` (structure of the manuscript, figures and tables) |
+| [docs/](docs/) | `methods.md` (how everything was done), `literature.md` (search, audit, research gaps, checklist), `sources.md` (every source and what was learnt from it), `paper_outline.md` (structure of the manuscript, figures and tables) |
 | [tools/](tools/) | `check_numbers.py` and its manifest: every number in the documents against its source file |
 | [README.md](README.md) | the project from the mini project onwards, and how to run the code |
 

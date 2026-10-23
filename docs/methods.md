@@ -147,6 +147,39 @@ NACA 2412.
 - **Bayesian optimisation → fmincon** (`'Algorithm', 'bayesopt'`). MATLAB `bayesopt` with expected
   improvement plus, the geometric limits as deterministic constraints on the variables, and the first
   20 starting designs as initial points. The budget is population × (generations + 1) evaluations.
+- **Surrogate-assisted search → fmincon** (`'Algorithm', 'surrogate'`, `surrogateModel.m`).
+  - *Surrogate.* An ensemble of five fully connected networks (scikit-learn `MLPRegressor`, hidden
+    layers 128-128-64, ReLU, at most 300 epochs with early stopping, random states 1 to 5) that predicts
+    the objective from the 14 absolute CST coefficients (seed fit plus change), standardised. Only the
+    ensemble mean is used. Training data: the designs that XFOIL analysed in the population study,
+    without six held-out airfoils (NACA 2412, NACA 0012, NACA 4415, Clark Y, SD7062, S1223). Model B
+    (mean of the peak CL/CD with free and tripped flow): 10 341 designs of the robusttrip runs of 24
+    airfoils. Model A (peak CL/CD, free transition): 43 737 designs of the peak and no-curvature runs; the
+    203 designs suspected of false solutions were analysed again with the friction floor (45 values
+    changed, 3 designs dropped).
+  - *Search.* A genetic algorithm on the surrogate (population 4 × `Population`, 4 × `Generations`
+    generations, function tolerance 10⁻⁴; start: the usual starting designs plus 3 × `Population` designs
+    that meet the geometric limits), with the same limits and constraint handling. The 20 best distinct
+    designs of its final population (at least 0.02 × `MaxChange` apart) are analysed with XFOIL.
+  - *Trust check*, with limits from the training airfoils only (`<model>_domain.json`): the distance of
+    the seed fit from the nearest training seed fit, in standardised CST units, at most the largest such
+    distance between training airfoils (model B 5.78, model A 5.15); at least half of the candidates
+    with a usable polar; the median relative error of the predictions on the usable candidates at most
+    the 90th percentile of a cross-validation grouped by airfoil (5 folds; model B 6.2 %, model A
+    7.0 %).
+  - *Closed loop* (`'SurrogateRounds'` 3). If the check fails, a Gaussian process (`fitrgp`, squared
+    exponential kernel, standardised) is fitted to the errors of the surrogate on all designs analysed so
+    far (unusable designs count as 0), with the design changes divided by `MaxChange` as inputs. The
+    corrected surrogate is searched again in a box around the best design whose half-width is
+    `MaxChange` × 0.5^round (population 4 × `Population`, 2 × `Generations` generations), and its 10 best
+    new distinct designs are analysed. The loop stops when a round passes the check. The distance limit
+    applies in every round, so an airfoil beyond it always falls back.
+  - *Fallback* (`'SurrogateFallback'`). If no round passes, the genetic algorithm runs with XFOIL as
+    for `'ga'`, started from the fitted seed, the usable candidates of the first search (best first) and
+    the usual starting designs, cut to the population size. The better of its result and the best
+    candidate is kept.
+  - fmincon then refines the result as for `'ga'`. `'WarmStart'` adds given shapes (in the benchmark:
+    the optima of the three training airfoils whose seed fits are closest) to the starting designs.
 - **Result.** The better of the global and local results. If neither beats the seed, the seed is
   returned.
 - **Parallelism.** Candidates are evaluated in parallel on 6 MATLAB workers.
@@ -178,9 +211,30 @@ Summary:
   Ncrit = 5, 7, 9 and 11 (Re = 10⁶) and at Re = 0.5 and 2 × 10⁶ (Ncrit 9). The gain is taken against
   the seed at the same condition.
 - **Comparison with Xoptfoil2** (`Paper/benchmark_xoptfoil2.m`). Xoptfoil2 2.0.0 is run three times on
-  the same task, and every design is re-analysed with one protocol.
+  the same task, and every design is re-analysed with one protocol: 160 panel nodes, the friction floor
+  and the rule against false solutions of the population study (`Paper/consensusPolar.m`), the
+  optimize_airfoil designs at their exact CST coordinates.
 - **Optimiser comparison.** GA, particle swarm and Bayesian optimisation, global stage only, equal
-  budget of 640 evaluations, three seeds each.
+  budget of 640 evaluations, three seeds each. Repeated with the code of the surrogate optimiser
+  (021a63d) and the surrogate added (model A): `results/surrogate/equal_budget.csv`.
+- **Surrogate-assisted optimiser** (`results/surrogate`). Benchmark on the six held-out airfoils with the
+  robust objective (mean of the peak CL/CD with free transition, Ncrit 9, and with transition tripped at
+  5 % chord), three seeds each, against GA → fmincon with the same settings; seeds 4 to 10 added for NACA
+  2412 and S1223 and the two optimisers compared with a two-sided Mann-Whitney U test. The versions of
+  the method are separate commits; every run records its commit.
+- **Peak comparison with Xoptfoil2** (six held-out airfoils, peak CL/CD, free transition, three runs
+  each). Xoptfoil2 can fix transition only for a whole run and has no peak objective, so it maximises
+  CL/CD at three lift coefficients (the CL at the peak of the original −0.2, at the peak and +0.2;
+  weights 0.25 / 0.5 / 0.25). It starts from the CST fit of the original that optimize_airfoil starts
+  from (10 decimals); it may have as many curvature reversals per surface as the curvature limits allow,
+  at most 2 (the largest value it accepts); the leading-edge curvature check is off, as in the NACA 2412
+  benchmark; the thickness is a geometry target at the original's value, because its minimum-thickness
+  limit was read but not enforced on the result; it uses 6 Bezier points per surface, or 7 where it
+  rejects its 6-point fit of the seed (S1223). It has no pitching-moment limit. The GA designs are the
+  peak runs of the population study; every design is analysed with `consensusPolar.m`.
+- **Final designs of the surrogate benchmark through the safeguards.** All 64 final designs (surrogate
+  and GA) are analysed with `xfoil_sensitivity_check.m` and `collect_population_results.m`, as in the
+  population study.
 
 - **Population study** (`Paper/run_population_study.m`, `Paper/collect_population_results.m`). The same
   optimisation is run for 30 seed airfoils: 18 NACA 4- and 5-digit sections (0009, 0012, 0015, 1408,
@@ -329,6 +383,10 @@ Results: [results/cfd](../results/cfd/README.md).
   second-order iterations) and Transition SST at 0°, 2°, 3°, 4°, 5°, 6°, 7° and 8° (5000). NACA 2412 at
   4° is repeated with both models on a mesh refined by √2 in both directions. XFOIL is run at the same
   Mach number with free transition and with transition fixed at 5 % chord.
+- **RANS check of the surrogate optimiser** (`run_design_study(outDir, false, 'surrogate')`). The same
+  models, angles and meshes for NACA 0012 and for the surrogate designs of NACA 2412 and NACA 0012 (seed 3
+  of each, the best by the objective), without the start-up check and the refined mesh. NACA 2412 and
+  the design of the current optimiser for the same objective are in the design study.
 
 ## 9. Software and hardware
 
