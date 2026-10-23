@@ -1,4 +1,4 @@
-function run_design_study(outDir, pilot)
+function run_design_study(outDir, pilot, set)
 %RUN_DESIGN_STUDY  RANS check of the XFOIL-optimised NACA 2412 designs.
 %   RUN_DESIGN_STUDY runs Fluent for the airfoils of designStudyAirfoils.m
 %   at Re = 1e6 and M = 0.15: the original NACA 2412, three designs
@@ -54,6 +54,11 @@ function run_design_study(outDir, pilot)
 %   runs are not repeated, so the batch can be stopped and started again.
 %   collect_cfd_results.m makes the tables and figures.
 %
+%   RUN_DESIGN_STUDY(outDir, pilot, 'surrogate') runs the same models and
+%   angles for designStudyAirfoils('surrogate') (the RANS check of the
+%   surrogate-assisted optimiser), without the start-up check and the
+%   refined mesh, which belong to the original study.
+%
 %   RUN_DESIGN_STUDY(outDir, true) runs a few iterations of both models on
 %   every mesh (a check of the meshes and journals). Fluent is needed: set
 %   the environment variable FLUENT_EXE to fluent.exe.
@@ -62,20 +67,23 @@ here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
 if nargin < 1 || isempty(outDir), outDir = fullfile(root, 'output', 'cfd', 'designs'); end
 if nargin < 2, pilot = false; end
+if nargin < 3, set = ''; end
+extras = isempty(set);                               % start-up check and refined mesh: original study only
 if ~exist(outDir, 'dir'), mkdir(outDir); end
 addpath(here, fullfile(root, 'Aerodynamics'), fullfile(root, 'NACA2412'));
 started = datetime('now', 'TimeZone', 'UTC');
 
-D = designStudyAirfoils();
+D = designStudyAirfoils(set);
 designs = [D.name, D.source];
 nD = size(designs, 1);
 far = {'Radius', 500, 'WakeLength', 500, 'WakeFirstCell', 0.1, 'NNormal', 180};
-M = cell(nD + 2, 1);
+M = cell(nD + 2 * extras, 1);
 for k = 1:nD
     [xu, yu, xl, yl] = readAirfoil(designs{k, 2});
     G = airfoilCGrid(xu, yu, xl, yl, far{:});
     M{k} = saveMesh(outDir, designs{k, 1}, G);
 end
+if extras
 % NASA NACA 0012, medium mesh of verify_naca0012.m (first cell 2e-6)
 x = (1 - cos(linspace(0, pi, 2001)')) / 2;
 y = 0.594689181*(0.298222773*sqrt(x) - 0.127125232*x - 0.357907906*x.^2 + 0.291984971*x.^3 - 0.105174606*x.^4);
@@ -89,6 +97,7 @@ gf = rm^(179 / 253);
 G = airfoilCGrid(xu, yu, xl, yl, 'Radius', 500, 'WakeLength', 500, 'WakeFirstCell', 0.1 / sqrt(2), 'NNormal', 254, ...
     'NSurface', 284, 'NWake', 113, 'FirstCell', 500 * (gf - 1) / (rm^179 - 1));
 M{nD + 2} = saveMesh(outDir, 'naca2412_fine', G);
+end
 M = cell2table(vertcat(M{:}), 'VariableNames', {'design', 'cells', 'negative_cells', 'first_cell', 'growth', 'wake_growth'});
 writetable(M, fullfile(outDir, 'meshes.csv'));
 
@@ -107,11 +116,12 @@ end
 % {model, options, design, alpha}: the start-up check first; then, for each
 % model, the angles near the optima for every design and the refined mesh
 runs = {'check', check, 'n0012_medium', 10};
+if ~extras, runs = cell(0, 4); end
 for m = 1:size(models, 1)
     for a = models{m, 3}
         for k = 1:nD, runs(end+1, :) = {models{m, 1}, models{m, 2}, designs{k, 1}, a}; end %#ok<AGROW>
     end
-    runs(end+1, :) = {models{m, 1}, models{m, 2}, 'naca2412_fine', 4}; %#ok<AGROW>
+    if extras, runs(end+1, :) = {models{m, 1}, models{m, 2}, 'naca2412_fine', 4}; end %#ok<AGROW>
 end
 
 allT = {};  allH = {};

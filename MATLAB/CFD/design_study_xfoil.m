@@ -1,4 +1,4 @@
-function T = design_study_xfoil(outDir)
+function T = design_study_xfoil(outDir, set)
 %DESIGN_STUDY_XFOIL  XFOIL polars of the airfoils of the CFD design study.
 %   T = DESIGN_STUDY_XFOIL analyses the airfoils of run_design_study.m
 %   (designStudyAirfoils.m)
@@ -12,6 +12,8 @@ function T = design_study_xfoil(outDir)
 %               optimisation, to show the effect of the Mach number
 %   and writes xfoil.csv to outDir (default results/cfd/designs):
 %   design, condition, alpha, CL, CD, CM, xtrTop, xtrBot.
+%   T = DESIGN_STUDY_XFOIL(outDir, 'surrogate') analyses the airfoils of
+%   designStudyAirfoils('surrogate') instead.
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
@@ -22,7 +24,8 @@ if ~exist(outDir, 'dir'), mkdir(outDir); end
 exe = getenv('XFOIL_EXE');
 if isempty(exe), exe = fullfile(root, 'Aerodynamics', 'xfoil.exe'); end
 
-D = designStudyAirfoils();
+if nargin < 2, set = ''; end
+D = designStudyAirfoils(set);
 designs = [D.name, D.source];
 conditions ={'free', struct('Mach', 0.15)
               'tripped', struct('Mach', 0.15, 'Xtr', [0.05 0.05])
