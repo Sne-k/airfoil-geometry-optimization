@@ -1,0 +1,13 @@
+method,seed,objective_original_fit,objective,xfoil_analysed_designs,evaluations,run_seconds,git_commit,note
+surrogate,1,104.1169,139.3161,23,23,312,021a63d,
+surrogate,2,104.1169,139.7838,8,8,221,021a63d,
+surrogate,3,104.1169,141.8845,7,7,223,021a63d,
+genetic algorithm,1,104.1169,127.7149,293,615,533,021a63d,
+genetic algorithm,2,104.1169,133.4312,404,615,551,021a63d,
+genetic algorithm,3,104.1169,128.4444,379,615,692,021a63d,
+particle swarm,1,104.1169,128.5783,85,643,206,021a63d,
+particle swarm,2,104.1169,123.0999,70,643,180,021a63d,
+particle swarm,3,104.1169,126.4591,81,643,187,021a63d,
+Bayesian optimisation,1,104.1169,134.2606,646,646,5545,021a63d,
+Bayesian optimisation,2,104.1169,131.026,650,650,5485,021a63d,
+Bayesian optimisation,3,104.1169,132.7041,648,648,10320,021a63d,run time includes a laptop standby

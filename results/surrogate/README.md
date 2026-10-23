@@ -38,6 +38,9 @@ check and code version of every run.
 
 ¹ Not trusted; the result comes from the fallback to the genetic algorithm with XFOIL.
 
+The final version (v5, below) gives these results unchanged: it only makes the trust check stricter for
+airfoils beyond the distance limit, and the S1223 runs above were not trusted anyway.
+
 - The surrogate was trusted in 14 of 18 runs. In those, it needed 4 to 22 times fewer XFOIL analyses
   than the current optimiser with the same seed. Its result was higher in 9 of the 14 runs and at most
   1.1 lower in the other 5 (NACA 4415 seeds 1 and 3, SD7062 all three seeds).
@@ -72,12 +75,90 @@ Mean of three seeds: objective / XFOIL-analysed designs. The versions are commit
 - **v4** starts the fallback from the first-search candidates and the usual starting population. Only
   the four runs that fall back (S1223 seeds 1 to 3, NACA 0012 seed 3) were run again; the other 14
   never reach the fallback, so v4 gives them the v3 result.
+- **v5** (be7baa1) applies the distance limit in every round of the closed loop, not only to the first
+  batch. In v4, S1223 seed 4 passed the check after one correction round (median error 4.3 %): the
+  corrected surrogate agreed with XFOIL near one design, but that design was poor (111.0), and the
+  fallback never ran. With v5 the run falls back and gives 126.8. An airfoil beyond the distance limit
+  therefore always falls back. The 18 runs above are unchanged.
+
+## Ten seeds: NACA 2412 and S1223
+
+Seeds 4 to 10 were added for the two airfoils at the ends of the range: one inside the training
+airfoils and one outside. Surrogate runs from seed 4 on use v5 (NACA 2412 seed 4: v4, the same code
+path inside the distance limit); the current optimiser is unchanged.
+
+| Airfoil | Optimiser | Mean ± std | Median | Range | XFOIL designs (mean) | Time (mean) |
+|---|---|---:|---:|---:|---:|---:|
+| NACA 2412 | surrogate | 107.5 ± 0.5 | 107.5 | 106.8 to 108.2 | 76 | 12 min |
+| NACA 2412 | current (GA → fmincon) | 104.1 ± 2.8 | 104.7 | 98.1 to 106.9 | 921 | 41 min |
+| S1223 | surrogate (fallback in all 10) | 126.8 ± 3.8 | 128.1 | 117.2 to 130.1 | 1087 | 49 min |
+| S1223 | current (GA → fmincon) | 122.9 ± 6.5 | 124.8 | 112.8 to 130.4 | 1054 | 46 min |
+
+Mann-Whitney U test (two-sided) of the two optimisers: NACA 2412 p = 0.0004; S1223 p = 0.19. On NACA
+2412 the surrogate optimiser is better, with a twelfth of the XFOIL analyses and a sixth of the spread.
+On S1223 it rejects itself in every seed, and the fallback is no worse than the current optimiser.
+
+## Optimiser comparison at equal budget (NACA 2412, peak CL/CD, free transition)
+
+The task of the comparison in [results/paper](../paper/README.md#optimiser-comparison-at-equal-budget-naca-2412-peak-clcd):
+global search only, population 40, 15 generations. GA, particle swarm and Bayesian optimisation were
+run again with the current code (021a63d, friction floor). The surrogate uses a second model trained
+on the free-transition peak runs of the population study (43 737 designs of the 24 training airfoils;
+trust limits from those airfoils: distance 5.15, median error 7.0 %). All runs:
+[equal_budget.csv](equal_budget.csv).
+
+| Search | Best objective, seeds 1 / 2 / 3 | Mean ± std | XFOIL-analysed designs (mean) | Time (mean) |
+|---|---:|---:|---:|---:|
+| surrogate | 139.3 / 139.8 / 141.9 | 140.3 ± 1.4 | 13 | 4 min |
+| genetic algorithm | 127.7 / 133.4 / 128.4 | 129.9 ± 3.1 | 359 | 10 min |
+| particle swarm | 128.6 / 123.1 / 126.5 | 126.1 ± 2.8 | 79 | 3 min |
+| Bayesian optimisation | 134.3 / 131.0 / 132.7 | 132.7 ± 1.6 | 648 | 92 min ² |
+
+² Seeds 1 and 2; the run time of seed 3 includes a standby of the laptop.
+
+- GA and particle swarm reproduce the published values exactly. Bayesian optimisation does not (published
+  128.0 / 126.2 / 130.4), because its parallel evaluations are not repeatable.
+- The surrogate was trusted in all three seeds. Its final population held 20, 5 and 4 distinct
+  candidates, which were analysed with XFOIL; the counts in the table also include the three other
+  XFOIL analyses of every run.
+
+## Comparison with Xoptfoil2 on the six airfoils (peak CL/CD, free transition)
+
+Xoptfoil2 2.0.0 can trip transition only for a whole run and has no peak objective, so it cannot run the
+free-plus-tripped task above. It was given the closest task it can run: maximum CL/CD at three lift
+coefficients around the peak of the original (CL at the peak −0.2, at the peak, +0.2; weights 0.25 /
+0.5 / 0.25), free transition, Re = 10⁶. It starts from the same CST fit of the original as
+`optimize_airfoil`, may have as many curvature reversals per surface as the curvature limits allow
+(at most 2, the largest value it accepts), and keeps the thickness of the original (a thickness
+target: its minimum-thickness limit alone was not enforced on the result). It uses its default 6 Bezier
+points per surface, 7 for S1223, where it rejects its 6-point fit of the seed. The GA designs are the
+peak runs of the population study; the surrogate (v5) uses the free-transition model. Every design was
+analysed in the same way (XFOIL with the friction floor and the rule against false solutions). All
+designs: [peak_compare.csv](peak_compare.csv).
+
+| Airfoil | Original | GA → fmincon | Surrogate | Xoptfoil2 |
+|---|---:|---:|---:|---:|
+| NACA 2412 | 104.6 | 139.4 (137.7 to 141.8) | 143.0 (142.9 to 143.1) | 154.9 (143.0 to 161.0) ³ |
+| NACA 0012 | 76.5 | 116.1 (111.1 to 118.9) | 124.1 (123.7 to 124.4) | 108.2 (91.1 to 122.8) |
+| NACA 4415 | 121.6 | 143.7 (142.4 to 145.7) | 145.9 (145.4 to 146.3) | 143.2 (142.0 to 145.5) ³ |
+| Clark Y | 114.8 | 171.7 (170.3 to 172.6) | 171.3 (171.3 to 171.4) | 137.7 (128.0 to 145.6) |
+| SD7062 | 120.3 | 165.9 (163.4 to 168.0) | 165.8 (163.7 to 166.9) | 158.4 (154.6 to 165.9) ³ |
+| S1223 | 120.9 | 170.4 (167.1 to 175.5) | 179.5 (167.1 to 185.9) | 142.7 (138.6 to 145.5) |
+
+Peak CL/CD, mean of three runs (range). ³ Xoptfoil2 has no pitching-moment limit. Designs beyond the
+limit of `optimize_airfoil` (the magnitude of CM at 0° at most 0.05 above the original's): NACA 2412 runs 2 and 3
+(CM −0.120 and −0.117; the run within the limit gives 143.0), NACA 4415 run 1, SD7062 all three runs.
+
+- The surrogate optimiser has the highest mean on NACA 0012, NACA 4415 and S1223, is level with the GA
+  on Clark Y and SD7062, and on NACA 2412 is above the GA and level with the one Xoptfoil2 run within the
+  moment limit. Its spread between runs is the smallest on five airfoils; on S1223, where it falls back
+  to the genetic algorithm, it is the largest (167.1 to 185.9). It took 4 to 32 minutes per run on
+  average, the GA 28 to 130.
+- Xoptfoil2 is the fastest (1 to 8 minutes on average) but varies more between runs and is clearly lower
+  on Clark Y and S1223. It optimises CL/CD at three lift coefficients, not the peak itself.
 
 ## Still running
 
-- Optimiser comparison at equal budget on NACA 2412 (peak CL/CD, free transition): GA, particle swarm,
-  Bayesian optimisation and the surrogate, three seeds each, all with the current code.
-- Seeds 4 to 10 on NACA 2412 and S1223 (surrogate and current optimiser), for a rank test.
-- A comparison with Xoptfoil2 on the six airfoils, for peak CL/CD with free transition. Xoptfoil2 can
-  trip transition only for the whole run, so it cannot run the free-plus-tripped task above.
-- The re-analysis of the final designs with all safeguards of the population study.
+- The final designs of the benchmark (surrogate and current optimiser, all seeds) through the safeguards
+  of the population study: the sensitivity test at exact and rounded coordinates and two panellings, and
+  the analysis at the seven conditions.

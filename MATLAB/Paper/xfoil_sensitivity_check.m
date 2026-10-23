@@ -56,7 +56,9 @@ for k = 1:numel(d)
     S = struct('Re', o.Re, 'objective', o.Objective, 'weights', o.Weights, 'aggregate', o.Aggregate, 'cmMax', Inf, 'clMaxMin', -Inf);
     if strcmp(o.Objective, 'LDatAlpha'), S.design = o.DesignAlpha; else, S.design = o.DesignCL; end
     if isfinite(o.CmIncrease) && isfinite(r.original.CM0), S.cmMax = abs(r.original.CM0) + o.CmIncrease; end
-    if o.KeepCLmax, S.clMaxMin = r.original.CLmax; end
+    if o.KeepCLmax                                     % the limit and the sweep of the optimiser (optimize_airfoil.m)
+        S.clMaxMin = r.runInfo.limits.clMaxMin;  S.alphaRange = [-2 18 0.5];
+    end
     S.flows = arrayfun(@(n) struct('Ncrit', n), o.Ncrit(:).', 'UniformOutput', false);
     if isfield(o, 'Conditions') && ~isempty(o.Conditions), S.flows = o.Conditions(:).'; end   % older runs lack it
     R(end+1) = struct('tag', tag, 'form', tok{1}, 'x', r.x, 'yu', yu, 'yl', yl, 'S', S, ...
@@ -66,7 +68,7 @@ fprintf('[SENSITIVITY] %d runs\n', numel(R));
 
 %% Evaluations: run x {exact160, exact200, round160, round200} x {floor off, floor on}
 variants = {'exact160', false, []; 'exact200', false, 200; 'round160', true, []; 'round200', true, 200};
-jobs = [repelem((1:numel(R))', 8), repmat(kron((1:4)', [1; 1]), numel(R), 1), repmat([0; 1], 4 * numel(R), 1)];
+jobs = [repelem((1:numel(R))', 8, 1), repmat(kron((1:4)', [1; 1]), numel(R), 1), repmat([0; 1], 4 * numel(R), 1)];
 E = nan(size(jobs, 1), 1);
 if workers > 0 && isempty(gcp('nocreate')), parpool('Processes', workers); end
 parfor (j = 1:size(jobs, 1), workers)

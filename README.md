@@ -150,8 +150,10 @@ NACA 2412 +33 %, NACA 4412 +29 %, NACA 23012 +32 %, Clark Y +50 %.
   airfoil; if not, a closed-loop correction and then the usual XFOIL search take over. On six airfoils
   the surrogate never saw, optimised for free and tripped flow, it was trusted in 14 of 18 runs and then
   needed 4 to 22 times fewer XFOIL analyses than the current optimiser for a similar or higher result.
-  It rejected itself on S1223, which lies outside the training airfoils
-  ([results/surrogate](results/surrogate/README.md)).
+  It rejected itself on S1223, which lies outside the training airfoils. With ten seeds on NACA 2412 it
+  is better than the current optimiser (107.5 ± 0.5 against 104.1 ± 2.8, Mann-Whitney p = 0.0004), and
+  it is compared at equal budget with GA, particle swarm and Bayesian optimisation, and with Xoptfoil2
+  on six airfoils ([results/surrogate](results/surrogate/README.md)).
 - **CFD.** The Fluent set-up is verified on NASA's NACA 0012 case: lift within 1.2 % and drag within
   6.4 % of each of NASA's three reference codes, skin friction within 1.2 % of CFL3D
   ([results/cfd](results/cfd/README.md)). Against wind-tunnel measurements of the Eppler 387 at Re = 300 000 (NASA TM-4062), with

@@ -81,9 +81,13 @@ with XFOIL. A trust check with limits from the training airfoils only decides wh
 be used; if not, a closed-loop correction and then the usual XFOIL search take over. On six airfoils it
 never saw, for the robust objective, it was trusted in 14 of 18 runs and then needed 4 to 22 times fewer
 XFOIL analyses than the current optimiser for a similar or higher result; on S1223, outside the training
-airfoils, it rejected itself and the fallback gave 128.3 against 125.7
-([results/surrogate](results/surrogate/README.md)). The comparison at equal budget, ten seeds with a
-rank test, a comparison with Xoptfoil2 and the re-analysis of the final designs are still running.
+airfoils, it rejected itself and the fallback gave 128.3 against 125.7. With ten seeds, on NACA 2412 it
+gives 107.5 ± 0.5 against 104.1 ± 2.8 with a twelfth of the XFOIL analyses (Mann-Whitney p = 0.0004); on
+S1223 it falls back every time and is no worse (126.8 against 122.9, p = 0.19). At equal budget on NACA
+2412 (free transition) it reaches 140.3 against 126.1 to 132.7 for GA, particle swarm and Bayesian
+optimisation, and against Xoptfoil2 on the six airfoils it is level or ahead except where Xoptfoil2 breaks
+the moment limit ([results/surrogate](results/surrogate/README.md)). The re-analysis of the final designs
+with all safeguards is still running.
 
 ## What is new, and what is not
 
