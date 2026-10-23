@@ -1,4 +1,4 @@
-function D = designStudyAirfoils()
+function D = designStudyAirfoils(set)
 %DESIGNSTUDYAIRFOILS  The airfoils of the CFD design study.
 %   D = DESIGNSTUDYAIRFOILS returns a table with one row per airfoil: name
 %   (used in file names), source (an airfoil name or a coordinate file, as
@@ -16,8 +16,29 @@ function D = designStudyAirfoils()
 %                     (results/population/airfoils)
 %   run_design_study.m, design_study_xfoil.m and collect_cfd_results.m use
 %   this list.
+%
+%   D = DESIGNSTUDYAIRFOILS('surrogate') returns the airfoils of the RANS
+%   check of the surrogate-assisted optimiser (results/surrogate):
+%     naca0012               the original NACA 0012
+%     naca2412_surrogate_s3  NACA 2412 optimised for the mean of the peak CL/CD
+%                            with free and tripped flow, surrogate optimiser
+%                            (seed 3, the best of ten)
+%     naca0012_surrogate_s3  the same for NACA 0012 (seed 3, the best of three;
+%                            the trust check rejected the surrogate, so the
+%                            design comes from the fallback)
+%   NACA 2412 itself and the design of the current optimiser for the same
+%   objective (robust_trip_s3) are in the default list.
 
 repo = fullfile(fileparts(mfilename('fullpath')), '..', '..');
+if nargin == 1 && strcmp(set, 'surrogate')
+    s = fullfile(repo, 'results', 'surrogate', 'airfoils');
+    D = cell2table({
+        'naca0012',              'NACA 0012',                                         'NACA 0012'
+        'naca2412_surrogate_s3', fullfile(s, 'NACA_2412_surrogate_s3.dat'), 'NACA 2412, surrogate optimiser (free and tripped flow)'
+        'naca0012_surrogate_s3', fullfile(s, 'NACA_0012_surrogate_s3.dat'), 'NACA 0012, surrogate optimiser (free and tripped flow)'
+        }, 'VariableNames', {'name', 'source', 'label'});
+    return;
+end
 paper = fullfile(repo, 'results', 'paper', 'runs');
 population = fullfile(repo, 'results', 'population', 'airfoils');
 D = cell2table({
