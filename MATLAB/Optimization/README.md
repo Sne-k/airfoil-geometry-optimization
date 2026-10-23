@@ -103,6 +103,8 @@ designs only. `'Curvature', false` switches the limits off.
 4. **Closed loop.** If it is not trusted, a Gaussian process is fitted to its errors on the designs
    analysed so far, the corrected surrogate is searched again in a region around the best design that
    halves every round, and new candidates are analysed. The loop stops when a round passes the check.
+   The distance limit applies in every round, so an airfoil beyond it never passes: a corrected
+   surrogate can agree with XFOIL near one design and still miss the optimum.
 5. **Fallback.** If no round passes, the genetic algorithm runs with XFOIL as usual, started from the
    best candidates of the first search and the usual starting population. The better of its result and
    the best candidate is kept.
