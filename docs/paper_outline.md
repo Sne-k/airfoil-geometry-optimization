@@ -97,7 +97,15 @@ the question, the approach and the contributions.
   exists (Ribeiro et al. 2012; Meliani et al. 2019; Mar Aye et al. 2023); Khan et al. (2025) optimise,
   with a GA, a network trained on fully turbulent SST results for three of our six airfoils (NACA 2412,
   4415, 0012) and compare its optimum with XFOIL only. What is ours is the trust check from the training
-  airfoils and its test on airfoils the surrogate never saw. Michael et al. (2026) save 61 % of the XFOIL
+  airfoils and its test on airfoils the surrogate never saw: Li, Du & Martins (2022) name extrapolation as
+  an open problem and avoid it with a smaller design space or more data; we detect it and fall back.
+  Meliani et al. (2019) let only the high-fidelity model update the best solution, the same principle as
+  analysing every kept design with XFOIL; their surrogate is built for one problem, ours is trained once on
+  the logs of earlier optimisations (10 341 and 43 737 XFOIL designs, no extra sampling), where cross-airfoil
+  models in the review need about 10⁵ dedicated RANS samples. Li et al. ask for relative errors below 1 %
+  for data-based optima; ours is about 2 % on unseen airfoils, which is enough because the surrogate only
+  ranks and XFOIL decides. Transition makes the objective discontinuous (Li et al.), one reason for the
+  gradient-free global stage. Michael et al. (2026) save 61 % of the XFOIL
   calls with a geometric filter (S1223, NACA 2412); our trusted NACA 2412 runs need 92 % fewer (another
   Reynolds number and objective, so not like for like). He et al. (2019) find RANS optima independent of
   the start; with XFOIL the GA ends 98.1 to 106.9 on NACA 2412 over ten seeds, the surrogate optimiser
