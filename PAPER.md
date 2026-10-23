@@ -182,5 +182,6 @@ with all safeguards is still running.
 ## State
 
 All computations are finished; the results are final and published in this repository. The manuscript
-is the next step: scope (with or without the morphing studies), format and target journal are open
+is the next step. The morphing studies are left out of this paper and kept for a second one; format and
+target journal are open
 ([docs/paper_outline.md](docs/paper_outline.md)).
