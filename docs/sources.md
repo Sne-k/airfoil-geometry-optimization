@@ -40,6 +40,13 @@ among them works on one or two airfoils without a tripped-flow or RANS check of 
 |---|---|---|---|
 | Michael, Abagero, Tullu, Abebe & Jung (2026). Accelerated airfoil optimization via a geometry-based discriminator within particle swarm optimization. *IEEE Access* 14, 59022–59034 | full text | Particle swarm with NURBS and XFOIL on S1223 (Re = 3 × 10⁵) and NACA 2412 (Re = 5 × 10⁵). Before XFOIL, candidates are rejected if a surface changes slope direction more than 4 times or a slope jump exceeds 0.06 (limits from the UIUC database); the filter cuts XFOIL calls by 61 % (1000 to 390) and raises the peak CL/CD of the result by 16.85 %, although the same number is elsewhere described as the gain over the original. The objective is the worst CL/CD over 0–8°, but the peak is reported. One run per configuration | A third geometric safeguard beside Xoptfoil2 and Pangas & Gamboa (literature.md gaps 1 and 4); now also the comparison point for the XFOIL saving of the surrogate optimiser (section 7) |
 
+### 1.4 Fourth batch (24 October 2026)
+
+| Paper | Status | What we learnt | Where it is used |
+|---|---|---|---|
+| Li, Du & Martins (2022). Machine learning in aerodynamic shape optimization. *Prog. Aerosp. Sci.* 134, 100849 (open access) | full text of the parts on design space, aerodynamic models, surrogate-based and interactive optimisation, and the conclusions | Most learned models interpolate and lose accuracy when they extrapolate; the field keeps extrapolation down by shrinking the design space (geometric filtering, for example a validity model trained on over 10 000 airfoils) and by more training data, and names extrapolatory models as an open problem. A check at run time of whether a model may be used for a new case is not among the methods reviewed. Models trained across many airfoils need about 10⁵ RANS samples (Webfoil and successors, mean drag errors of 0.1 to 5 counts), and relative errors below 1 % are said to be needed for optima like those of CFD-based optimisation. Transition makes objectives discontinuous, which hampers gradient-based optimisation. ML studies should end with a comparison with state-of-the-art methods | The claim of the surrogate optimiser (detect extrapolation and fall back, instead of avoiding it); the comparison with the current optimiser, particle swarm, Bayesian optimisation and Xoptfoil2; the case for gradient-free search with XFOIL ([PAPER.md](../PAPER.md), outline section 5.5) |
+| Meliani, Bartoli, Lefebvre, Bouhlel, Martins & Morlier (2019). Multi-fidelity efficient global optimization: methodology and application to airfoil shape design. AIAA 2019-3236 | full text | Multi-fidelity Bayesian optimisation with XFOIL (1/200 of the cost) as the low and RANS as the high fidelity for one subsonic airfoil; about half the cost of single-fidelity Bayesian optimisation, and in the 15-variable case the gradient-based optimum (110.5 against 110.7) after 8 RANS and 437 XFOIL analyses beyond a starting sample. Only high-fidelity values may update the best solution. The surrogate is built for the one problem from its own samples | Prior work named in PAPER.md; the parallel with our rule that every kept design is analysed with XFOIL; the contrast that our surrogate is trained once on the logs of earlier optimisations of 24 airfoils and used for new airfoils |
+
 ## 2. Papers and reports found during the work (full text)
 
 | Source | What we learnt | Where it is used |
@@ -88,16 +95,20 @@ Listed with details in [literature.md](literature.md): Drela & Giles (1987); Mac
 Ingen (2008, to check); Menter (1994); Langtry & Menter (2009); Eça et al. (2022, SciTech); Avirović et al.
 (2026); Spalart & Rumsey (2007); Thomas & Salas (1986); Roache (1994); Masters et al. (2017); Hicks & Henne
 (1978); Chen, Chiu & Fuge (2020, paper overview and code); Kennedy & Eberhart (1995); Jones, Schonlau &
-Welch (1998); Deb (2000); Owoyele & Pal (2021); Li, Du & Martins (2022); Meliani et al. (2019); Abouzoul et
-al. (2026, two papers); Hoyos et al. (2021); Fakhari & Mrad (2025); Barbarino et al. (2011); Secanell,
+Welch (1998); Deb (2000); Owoyele & Pal (2021); Abouzoul et al. (2026, two papers); Hoyos et al. (2021); Fakhari & Mrad (2025); Barbarino et al. (2011); Secanell,
 Suleman & Gamboa (2006); Koreanschi et al. (2016); Majid & Jo (2021); Chen et al. (2023); Rashad & Zingg
 (2016); Abbott & von Doenhoff (1959); Gregory & O'Reilly (1970); McCroskey (1987). The screened papers of
 the audit are in `literature/screening.csv`.
 
-Worth reading in full next: **Li, Du & Martins (2022)**, the review of machine learning in aerodynamic
-shape optimisation, now the main reference for the surrogate optimiser; **Abouzoul et al. (2026)**, a
-surrogate optimiser with morphing on NACA 2412 checked with Transition SST, which matters for the decision
-on morphing; **Meliani et al. (2019)**, multi-fidelity Bayesian optimisation with XFOIL and RANS.
+Worth reading in full next: **Abouzoul et al. (2026)**, two papers (doi:10.1016/j.ast.2026.113128 and
+doi:10.1016/j.ast.2026.112630), a surrogate optimiser with morphing on NACA 2412 checked with Transition
+SST, which matters for the decision on morphing. No free copy exists (no preprint on arXiv, SSRN or HAL;
+searched 24 October 2026); their abstracts are summarised in literature.md. The same group's open-access
+conference paper (Abouzoul, Gaber & Tayane 2025, *E3S Web of Conferences* 680, 00095,
+doi:10.1051/e3sconf/202568000095) describes the earlier stage of the method (surrogates trained on NACA
+profiles with Bayesian optimisation); its site refuses automated reading, so it has to be downloaded by
+hand. Li, Du & Martins (2022) and Meliani et al. (2019) were read
+on 24 October 2026 (section 1.4).
 
 ## 7. Knowledge that was not yet used, and what was done with it (24 October 2026)
 
@@ -108,3 +119,6 @@ on morphing; **Meliani et al. (2019)**, multi-fidelity Bayesian optimisation wit
 | RANS optima are reached from any start; XFOIL runs end at different designs for different seeds | He et al. (2019) | Used to read the ten-seed result: the GA spreads over 98.1 to 106.9 on NACA 2412, the surrogate optimiser over 106.8 to 108.2 ([results/surrogate](../results/surrogate/README.md)) |
 | A geometric filter saves 61 % of the XFOIL calls on S1223 and NACA 2412 | Michael et al. (2026) | A comparison point in the outline section 5.5 (our trusted runs on NACA 2412 need 92 % fewer, at another Reynolds number and objective, so not like for like) |
 | Two discrete Ncrit values can misrepresent robustness | Hollom & Qin (2018) | Cited at the limit on discrete Ncrit values in PAPER.md |
+| Learned models interpolate; extrapolation is an open problem, handled in the literature by shrinking the design space or adding data | Li, Du & Martins (2022) | The claim of the surrogate optimiser is worded against it in PAPER.md and the outline: the trust check detects extrapolation and falls back to XFOIL |
+| Only the accurate model may update the best solution | Meliani et al. (2019) | Named as the same principle as our verification of every kept design (outline section 5.5) |
+| Cross-airfoil models need about 10⁵ dedicated RANS samples; ours reuses the logs of earlier optimisations (10 341 and 43 737 XFOIL designs), at no extra cost | Li, Du & Martins (2022) | Outline section 5.5 |
