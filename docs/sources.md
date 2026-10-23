@@ -47,6 +47,12 @@ among them works on one or two airfoils without a tripped-flow or RANS check of 
 | Li, Du & Martins (2022). Machine learning in aerodynamic shape optimization. *Prog. Aerosp. Sci.* 134, 100849 (open access) | full text of the parts on design space, aerodynamic models, surrogate-based and interactive optimisation, and the conclusions | Most learned models interpolate and lose accuracy when they extrapolate; the field keeps extrapolation down by shrinking the design space (geometric filtering, for example a validity model trained on over 10 000 airfoils) and by more training data, and names extrapolatory models as an open problem. A check at run time of whether a model may be used for a new case is not among the methods reviewed. Models trained across many airfoils need about 10⁵ RANS samples (Webfoil and successors, mean drag errors of 0.1 to 5 counts), and relative errors below 1 % are said to be needed for optima like those of CFD-based optimisation. Transition makes objectives discontinuous, which hampers gradient-based optimisation. ML studies should end with a comparison with state-of-the-art methods | The claim of the surrogate optimiser (detect extrapolation and fall back, instead of avoiding it); the comparison with the current optimiser, particle swarm, Bayesian optimisation and Xoptfoil2; the case for gradient-free search with XFOIL ([PAPER.md](../PAPER.md), outline section 5.5) |
 | Meliani, Bartoli, Lefebvre, Bouhlel, Martins & Morlier (2019). Multi-fidelity efficient global optimization: methodology and application to airfoil shape design. AIAA 2019-3236 | full text | Multi-fidelity Bayesian optimisation with XFOIL (1/200 of the cost) as the low and RANS as the high fidelity for one subsonic airfoil; about half the cost of single-fidelity Bayesian optimisation, and in the 15-variable case the gradient-based optimum (110.5 against 110.7) after 8 RANS and 437 XFOIL analyses beyond a starting sample. Only high-fidelity values may update the best solution. The surrogate is built for the one problem from its own samples | Prior work named in PAPER.md; the parallel with our rule that every kept design is analysed with XFOIL; the contrast that our surrogate is trained once on the logs of earlier optimisations of 24 airfoils and used for new airfoils |
 
+### 1.5 Fifth paper (24 October 2026)
+
+| Paper | Status | What we learnt | Where it is used |
+|---|---|---|---|
+| Abouzoul, Gaber & Tayane (2025). Machine learning–assisted airfoil optimization and perspectives for morphing wing applications. *E3S Web of Conferences* 680, 00095 (CC BY 4.0) | full text | The early stage of the group behind the two 2026 morphing papers: four NACA 4-digit descriptors plus the angle of attack, XFOIL data, unspecified regression surrogates and Bayesian optimisation of CL/CD; Fluent confirmation claimed without values; Reynolds number, Ncrit, sample count, surrogate error and repeated runs not stated. NACA 2412 at α = 0°: CL/CD 39.17 → 57.68 (58.69 in the text), compared with GA and particle swarm values from another study; ratios computed from CD rounded to three decimals. Morphing is a concept: the optimised profile as a target state reachable by a morphing structure | An example for the audit and checklist outside the audit sample (literature.md section 5). For the morphing decision: their later papers judge the deformation path, which `MATLAB/Morphing/morph_to_design.m` already computes (the peak L/D at every second step from the original to a design) |
+
 ## 2. Papers and reports found during the work (full text)
 
 | Source | What we learnt | Where it is used |
@@ -104,10 +110,7 @@ Worth reading in full next: **Abouzoul et al. (2026)**, two papers (doi:10.1016/
 doi:10.1016/j.ast.2026.112630), a surrogate optimiser with morphing on NACA 2412 checked with Transition
 SST, which matters for the decision on morphing. No free copy exists (no preprint on arXiv, SSRN or HAL;
 searched 24 October 2026); their abstracts are summarised in literature.md. The same group's open-access
-conference paper (Abouzoul, Gaber & Tayane 2025, *E3S Web of Conferences* 680, 00095,
-doi:10.1051/e3sconf/202568000095) describes the earlier stage of the method (surrogates trained on NACA
-profiles with Bayesian optimisation); its site refuses automated reading, so it has to be downloaded by
-hand. Li, Du & Martins (2022) and Meliani et al. (2019) were read
+conference paper was read instead (section 1.5). Li, Du & Martins (2022) and Meliani et al. (2019) were read
 on 24 October 2026 (section 1.4).
 
 ## 7. Knowledge that was not yet used, and what was done with it (24 October 2026)
