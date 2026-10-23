@@ -94,9 +94,20 @@ path inside the distance limit); the current optimiser is unchanged.
 | S1223 | surrogate (fallback in all 10) | 126.8 ± 3.8 | 128.1 | 117.2 to 130.1 | 1087 | 49 min |
 | S1223 | current (GA → fmincon) | 122.9 ± 6.5 | 124.8 | 112.8 to 130.4 | 1054 | 46 min |
 
+![Best value so far against XFOIL-analysed designs, ten seeds](convergence_ten_seeds.png)
+
+Median of the ten seeds (band: quartiles) of the best valid objective so far against the number of
+designs analysed with XFOIL ([convergence_ten_seeds.csv](convergence_ten_seeds.csv)); the surrogate's own
+evaluations need no XFOIL and are not counted. On NACA 2412 the first candidate of the surrogate is
+within 0.4 of the run's final value in every seed. On S1223, where every run falls back, the median of
+the surrogate optimiser is ahead from about 12 to 75 designs, slightly behind at 100 to 150, and ahead
+from about 200 designs on.
+
 Mann-Whitney U test (two-sided) of the two optimisers: NACA 2412 p = 0.0004; S1223 p = 0.19. On NACA
 2412 the surrogate optimiser is better, with a twelfth of the XFOIL analyses and a sixth of the spread.
 On S1223 it rejects itself in every seed, and the fallback is no worse than the current optimiser.
+He et al. (2019) find that RANS optimisations reach the same optimum from any start; with XFOIL the
+current optimiser ends anywhere between 98.1 and 106.9 on NACA 2412, so a single run says little about it.
 
 ## Optimiser comparison at equal budget (NACA 2412, peak CL/CD, free transition)
 
@@ -157,8 +168,49 @@ limit of `optimize_airfoil` (the magnitude of CM at 0° at most 0.05 above the o
 - Xoptfoil2 is the fastest (1 to 8 minutes on average) but varies more between runs and is clearly lower
   on Clark Y and S1223. It optimises CL/CD at three lift coefficients, not the peak itself.
 
+## Final designs through the safeguards of the population study
+
+All final designs of the benchmark above (surrogate optimiser and current optimiser; ten seeds for NACA
+2412 and S1223, three for the others: 32 each) were analysed again with the code of the population study:
+[safeguards/](safeguards/), one folder per optimiser, with the same files as
+[results/population](../population/README.md).
+
+- **No false XFOIL solutions.** `xfoil_sensitivity_check.m`: every one of the 64 designs reproduces its
+  recorded objective, and with the friction floor the exact and rounded coordinates at 160 and 200 panel
+  nodes agree within 0.27 % (surrogate) and 0.23 % (current optimiser). No design meets the rerun rule.
+- **The seven conditions** (`collect_population_results.m`; consensus polars). Median gain in peak CL/CD
+  over the original, all 32 designs of each optimiser:
+
+| Condition | Surrogate optimiser | Current optimiser |
+|---|---:|---:|
+| design (Ncrit 9, Re = 10⁶) | +36.1 % | +31.9 % |
+| Ncrit 5 / 7 / 11 | +40.7 / +39.5 / +34.3 % | +30.5 / +35.1 / +29.1 % |
+| Re = 0.5 × 10⁶ / 2 × 10⁶ | +30.3 / +44.6 % | +24.3 / +35.8 % |
+| tripped at 5 % chord | +3.4 % | +2.8 % |
+| designs below the original when tripped | 14 of 32 | 11 of 32 |
+
+Mean over the seeds, peak CL/CD with free / tripped transition (in brackets: designs below the original
+when tripped):
+
+| Airfoil | Original | Surrogate optimiser | Current optimiser |
+|---|---:|---:|---:|
+| NACA 2412 | 104.6 / 73.1 | 137.6 / 77.4 (0 of 10) | 132.9 / 75.4 (0 of 10) |
+| NACA 0012 | 76.5 / 62.2 | 121.9 / 75.8 (0 of 3) | 110.8 / 73.9 (0 of 3) |
+| NACA 4415 | 121.6 / 61.1 | 143.1 / 74.0 (0 of 3) | 142.0 / 73.6 (0 of 3) |
+| Clark Y | 114.8 / 80.0 | 171.4 / 79.0 (3 of 3) | 168.3 / 78.8 (3 of 3) |
+| SD7062 | 120.3 / 77.6 | 161.7 / 77.6 (1 of 3) | 162.0 / 78.2 (1 of 3) |
+| S1223 | 120.9 / 85.0 | 173.0 / 80.6 (10 of 10) | 162.7 / 83.2 (7 of 10) |
+
+- With free transition the surrogate designs gain more than those of the current optimiser at every
+  condition. With tripped flow the two are close. On Clark Y and S1223, the two airfoils with the best
+  tripped values of the six, most designs of both optimisers are below the original when tripped: the
+  objective is the mean of the two values, so it can trade a small tripped loss for a large free gain.
+- `summary.csv` and `robustness_summary.csv` take seed 1 only, as in the population study; the tables
+  above use all seeds (`conditions.csv`).
+
 ## Still running
 
-- The final designs of the benchmark (surrogate and current optimiser, all seeds) through the safeguards
-  of the population study: the sensitivity test at exact and rounded coordinates and two panellings, and
-  the analysis at the seven conditions.
+- A RANS check (Fluent, the models and angles of the [CFD design study](../cfd/README.md#design-study))
+  of the surrogate designs of NACA 2412 and NACA 0012 (seed 3 of each, the best by the objective; for
+  NACA 0012 the trust check rejected the surrogate, so this design comes from the fallback) and of NACA
+  0012 itself. The coordinates are in [airfoils/](airfoils/).
