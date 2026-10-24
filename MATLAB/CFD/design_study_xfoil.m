@@ -1,4 +1,4 @@
-function T = design_study_xfoil(outDir, set)
+function T = design_study_xfoil(outDir, airfoilSet)
 %DESIGN_STUDY_XFOIL  XFOIL polars of the airfoils of the CFD design study.
 %   T = DESIGN_STUDY_XFOIL analyses the airfoils of run_design_study.m
 %   (designStudyAirfoils.m)
@@ -24,8 +24,8 @@ if ~exist(outDir, 'dir'), mkdir(outDir); end
 exe = getenv('XFOIL_EXE');
 if isempty(exe), exe = fullfile(root, 'Aerodynamics', 'xfoil.exe'); end
 
-if nargin < 2, set = ''; end
-D = designStudyAirfoils(set);
+if nargin < 2, airfoilSet = ''; end
+D = designStudyAirfoils(airfoilSet);
 designs = [D.name, D.source];
 conditions ={'free', struct('Mach', 0.15)
               'tripped', struct('Mach', 0.15, 'Xtr', [0.05 0.05])

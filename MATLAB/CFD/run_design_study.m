@@ -1,4 +1,4 @@
-function run_design_study(outDir, pilot, set)
+function run_design_study(outDir, pilot, airfoilSet)
 %RUN_DESIGN_STUDY  RANS check of the XFOIL-optimised NACA 2412 designs.
 %   RUN_DESIGN_STUDY runs Fluent for the airfoils of designStudyAirfoils.m
 %   at Re = 1e6 and M = 0.15: the original NACA 2412, three designs
@@ -67,13 +67,13 @@ here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
 if nargin < 1 || isempty(outDir), outDir = fullfile(root, 'output', 'cfd', 'designs'); end
 if nargin < 2, pilot = false; end
-if nargin < 3, set = ''; end
-extras = isempty(set);                               % start-up check and refined mesh: original study only
+if nargin < 3, airfoilSet = ''; end
+extras = isempty(airfoilSet);                        % start-up check and refined mesh: original study only
 if ~exist(outDir, 'dir'), mkdir(outDir); end
 addpath(here, fullfile(root, 'Aerodynamics'), fullfile(root, 'NACA2412'));
 started = datetime('now', 'TimeZone', 'UTC');
 
-D = designStudyAirfoils(set);
+D = designStudyAirfoils(airfoilSet);
 designs = [D.name, D.source];
 nD = size(designs, 1);
 far = {'Radius', 500, 'WakeLength', 500, 'WakeFirstCell', 0.1, 'NNormal', 180};
