@@ -91,8 +91,10 @@ the question, the approach and the contributions.
   method developed (no check, check and fallback, closed loop, two fixes found by the benchmark). At
   equal budget on NACA 2412: 140.3 against 126.1 to 132.7 for GA, particle swarm and Bayesian
   optimisation. Against Xoptfoil2 on the six airfoils (peak, free transition): level or ahead except
-  where Xoptfoil2 breaks the moment limit. All final designs pass the safeguards; RANS check of two
-  designs. Figure: best value so far against XFOIL-analysed designs over ten seeds
+  where Xoptfoil2 breaks the moment limit. All final designs pass the safeguards. RANS check of the
+  NACA 2412 and NACA 0012 surrogate designs: fully turbulent +6.5 % and +14.1 % (the current optimiser's
+  NACA 2412 design +3.3 %), Transition SST +15.0 % and +50.9 % (smaller than XFOIL's free-transition gain,
+  as in the design study). Figure: best value so far against XFOIL-analysed designs over ten seeds
   (`results/surrogate/convergence_ten_seeds.png`). Position: surrogate-assisted airfoil optimisation
   exists (Ribeiro et al. 2012; Meliani et al. 2019; Mar Aye et al. 2023); Khan et al. (2025) optimise,
   with a GA, a network trained on fully turbulent SST results for three of our six airfoils (NACA 2412,

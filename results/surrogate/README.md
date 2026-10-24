@@ -208,9 +208,35 @@ when tripped):
 - `summary.csv` and `robustness_summary.csv` take seed 1 only, as in the population study; the tables
   above use all seeds (`conditions.csv`).
 
-## Still running
+## RANS check (Fluent)
 
-- A RANS check (Fluent, the models and angles of the [CFD design study](../cfd/README.md#design-study))
-  of the surrogate designs of NACA 2412 and NACA 0012 (seed 3 of each, the best by the objective; for
-  NACA 0012 the trust check rejected the surrogate, so this design comes from the fallback) and of NACA
-  0012 itself. The coordinates are in [airfoils/](airfoils/).
+The surrogate designs of NACA 2412 and NACA 0012 (seed 3 of each, the best by the objective; for NACA 0012
+the trust check rejected the surrogate, so this design comes from the fallback) and NACA 0012 itself, with
+the models, angles, meshes and evaluation of the [CFD design study](../cfd/README.md#design-study): Re = 10⁶,
+M = 0.15; k-ω SST fully turbulent at 0° to 10°, Transition SST at 0° to 8°, means over whole force cycles
+(`collect_cfd_results.m`); XFOIL at the same Mach number. NACA 2412 and the design of the current optimiser
+for the same objective (robust_trip_s3) come from the design study. All files:
+[surrogate_designs/](surrogate_designs/) (forces, transition locations, surface data, comparison with
+XFOIL, [design_polars.png](surrogate_designs/design_polars.png)). Coordinates: [airfoils/](airfoils/).
+
+Best CL/CD over the angles run (in brackets: the gain over the original of the same airfoil):
+
+| Airfoil | Fluent, Transition SST | XFOIL, free transition | Fluent, SST fully turbulent | XFOIL, tripped at 5 % chord |
+|---|---:|---:|---:|---:|
+| NACA 2412 (design study) | 122.1 | 103.3 | 65.8 | 72.0 |
+| current optimiser, robust_trip_s3 (design study) | 142.9 (+17.1 %) | 137.9 (+33.5 %) | 67.9 (+3.3 %) | 74.5 (+3.5 %) |
+| surrogate optimiser, seed 3 | 140.4 (+15.0 %) | 137.7 (+33.3 %) | 70.1 (+6.5 %) | 77.1 (+7.1 %) |
+| NACA 0012 | 91.3 | 75.5 | 59.3 | 60.9 |
+| surrogate optimiser, seed 3 (fallback) | 137.8 (+50.9 %) | 123.1 (+63.0 %) | 67.7 (+14.1 %) | 74.3 (+22.1 %) |
+
+- **RANS confirms the gains of both surrogate designs with both models.** Fully turbulent, the NACA 2412
+  design gains 6.5 %, as XFOIL predicts with tripped flow (7.1 %), and twice as much as the design of the
+  current optimiser (3.3 %). With the transition model it gains 15.0 % against 17.1 % for that design.
+- **As in the design study, the free-transition gain is smaller in RANS than in XFOIL** (15.0 % against
+  33.3 % for NACA 2412, 50.9 % against 63.0 % for NACA 0012); the fully turbulent gain is close to XFOIL's
+  tripped one.
+- **NACA 0012 itself cycles strongly with the transition model**: at its best angle CL/CD ranges from 74.5
+  to 111.6 within the cycles, so its gain with the transition model lies between about +21 % and +88 %
+  (design 135.7 to 139.9). The fully turbulent runs are steady.
+- Transition on the upper surface at 4° moves aft: 0.54 c (NACA 0012) to 0.70 c (its design); 0.67 c for
+  the NACA 2412 design.

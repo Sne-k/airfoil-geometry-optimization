@@ -1,0 +1,51 @@
+{
+  "started": "2026-10-23 18:50:17 UTC",
+  "finished": "2026-10-24 13:45:04 UTC",
+  "gitCommit": "6b93bdc",
+  "matlab": "24.2.0.3212159 (R2024b) Update 9",
+  "fluent": "2026 R1, build 10262 (student licence)",
+  "options": {
+    "Mach": 0.15,
+    "TimeStep": 1,
+    "StartTimeStep": 20,
+    "FirstOrder": 400,
+    "BlockSize": 50,
+    "Probes": [
+      1,
+      0.25
+    ],
+    "sst": [
+      "Model",
+      "sst",
+      "Re",
+      1.0E+6,
+      "Intensity",
+      0.052,
+      "ViscRatio",
+      0.009,
+      "Blocks",
+      60,
+      "Tail",
+      20
+    ],
+    "transition": [
+      "Model",
+      "transition",
+      "Re",
+      1.0E+6,
+      "Intensity",
+      0.14,
+      "ViscRatio",
+      50,
+      "SurfaceEvery",
+      [
+        200,
+        2400
+      ],
+      "Blocks",
+      100,
+      "Tail",
+      48
+    ]
+  }
+}
