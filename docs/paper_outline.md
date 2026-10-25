@@ -105,7 +105,7 @@ the question, the approach and the contributions.
   analysing every kept design with XFOIL; their surrogate is built for one problem, ours is trained once on
   the logs of earlier optimisations (10 341 and 43 737 XFOIL designs, no extra sampling), where cross-airfoil
   models in the review need about 10⁵ dedicated RANS samples. Li et al. ask for relative errors below 1 %
-  for data-based optima; ours is about 2 % on unseen airfoils, which is enough because the surrogate only
+  for data-based optima; in the 21 trusted runs ours was 0.1 to 4.2 % on the candidates, which is enough because the surrogate only
   ranks and XFOIL decides. Transition makes the objective discontinuous (Li et al.), one reason for the
   gradient-free global stage. Michael et al. (2026) save 61 % of the XFOIL
   calls with a geometric filter (S1223, NACA 2412); our trusted NACA 2412 runs need 92 % fewer (another
