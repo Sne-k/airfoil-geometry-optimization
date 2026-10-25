@@ -51,6 +51,7 @@ AIRFOIL_WORK/
 | 9 | `peak_compare.m`: the six-airfoil comparison with Xoptfoil2 | `surrogate/peak_compare/` |
 | 10 | `safeguards_final_designs.m`: the final designs through the safeguards of the population study | `surrogate/step4/` |
 | 11 | `make_convergence_figure.py`: best value so far against XFOIL-analysed designs | `results/surrogate/convergence_ten_seeds.*` |
+| 12 | `morphing_paths.m`: free and tripped CL/CD along the blend from the original to a robust design | `surrogate/morph_paths/` (`results/surrogate/morphing_paths.csv`) |
 
 The published runs used frozen copies of the code at the commits recorded in each `run_info.json`
 (v1 d9f9e25, v2 b709ef0, v3 23285ba, v4 021a63d, v5 be7baa1); these scripts use the code of this

@@ -1,4 +1,4 @@
-function D = designStudyAirfoils(set)
+function D = designStudyAirfoils(airfoilSet)
 %DESIGNSTUDYAIRFOILS  The airfoils of the CFD design study.
 %   D = DESIGNSTUDYAIRFOILS returns a table with one row per airfoil: name
 %   (used in file names), source (an airfoil name or a coordinate file, as
@@ -30,7 +30,7 @@ function D = designStudyAirfoils(set)
 %   objective (robust_trip_s3) are in the default list.
 
 repo = fullfile(fileparts(mfilename('fullpath')), '..', '..');
-if nargin == 1 && strcmp(set, 'surrogate')
+if nargin == 1 && strcmp(airfoilSet, 'surrogate')
     s = fullfile(repo, 'results', 'surrogate', 'airfoils');
     D = cell2table({
         'naca0012',              'NACA 0012',                                         'NACA 0012'

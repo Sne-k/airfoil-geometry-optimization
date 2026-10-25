@@ -63,6 +63,10 @@ function collect_cfd_results(runDir, outDir, only)
 %
 %   COLLECT_CFD_RESULTS(runDir, outDir, only) processes only the named
 %   folders, for example 'time_accurate' or {'designs', 'time_accurate'}.
+%   The folder surrogate_designs (run_design_study(..., 'surrogate'), the
+%   RANS check of the surrogate-assisted optimiser) is processed like
+%   designs, into outDir/surrogate_designs; there the gains are taken
+%   against the original of the same airfoil, where it is in the folder.
 
 here = fileparts(mfilename('fullpath'));
 root = fullfile(here, '..');
@@ -82,6 +86,9 @@ if wanted('verification') && isfile(fullfile(runDir, 'verification', 'forces.csv
 end
 if wanted('designs') && isfile(fullfile(runDir, 'designs', 'forces.csv'))
     designs(fullfile(runDir, 'designs'), fullfile(outDir, 'designs'), tol);
+end
+if wanted('surrogate_designs') && isfile(fullfile(runDir, 'surrogate_designs', 'forces.csv'))
+    designs(fullfile(runDir, 'surrogate_designs'), fullfile(outDir, 'surrogate_designs'), tol, 'surrogate');
 end
 if wanted('transition_tests') && isfile(fullfile(runDir, 'transition_tests', 'forces.csv'))
     transitionTests(fullfile(runDir, 'transition_tests'), fullfile(outDir, 'transition_tests'), tol);
@@ -362,7 +369,8 @@ end
 end
 
 %% ------------------------------------------------------------------ design study
-function designs(in, out, tol)
+function designs(in, out, tol, airfoilSet)
+if nargin < 4, airfoilSet = ''; end
 if ~exist(out, 'dir'), mkdir(out); end
 T = readtable(fullfile(in, 'forces.csv'));
 H = readtable(fullfile(in, 'history.csv'));
@@ -508,7 +516,7 @@ if ~isempty(S)
     if ~isempty(S), writetable(S, fullfile(out, 'surface.csv')); end
 end
 
-D = designStudyAirfoils();
+D = designStudyAirfoils(airfoilSet);
 D = D(ismember(D.name, F.design), :);                % the airfoils that have been run, NACA 2412 first
 order = D.name';
 label = cell2struct(D.label, D.name, 1);
@@ -567,13 +575,20 @@ for m = 1:size(pairs, 1)
             if isnan(best(k, 1)), continue; end           % no runs of this airfoil with this model yet
             if strcmp(src{1}, 'cfd'), method = pairs{m, 1}; else, method = ['xfoil_' pairs{m, 2}]; end
             sel = strcmp(F.model, pairs{m, 1}) & strcmp(F.design, order{k});
+            base = 1;                                     % the original: NACA 2412, or for a set the same airfoil
+            if ~isempty(airfoilSet)
+                base = find(strcmp(order, regexp(order{k}, '^naca\d{4}', 'match', 'once')), 1);
+            end
+            if isempty(base), gain = NaN; else, gain = 100 * (best(k, 1) / best(base, 1) - 1); end
             P(end+1, :) = {method, order{k}, sum(sel), best(k, 1), best(k, 2), best(k, 3), best(k, 4), best(k, 5), ...
-                100 * (best(k, 1) / best(1, 1) - 1), all(F.steady(sel))}; %#ok<AGROW>
+                gain, all(F.steady(sel))}; %#ok<AGROW>
         end
     end
 end
+gainName = 'gain_over_naca2412_percent';
+if ~isempty(airfoilSet), gainName = 'gain_over_original_percent'; end
 P = cell2table(P, 'VariableNames', {'method', 'design', 'angles', 'best_LD', 'alpha_best', 'CL_best', 'LD_min_at_best', ...
-    'LD_max_at_best', 'gain_over_naca2412_percent', 'all_cfd_runs_steady'});
+    'LD_max_at_best', gainName, 'all_cfd_runs_steady'});
 writetable(P, fullfile(out, 'peaks.csv'));
 
 % The force cycle of the Transition SST runs, shown for NACA 2412 at 4 deg: forces of every

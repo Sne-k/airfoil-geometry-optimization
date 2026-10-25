@@ -86,8 +86,10 @@ gives 107.5 ± 0.5 against 104.1 ± 2.8 with a twelfth of the XFOIL analyses (Ma
 S1223 it falls back every time and is no worse (126.8 against 122.9, p = 0.19). At equal budget on NACA
 2412 (free transition) it reaches 140.3 against 126.1 to 132.7 for GA, particle swarm and Bayesian
 optimisation, and against Xoptfoil2 on the six airfoils it is level or ahead except where Xoptfoil2 breaks
-the moment limit ([results/surrogate](results/surrogate/README.md)). The re-analysis of the final designs
-with all safeguards is still running.
+the moment limit. All 64 final designs pass the safeguards against false XFOIL solutions, and Fluent
+confirms the gains of the NACA 2412 and NACA 0012 surrogate designs: fully turbulent +6.5 % and +14.1 %
+(XFOIL tripped: +7.1 % and +22.1 %), with Transition SST +15.0 % and +50.9 %
+([results/surrogate](results/surrogate/README.md)).
 
 ## What is new, and what is not
 
@@ -96,11 +98,13 @@ with all safeguards is still running.
   turbulence is matched to Ncrit, together with a fully turbulent bound (Adler et al. 2022 compare with
   fully turbulent RANS; Abouzoul et al. 2026 check morphing optima with Transition SST); the false-solution finding with two validated
   safeguards; a surrogate-assisted optimiser that verifies every kept design with XFOIL and checks
-  whether its surrogate can be trusted for the airfoil, tested on airfoils it never saw (the literature
-  check of this point is still open); a reporting checklist; open code in which every number is traceable.
+  whether its surrogate can be trusted for the airfoil, tested on airfoils it never saw. Li, Du & Martins
+  (2022) name extrapolation as an open problem of learned models and describe ways to avoid it (a smaller
+  design space, more data), not a check at run time that falls back to the analysis code; a reporting checklist; open code in which every number is traceable.
 - **Not new:** the GA → fmincon optimiser, surrogate-assisted optimisation as such (a neural network with a
   GA on RANS, Ribeiro et al. 2012; multi-fidelity surrogates with XFOIL and RANS, Meliani et al. 2019 and
-  Mar Aye et al. 2023; a network optimised for three of our airfoils, Khan et al. 2025), CST shapes, XFOIL, Transition SST, and the two-condition robust objective (Caboni et al. 2018). Robust laminar-flow design is studied by Hollom & Qin and others
+  Mar Aye et al. 2023; a network optimised for three of our airfoils, Khan et al. 2025; reviewed by Li,
+  Du & Martins 2022), CST shapes, XFOIL, Transition SST, and the two-condition robust objective (Caboni et al. 2018). Robust laminar-flow design is studied by Hollom & Qin and others
   ([docs/literature.md](docs/literature.md)).
 
 ## Limits to state openly
@@ -184,5 +188,6 @@ with all safeguards is still running.
 ## State
 
 All computations are finished; the results are final and published in this repository. The manuscript
-is the next step: scope (with or without the morphing studies), format and target journal are open
+is the next step. The morphing studies of the repository are not part of the paper (decided on 25 October
+2026); one result on morphing paths goes into the discussion. Format and target journal are open
 ([docs/paper_outline.md](docs/paper_outline.md)).
