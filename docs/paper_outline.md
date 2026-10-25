@@ -115,7 +115,11 @@ the question, the approach and the contributions.
 
 **6. Discussion.** What a reported gain means; the reporting checklist; limits (two-dimensional, no
 experiment of our own, XFOIL's free-transition drag is 11–14 % low, one Reynolds number for the search,
-the Transition SST runs do not all settle).
+the Transition SST runs do not all settle). One short paragraph on reaching a robust design gradually:
+along a linear blend from the original to the robust designs every intermediate shape is better than the
+original with free and with tripped flow, and the objective rises at every step (80 % of the deformation
+gives 83 to 89 % of the gain); Abouzoul et al. (2026) judge morphing targets by such paths
+(`results/surrogate/morphing_paths.csv`).
 
 **7. Conclusions.**
 
@@ -136,8 +140,11 @@ the Transition SST runs do not all settle).
 
 ## Open decisions (for the team)
 
-1. **Scope.** Keep the morphing studies in this paper or leave them for a second one. They are a
-   different question; leaving them out makes the paper tighter.
+1. **Scope.** Decided on 25 October 2026: the morphing studies are not part of the paper. They answer a
+   different question, are XFOIL-only and predate the safeguards and the RANS checks, and Abouzoul et al.
+   (2026) already combine surrogate optimisation, morphing and Transition SST on NACA 2412; a morphing
+   section would make the contribution less clear. The morphing-path result goes into the discussion
+   (one paragraph). The studies stay in the repository as part of the project's history.
 2. **Journal.** Candidates to compare by scope and review time: *Aerospace Science and Technology*,
    *Journal of Aircraft*, *The Aeronautical Journal*, *CEAS Aeronautical Journal*, *Aerospace* (MDPI). The
    choice sets the length and the reference style.

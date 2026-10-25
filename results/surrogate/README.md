@@ -208,6 +208,24 @@ when tripped):
 - `summary.csv` and `robustness_summary.csv` take seed 1 only, as in the population study; the tables
   above use all seeds (`conditions.csv`).
 
+## Morphing paths
+
+Peak CL/CD along a linear blend of the surfaces from the original (0) to a robust design (1), 21 shapes,
+free transition and tripped at 5 % chord, consensus polars ([morphing_paths.csv](morphing_paths.csv);
+`MATLAB/Surrogate/morphing_paths.m`):
+
+| Path | Original: free / tripped / mean | Blend 0.5 | Blend 0.8 | Design |
+|---|---:|---:|---:|---:|
+| NACA 2412 → surrogate design (seed 3) | 104.5 / 73.0 / 88.8 | 125.6 / 76.9 / 101.3 | 134.2 / 77.8 / 106.0 | 138.3 / 78.0 / 108.2 |
+| NACA 2412 → current optimiser (robust_trip_s3) | 104.5 / 73.0 / 88.8 | 126.3 / 74.8 / 100.5 | 133.8 / 75.3 / 104.5 | 138.2 / 75.2 / 106.7 |
+| NACA 0012 → surrogate design (seed 3) | 76.4 / 62.3 / 69.4 | 95.1 / 69.3 / 82.2 | 115.5 / 72.9 / 94.2 | 123.3 / 75.1 / 99.2 |
+
+Every intermediate shape is better than the original with free and with tripped flow, and the mean of the
+two rises at every step on all three paths; 80 % of the deformation gives 89 % (NACA 2412) and 83 %
+(NACA 0012) of the gain in the mean. With tripped flow the surrogate path is ahead of the path to the
+design of the current optimiser at every step after the start. The pitching moment grows smoothly (NACA 2412: −0.048 to
+−0.061). The exact and rounded coordinates agree within 0.3 % at every shape.
+
 ## RANS check (Fluent)
 
 The surrogate designs of NACA 2412 and NACA 0012 (seed 3 of each, the best by the objective; for NACA 0012

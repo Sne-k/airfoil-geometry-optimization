@@ -188,5 +188,6 @@ confirms the gains of the NACA 2412 and NACA 0012 surrogate designs: fully turbu
 ## State
 
 All computations are finished; the results are final and published in this repository. The manuscript
-is the next step: scope (with or without the morphing studies), format and target journal are open
+is the next step. The morphing studies of the repository are not part of the paper (decided on 25 October
+2026); one result on morphing paths goes into the discussion. Format and target journal are open
 ([docs/paper_outline.md](docs/paper_outline.md)).
