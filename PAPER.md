@@ -75,7 +75,7 @@ optimisations. Two safeguards were added and validated: a friction floor using X
 points, and every analysis at exact and rounded coordinates
 ([False XFOIL solutions](results/population/README.md#false-xfoil-solutions)).
 
-**9. A cheaper optimiser that knows when not to trust itself (preliminary).** A neural-network
+**9. A cheaper optimiser that knows when not to trust itself.** A neural-network
 surrogate of XFOIL, trained on the population study, ranks the candidates; every kept design is analysed
 with XFOIL. A trust check with limits from the training airfoils only decides whether the surrogate may
 be used; if not, a closed-loop correction and then the usual XFOIL search take over. On six airfoils it
@@ -84,11 +84,11 @@ XFOIL analyses than the current optimiser for a similar or higher result; on S12
 airfoils, it rejected itself and the fallback gave 128.3 against 125.7. With ten seeds, on NACA 2412 it
 gives 107.5 ± 0.5 against 104.1 ± 2.8 with a twelfth of the XFOIL analyses (Mann-Whitney p = 0.0004); on
 S1223 it falls back every time and is no worse (126.8 against 122.9, p = 0.19). At equal budget on NACA
-2412 (free transition) it reaches 140.3 against 126.1 to 132.7 for GA, particle swarm and Bayesian
+2412 (free transition) it reaches 140.3 against 126.0 to 132.7 for GA, particle swarm and Bayesian
 optimisation, and against Xoptfoil2 on the six airfoils it is level or ahead except where Xoptfoil2 breaks
 the moment limit. All 64 final designs pass the safeguards against false XFOIL solutions, and Fluent
-confirms the gains of the NACA 2412 and NACA 0012 surrogate designs: fully turbulent +6.5 % and +14.1 %
-(XFOIL tripped: +7.1 % and +22.1 %), with Transition SST +15.0 % and +50.9 %
+confirms the gains of the NACA 2412 and NACA 0012 surrogate designs: fully turbulent +6.6 % and +14.1 %
+(XFOIL tripped: +7.2 % and +22.1 %), with Transition SST +15.0 % and +50.9 %
 ([results/surrogate](results/surrogate/README.md)).
 
 ## What is new, and what is not

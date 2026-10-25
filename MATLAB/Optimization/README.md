@@ -112,7 +112,7 @@ designs only. `'Curvature', false` switches the limits off.
 
 Every design that is kept was analysed with XFOIL; the surrogate only ranks candidates. Results on six
 airfoils that the surrogate never saw: [results/surrogate](../../results/surrogate/README.md). The trained
-models and the training scripts are not in the repository yet.
+models and the scripts of their training and benchmark: [MATLAB/Surrogate](../Surrogate/README.md).
 
 Outputs, in `MATLAB/output/optimize_airfoil/<name>/`:
 - `<name>_optimized.dat` (199–299 points, loads in XFLR5)
