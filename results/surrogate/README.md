@@ -20,7 +20,8 @@ against the current optimiser (GA → fmincon), on six airfoils that the surroga
   prediction error on the candidates at most 6.2 % (90th percentile of a grouped cross-validation); at
   least half of the candidates with a usable polar.
 - The values below are the objectives that the optimiser recorded with XFOIL, with the friction floor.
-  The final designs have not yet been put through the full re-analysis of the population study.
+  All final designs were then analysed again with the safeguards of the population study and reproduce
+  them ([Final designs through the safeguards](#final-designs-through-the-safeguards-of-the-population-study)).
 
 All runs: [benchmark_runs.csv](benchmark_runs.csv), with the XFOIL-analysed designs, run time, trust
 check and code version of every run.
@@ -32,7 +33,7 @@ check and code version of every run.
 | NACA 2412 | 88.7 | 107.6 / 106.8 / 108.2 | 107.5 | 84 | 12 min | 105.5 / 103.3 / 106.8 | 105.2 | 915 | 41 min |
 | NACA 0012 | 69.9 | 98.7 / 98.4 / 99.2 ¹ | 98.8 | 328 | 22 min | 84.8 / 94.2 / 97.9 | 92.3 | 890 | 41 min |
 | NACA 4415 | 89.8 | 108.4 / 108.9 / 108.2 | 108.5 | 58 | 4 min | 108.8 / 106.1 / 108.5 | 107.8 | 982 | 41 min |
-| Clark Y | 96.8 | 125.2 / 125.0 / 125.4 | 125.2 | 139 | 11 min | 124.1 / 123.9 / 122.3 | 123.4 | 1018 | 51 min |
+| Clark Y | 96.8 | 125.1 / 125.0 / 125.4 | 125.2 | 139 | 11 min | 124.1 / 123.9 / 122.3 | 123.4 | 1018 | 51 min |
 | SD7062 | 99.7 | 119.9 / 118.4 / 120.4 | 119.6 | 54 | 6 min | 120.3 / 119.5 / 120.4 | 120.0 | 1063 | 47 min |
 | S1223 | 102.4 | 128.3 / 130.1 / 126.5 ¹ | 128.3 | 1096 | 52 min | 126.8 / 126.9 / 123.4 | 125.7 | 1122 | 51 min |
 
@@ -43,7 +44,7 @@ airfoils beyond the distance limit, and the S1223 runs above were not trusted an
 
 - The surrogate was trusted in 14 of 18 runs. In those, it needed 4 to 22 times fewer XFOIL analyses
   than the current optimiser with the same seed. Its result was higher in 9 of the 14 runs and at most
-  1.1 lower in the other 5 (NACA 4415 seeds 1 and 3, SD7062 all three seeds).
+  1.0 lower in the other 5 (NACA 4415 seeds 1 and 3, SD7062 all three seeds).
 - S1223 lies far outside the training airfoils (distance 7.48 against the limit 5.78; the other five are
   at 1.17 to 2.78). The check rejects the surrogate in all three seeds, and the fallback then gives a
   result similar to the current optimiser, at a similar cost.
@@ -122,7 +123,7 @@ trust limits from those airfoils: distance 5.15, median error 7.0 %). All runs:
 |---|---:|---:|---:|---:|
 | surrogate | 139.3 / 139.8 / 141.9 | 140.3 ± 1.4 | 13 | 4 min |
 | genetic algorithm | 127.7 / 133.4 / 128.4 | 129.9 ± 3.1 | 359 | 10 min |
-| particle swarm | 128.6 / 123.1 / 126.5 | 126.1 ± 2.8 | 79 | 3 min |
+| particle swarm | 128.6 / 123.1 / 126.5 | 126.0 ± 2.8 | 79 | 3 min |
 | Bayesian optimisation | 134.3 / 131.0 / 132.7 | 132.7 ± 1.6 | 648 | 92 min ² |
 
 ² Seeds 1 and 2; the run time of seed 3 includes a standby of the laptop.
@@ -177,7 +178,9 @@ All final designs of the benchmark above (surrogate optimiser and current optimi
 
 - **No false XFOIL solutions.** `xfoil_sensitivity_check.m`: every one of the 64 designs reproduces its
   recorded objective, and with the friction floor the exact and rounded coordinates at 160 and 200 panel
-  nodes agree within 0.27 % (surrogate) and 0.23 % (current optimiser). No design meets the rerun rule.
+  nodes agree within 0.27 % (surrogate) and 0.23 % (current optimiser), except for one design of the current
+  optimiser (S1223, seed 1) whose rounded coordinates give no usable polar at 200
+  nodes; its other three values agree within 0.04 %. No design meets the rerun rule.
 - **The seven conditions** (`collect_population_results.m`; consensus polars). Median gain in peak CL/CD
   over the original, all 32 designs of each optimiser:
 
@@ -243,12 +246,12 @@ Best CL/CD over the angles run (in brackets: the gain over the original of the s
 |---|---:|---:|---:|---:|
 | NACA 2412 (design study) | 122.1 | 103.3 | 65.8 | 72.0 |
 | current optimiser, robust_trip_s3 (design study) | 142.9 (+17.1 %) | 137.9 (+33.5 %) | 67.9 (+3.3 %) | 74.5 (+3.5 %) |
-| surrogate optimiser, seed 3 | 140.4 (+15.0 %) | 137.7 (+33.3 %) | 70.1 (+6.5 %) | 77.1 (+7.1 %) |
+| surrogate optimiser, seed 3 | 140.4 (+15.0 %) | 137.7 (+33.3 %) | 70.1 (+6.6 %) | 77.1 (+7.2 %) |
 | NACA 0012 | 91.3 | 75.5 | 59.3 | 60.9 |
 | surrogate optimiser, seed 3 (fallback) | 137.8 (+50.9 %) | 123.1 (+63.0 %) | 67.7 (+14.1 %) | 74.3 (+22.1 %) |
 
 - **RANS confirms the gains of both surrogate designs with both models.** Fully turbulent, the NACA 2412
-  design gains 6.5 %, as XFOIL predicts with tripped flow (7.1 %), and twice as much as the design of the
+  design gains 6.6 %, as XFOIL predicts with tripped flow (7.2 %), and twice as much as the design of the
   current optimiser (3.3 %). With the transition model it gains 15.0 % against 17.1 % for that design.
 - **As in the design study, the free-transition gain is smaller in RANS than in XFOIL** (15.0 % against
   33.3 % for NACA 2412, 50.9 % against 63.0 % for NACA 0012); the fully turbulent gain is close to XFOIL's
