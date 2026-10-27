@@ -275,6 +275,7 @@ end
 exportgraphics(f, fullfile(outDir, 'gains_by_condition.png'), 'Resolution', 130);
 close(f);
 if ~isempty(A)
+    A = A(abs(A.LD_original) >= 1, :);              % a gain against CL/CD of about 0 (symmetric originals at 0 deg) is not defined
     f = figure('Color', 'w', 'Position', [60 60 700 430], 'Visible', 'off');
     hold on;  box on;  grid on;
     for k = 1:numel(names)

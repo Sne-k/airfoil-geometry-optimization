@@ -77,7 +77,9 @@ At the design condition, the same designs measured three ways (`conditions.csv`,
 
 A design optimised at 2° shows about twice the gain at that angle that it has in peak CL/CD, and almost
 none at the design lift; the largest single value at 2° is 141 %. `gain_by_angle.csv` and the figure give
-the gain of the peak-optimised designs at every angle.
+the gain of the peak-optimised designs at every angle. The figure leaves out the three symmetric originals
+(NACA 0009, 0012, 0015) at 0°, where their CL/CD is about zero and a gain relative to it is not defined;
+the CSV keeps them.
 
 ![Gain by reporting angle](gain_by_angle.png)
 
