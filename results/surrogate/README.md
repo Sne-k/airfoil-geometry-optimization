@@ -107,7 +107,7 @@ from about 200 designs on.
 Mann-Whitney U test (two-sided) of the two optimisers: NACA 2412 p = 0.0004; S1223 p = 0.19. On NACA
 2412 the surrogate optimiser is better, with a twelfth of the XFOIL analyses and a sixth of the spread.
 On S1223 it rejects itself in every seed, and the fallback is no worse than the current optimiser.
-He et al. (2019) find that RANS optimisations reach the same optimum from any start; with XFOIL the
+He et al. (2019) find that RANS optimisations from various starting shapes reach the same optimum; with XFOIL the
 current optimiser ends anywhere between 98.1 and 106.9 on NACA 2412, so a single run says little about it.
 
 ## Optimiser comparison at equal budget (NACA 2412, peak CL/CD, free transition)
