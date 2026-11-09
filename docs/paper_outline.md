@@ -41,7 +41,8 @@ the question, the approach and the contributions.
 - XFOIL-based optimisation and its safeguards (Xoptfoil2; Pangas & Gamboa 2025; Michael et al. 2026).
 - Dependence of the optimum on the analysis tool (Adler et al. 2022; Hoyos et al. 2022).
 - Checks with RANS (Bashir et al. 2021; Abouzoul et al. 2026).
-- Robust design under transition uncertainty for laminar-flow airfoils (Hollom & Qin; Zhao et al.; Li et al.).
+- Robust design of laminar-flow airfoils: against uncertain Mach number and lift (Li et al. 2013; Zhao et al.)
+  and against transition uncertainty (Hollom & Qin).
 - The audit: how gains are reported (metric, repeats, checks).
 
 **3. Methods.** From `docs/methods.md`:
@@ -104,8 +105,8 @@ the question, the approach and the contributions.
   Meliani et al. (2019) let only the high-fidelity model update the best solution, the same principle as
   analysing every kept design with XFOIL; their surrogate is built for one problem, ours is trained once on
   the logs of earlier optimisations (10 341 and 43 737 XFOIL designs, no extra sampling), where cross-airfoil
-  models in the review need about 10⁵ dedicated RANS samples. Li et al. ask for relative errors below 1 %
-  for data-based optima; in the 21 trusted runs ours was 0.1 to 4.2 % on the candidates, which is enough because the surrogate only
+  models in the review need about 10⁵ dedicated RANS samples. Li et al. ask data-based models for relative errors below 1 %
+  if their optima are to match CFD-based ones; in the 21 trusted runs ours was 0.1 to 4.2 % on the candidates, which is enough because the surrogate only
   ranks and XFOIL decides. Transition makes the objective discontinuous (Li et al.), one reason for the
   gradient-free global stage. Michael et al. (2026) save 61 % of the XFOIL
   calls with a geometric filter (S1223, NACA 2412); our trusted NACA 2412 runs need 92 % fewer (another

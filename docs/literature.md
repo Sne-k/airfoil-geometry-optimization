@@ -63,7 +63,7 @@ lead to, and a draft reporting checklist.
 | Deb, K. (2000). An efficient constraint handling method for genetic algorithms. *Computer Methods in Applied Mechanics and Engineering* 186(2–4), 311–338. doi:10.1016/S0045-7825(99)00389-8 | feasibility rules used here | abstract |
 | Owoyele, O. & Pal, P. (2021). A novel machine learning-based optimization algorithm (ActivO) for accelerating simulation-driven engine design. *Applied Energy* 285, 116455. doi:10.1016/j.apenergy.2021.116455 | the optimiser used by Song et al. (2022) | abstract |
 | Li, J., Du, X. & Martins, J. R. R. A. (2022). Machine learning in aerodynamic shape optimization. *Progress in Aerospace Sciences* 134, 100849. doi:10.1016/j.paerosci.2022.100849 | review of machine learning for design space, aerodynamic evaluation and optimisation architecture. Most prediction models interpolate and lose accuracy when they extrapolate; extrapolation is kept down by shrinking the design space (geometric filtering, e.g. a validity model trained on over 10 000 airfoils) and by more training data, and extrapolatory models are named as an open problem; no check at run time of whether a model may be used is described. Data-based airfoil models trained across many airfoils (about 10⁵ RANS samples each; Webfoil) reach mean drag errors of 0.1 to 5 counts; relative errors below 1 % are said to be needed for optima like those of CFD-based optimisation. Laminar–turbulent transition makes objectives discontinuous, which hampers gradient-based optimisation. Recommends that ML studies end with a comparison with state-of-the-art methods | read (full text, open access) |
-| He, X., Li, J., Mader, C. A., Yildirim, A. & Martins, J. R. R. A. (2019). Robust aerodynamic shape optimization — from a circle to an airfoil. *Aerospace Science and Technology* 87, 48–61. doi:10.1016/j.ast.2019.01.051 | robustness of the optimisation process (not of the design): parametrisation, mesh deformation and flow-solver failures on the ADODG NACA 0012 and RAE 2822 benchmarks. Reported optima of the same benchmark differ between groups by up to 23 drag counts (solver, mesh, parametrisation, constraints); RANS optimisations from many starting shapes, including a circle, reach the same optimum, which supports unimodality of these RANS problems | read (full text) |
+| He, X., Li, J., Mader, C. A., Yildirim, A. & Martins, J. R. R. A. (2019). Robust aerodynamic shape optimization — from a circle to an airfoil. *Aerospace Science and Technology* 87, 48–61. doi:10.1016/j.ast.2019.01.051 | robustness of the optimisation process (not of the design): parametrisation, mesh deformation and flow-solver failures on the ADODG NACA 0012 and RAE 2822 benchmarks. For the inviscid (Euler) NACA 0012 case, the optimal drag reported by different groups differs by up to 23 counts (solver, mesh, parametrisation, constraints); RANS optimisations of the RAE 2822 from various starting shapes, including random perturbations, all converge to the reference optimum, and one started from a circle reaches almost the same optimum, which supports unimodality of these RANS problems | read (full text) |
 | Meliani, M., Bartoli, N., Lefebvre, T., Bouhlel, M.-A., Martins, J. R. R. A. & Morlier, J. (2019). Multi-fidelity efficient global optimization: methodology and application to airfoil shape design. AIAA Aviation 2019 Forum, paper 2019-3236. doi:10.2514/6.2019-3236 | multi-fidelity Bayesian optimisation (recursive co-kriging, expected improvement, a criterion for which fidelity to query) with XFOIL as the low fidelity (1/200 of the cost) and ADflow RANS as the high fidelity; one subsonic airfoil (M = 0.25, Re = 6 × 10⁶, SVD modes, 9 and 15 variables, maximum L/D, and minimum drag with CL and CM constraints). Only high-fidelity values update the best solution. About half the cost of single-fidelity Bayesian optimisation; in the 15-variable case 110.5 against 110.7 of the gradient-based optimum with 8 RANS and 437 XFOIL analyses after a starting sample of 16 and 744. The surrogate is built for the one problem | read (full text) |
 | Xoptfoil2, J. Guenzel, <https://github.com/jxjo/Xoptfoil2> (2.0.0) | XFOIL-based optimiser with curvature constraints against numerical artefacts | read (documentation and source) |
 
@@ -263,8 +263,8 @@ Web of Science must still be checked.
    within 6 %. We did not find a study that takes one design problem and separates the reported gain
    into its parts: the metric, numerical artefacts, shape artefacts, the transition assumption, and
    what survives in RANS.
-   He et al. (2019) find that optima reported for the same RANS benchmark differ by up to 23 drag counts
-   between groups, and Morgado et al. (2016) find XFOIL at least as close to wind-tunnel data as two RANS
+   He et al. (2019) find that optimal drag values reported for the same inviscid benchmark (NACA 0012,
+   Euler) differ by up to 23 counts between groups, and Morgado et al. (2016) find XFOIL at least as close to wind-tunnel data as two RANS
    models at Re = 2 × 10⁵, so neither tool can serve as the reference by default.
    *This project so far:*
    - Smoothness limits cost 3.8 % of peak CL/CD on NACA 2412.
@@ -292,7 +292,7 @@ Web of Science must still be checked.
    abstract of 238 mentions them. Michael et al. (2026), read in full outside the audit sample, also show
    one particle-swarm run per configuration.
    *This project:* the spread over three seeds is ±1.2 to ±9.1 in peak CL/CD (NACA 4412: 158.6–176.9).
-   For gradient-based RANS optimisation He et al. (2019) reach the same optimum from many starting shapes;
+   For gradient-based RANS optimisation He et al. (2019) reach the same optimum from various starting shapes;
    with XFOIL and a stochastic optimiser the seeds end at different designs, so one run is not enough.
 4. **Comparing optimisers fairly.** The ranking of GA, particle swarm and Bayesian optimisation depends on
    whether the budget counts all evaluations or only XFOIL analyses. Under smoothness limits, particle
@@ -320,8 +320,8 @@ Web of Science must still be checked.
      against 19 of 30 single-point designs.
    - At the design lift coefficient the designs optimised for peak CL/CD keep their gain at Ncrit 5
      (+24.9 and +24.7 %), while the designs optimised at that lift lose half of it (+31.0 and +15.0 %).
-     This agrees with Hollom & Qin (2018), whose minimum-drag designs at fixed lift lose laminar flow
-     fastest when Ncrit falls: whether a design is sensitive to Ncrit depends on the formulation.
+     This agrees with Hollom & Qin (2018), whose minimum-drag airfoils are the least robust to a drop
+     in Ncrit: whether a design is sensitive to Ncrit depends on the formulation.
    - XFOIL's false low-drag solutions are a hazard in their own right: in this study they existed only at
      one panelling or only at the exact design coordinates, and steered 3 of 217 optimisations
      (`results/population/README.md`, False XFOIL solutions). Adler et al. (2022) describe a milder
