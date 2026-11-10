@@ -311,6 +311,7 @@ sensitivity_designs          % the designs at other Ncrit and Reynolds numbers
 run_population_study         % 217 optimisations for 30 airfoils; 11 of them need coordinate files
                              % from the UIUC database (see the help text of the script)
 collect_population_results   % tables and figures in results/population
+trip_sensitivity             % the tripped condition with the trip at 2.5, 5 and 10 % chord
 xfoil_sensitivity_check      % the objective of every final design at exact and rounded coordinates
 test_false_solutions         % reproduces the known false XFOIL solutions and the friction floor
 % in MATLAB/CFD: needs ANSYS Fluent, see MATLAB/CFD/README.md
