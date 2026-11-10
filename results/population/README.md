@@ -127,6 +127,30 @@ airfoil (seed 1 of both):
 - Over the seven conditions (`robustness_summary.csv`), the median of the lowest gain of a design is
   +3.1 % for `robusttrip`, −1.6 % for `peak`, −5.2 % for `cldes` and −10.9 % for `alpha2`.
 
+## Position of the trip
+
+The tripped condition fixes transition at 5 % chord on both surfaces. To see whether the results depend
+on that choice, `MATLAB/Paper/trip_sensitivity.m` repeats the tripped analysis with the trip at 2.5 % and
+at 10 % chord for the 30 originals and the seed-1 designs of five formulations, with the analysis of
+`conditions.csv` (160 nodes, exact against rounded coordinates, friction floor). Run with the trip at
+5 %, the script gives the published peak CL/CD of the 30 `peak` designs and their originals exactly
+(`trip_sensitivity/control_5pct_peak.csv`). Median gain of the peak CL/CD with tripped boundary layers,
+with the designs worse than their original in brackets:
+
+| Trip at | `peak` | `alpha2` | `cldes` | `nocurv` | `robusttrip` | `robusttrip` better than `peak` |
+|---|---:|---:|---:|---:|---:|---:|
+| 2.5 % chord | −1.0 % (16 of 30) | −8.9 % (26 of 30) | −4.6 % (22 of 30) | −0.3 % (16 of 30) | +3.9 % (9 of 30) | 26 of 30 |
+| 5 % chord (`summary.csv`) | −1.6 % (19 of 30) | −9.4 % (26 of 30) | −5.2 % (21 of 30) | −1.1 % (17 of 29) | +3.6 % (9 of 30) | 29 of 30 |
+| 10 % chord | −1.4 % (18 of 30) | −10.3 % (26 of 30) | −4.6 % (21 of 30) | −0.5 % (16 of 30) | +6.1 % (10 of 30) | 29 of 30 |
+
+- **The conclusions do not depend on the trip position.** At every position the four single-condition
+  formulations lose with tripped flow, `robusttrip` gains, and the order of the formulations is the same.
+- **The medians of the single-condition formulations move by at most 0.9 points** from their value with
+  the trip at 5 %. The gain of `robusttrip`, which was optimised with the trip at 5 %, is 2.6 points
+  higher with the trip at 10 %.
+- One `nocurv` design has no stable tripped polar with the trip at 5 %; with the trip at 2.5 % and 10 %
+  all 30 have one.
+
 ## Robust formulations for NACA 2412
 
 Four formulations, each maximising the peak CL/CD under two conditions at once:
@@ -243,4 +267,5 @@ were repeated and reached the same objective (128.99 and 185.84).
 | `cst_coefficients.csv` | the exact CST coefficients of every final design (the `.dat` files are rounded to 6 decimals) |
 | `false_solution_cases.csv` | the known false solutions (six designs) and one control design, with exact CST coefficients and the expected objective at 160 and 200 nodes without and with the floor; `MATLAB/Paper/test_false_solutions.m` reproduces them |
 | `friction_floor_validation.csv` | the validation of the friction floor: 66 shapes at seven conditions, lowest CD over the floor, points below 0.9 times it, peak CL/CD with and without them |
+| `trip_sensitivity/` | the tripped condition with the trip at 2.5 % and 10 % chord (`trip_conditions.csv`, one row per design and trip position; `trip_summary.csv`, statistics per formulation and trip position) and the control run at 5 % (`control_5pct_peak.csv`); `MATLAB/Paper/trip_sensitivity.m` |
 | `airfoils/` | coordinates of the optimised designs |
